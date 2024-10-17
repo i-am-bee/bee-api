@@ -23,7 +23,10 @@ export default {
     target: 'node22.2.0',
     outDir: './dist',
     lib: {
-      entry: glob.sync(resolve(__dirname, 'src/**/*.ts')),
+      entry: [
+        ...glob.sync(resolve(__dirname, 'src/**/*.ts')),
+        ...glob.sync(resolve(__dirname, 'seeders/**/*.ts'))
+      ],
       formats: ['es']
     },
     rollupOptions: {
