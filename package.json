@@ -15,6 +15,7 @@
     "test:e2e:watch": "vitest watch tests/e2e",
     "mikro-orm": "NODE_OPTIONS='--import tsx' mikro-orm --config ./src/mikro-orm.config.ts",
     "prepare": "husky",
+    "lint": "eslint ./",
     "ts:check": "tsc --noEmit",
     "grpc:generate-types": "proto-loader-gen-types --defaults --keepCase --oneofs --longs=Number --enums=String --grpcLib=@grpc/grpc-js --outDir=./src/embedding/adapters/caikit/grpc/types ./src/embedding/adapters/caikit/grpc/protos/*.proto",
     "copyright": "./scripts/copyright.sh"
