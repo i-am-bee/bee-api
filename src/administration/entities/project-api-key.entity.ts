@@ -28,13 +28,17 @@ export class ProjectApiKey extends ProjectAdministrationScopedEntity {
   }
 
   @Property()
+  name: string;
+
+  @Property()
   key: string;
 
-  constructor({ key, ...rest }: ProjectApiKeyInput) {
+  constructor({ key, name, ...rest }: ProjectApiKeyInput) {
     super(rest);
     this.key = key;
+    this.name = name;
   }
 }
 
 export type ProjectApiKeyInput = ProjectAdministrationScopedEntityInput &
-  Pick<ProjectApiKey, 'key'>;
+  Pick<ProjectApiKey, 'key' | 'name'>;

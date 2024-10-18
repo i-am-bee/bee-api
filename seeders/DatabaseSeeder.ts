@@ -83,6 +83,7 @@ export class DatabaseSeeder extends Seeder {
       .getReference(projectUser.id, { wrapped: true });
     const projectApiKey = new ProjectApiKey({
       key: scryptApiKey(PROJECT_API_KEY),
+      name: 'test key',
       createdBy: ref(projectUser),
       project: ref(project)
     });
