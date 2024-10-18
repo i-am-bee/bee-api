@@ -96,6 +96,7 @@ export const BAM_API_KEY = getEnv('BAM_API_KEY', null);
 
 export const WATSONX_API_KEY = getEnv('WATSONX_API_KEY', null);
 export const WATSONX_PROJECT_ID = getEnv('WATSONX_PROJECT_ID', null);
+export const WATSONX_REGION = getEnv('WATSONX_REGION', null);
 
 export const CAIKIT_URL = getEnv('CAIKIT_URL', null);
 export const CAIKIT_CA_CERT = getEnv('CAIKIT_CA_CERT', null);

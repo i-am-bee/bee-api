@@ -48,7 +48,8 @@ import {
   OLLAMA_URL,
   OPENAI_API_KEY,
   WATSONX_API_KEY,
-  WATSONX_PROJECT_ID
+  WATSONX_PROJECT_ID,
+  WATSONX_REGION
 } from '@/config';
 
 export function getDefaultModel(backend: LLMBackend = LLM_BACKEND) {
@@ -137,6 +138,7 @@ export function createChatLLM(run: Loaded<Run>, backend: LLMBackend = LLM_BACKEN
       return WatsonXChatLLM.fromPreset(run.model as WatsonXChatLLMPresetModel, {
         apiKey: WATSONX_API_KEY,
         projectId: WATSONX_PROJECT_ID,
+        region: WATSONX_REGION ?? undefined,
         parameters: (parameters) => ({
           ...parameters,
           top_p: run.topP ?? parameters.top_p,
@@ -187,6 +189,7 @@ export function createCodeLLM(backend: LLMBackend = LLM_BACKEND) {
         modelId: 'meta-llama/llama-3-1-70b-instruct',
         apiKey: WATSONX_API_KEY,
         projectId: WATSONX_PROJECT_ID,
+        region: WATSONX_REGION ?? undefined,
         parameters: {
           decoding_method: 'greedy',
           include_stop_sequence: false,
