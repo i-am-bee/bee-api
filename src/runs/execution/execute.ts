@@ -52,6 +52,7 @@ import { LoadedRun } from '@/runs/execution/types.js';
 import { UserResource } from '@/tools/entities/tool-resources/user-resource.entity.js';
 import { SystemResource } from '@/tools/entities/tool-resources/system-resource.entity.js';
 import { BEE_OBSERVE_API_AUTH_KEY, BEE_OBSERVE_API_URL } from '@/config.js';
+import { Attachment } from '@/messages/attachment.entity';
 
 const agentExecutionTime = new Summary({
   name: 'agent_execution_time_seconds',
@@ -80,7 +81,7 @@ export async function executeRun(run: LoadedRun) {
     (message) =>
       new BaseMessage(
         message.role,
-        `${message.content}${message.attachments && message.attachments.length > 0 ? `\n\nFiles:\n${message.attachments.map((attachment) => attachment.file.id).join('\n')}` : ''}`,
+        `${message.content}${message.attachments && message.attachments.length > 0 ? `\n\nFiles:\n${message.attachments.map((attachment) => (attachment as Loaded<Attachment, 'file'>).file.$.filename).join('\n')}` : ''}`,
         {
           createdAt: message.createdAt
         }
