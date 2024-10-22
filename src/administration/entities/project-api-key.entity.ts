@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-import { Entity, Property } from '@mikro-orm/core';
+import { Entity, EventArgs, Property } from '@mikro-orm/core';
+import { requestContext } from '@fastify/request-context';
 
 import {
   ProjectAdministrationScopedEntity,
   ProjectAdministrationScopedEntityInput
 } from './project-administration-scoped.entity';
+
+import { inSeeder } from '@/context';
 
 @Entity()
 export class ProjectApiKey extends ProjectAdministrationScopedEntity {
@@ -37,6 +40,13 @@ export class ProjectApiKey extends ProjectAdministrationScopedEntity {
     super(rest);
     this.key = key;
     this.name = name;
+  }
+
+  override async authorize(_: EventArgs<any>) {
+    if (inSeeder()) return;
+    const projectPrincipal = requestContext.get('projectPrincipal');
+    if (projectPrincipal && this.createdBy.id === projectPrincipal.id) return;
+    super.authorize(_);
   }
 }
 

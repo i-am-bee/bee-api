@@ -56,7 +56,7 @@ export const projectAdministrationAccessFilter = async (
       if (projectPrincipal.role === ProjectRole.ADMIN) return { project: projectPrincipal.project };
       else
         return {
-          _id: projectPrincipal.id,
+          createdBy: projectPrincipal.id,
           project: projectPrincipal.project
         };
     default:
