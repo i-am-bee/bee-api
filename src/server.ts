@@ -89,10 +89,10 @@ try {
   app.register(filesModule, { prefix: '/v1' });
   app.register(vectorStoresModule, { prefix: '/v1' });
   app.register(vectorStoreFilesModule, { prefix: '/v1' });
+  app.register(apiKeysModule, { prefix: '/v1' });
   app.register(projectsModule, { prefix: '/v1' });
   app.register(projectUsersModule, { prefix: '/v1' });
   app.register(organizationUsersModule, { prefix: '/v1' });
-  app.register(apiKeysModule, { prefix: '/v1' });
 
   app.register(uiModule, { prefix: '/v1' });
 

@@ -59,7 +59,7 @@ import { Tag } from '@/swagger.js';
 
 export const apiKeysModule: FastifyPluginAsyncJsonSchemaToTs = async (app) => {
   app.post<{ Body: ApiKeyCreateBody; Params: ApiKeyCreateParams }>(
-    '/organization/projects/{project_id}/api_keys',
+    '/organization/projects/:project_id/api_keys',
     {
       schema: {
         body: apiKeyCreateBodySchema,
@@ -72,7 +72,7 @@ export const apiKeysModule: FastifyPluginAsyncJsonSchemaToTs = async (app) => {
   );
 
   app.get<{ Params: ApiKeyReadParams }>(
-    '/organization/projects/{project_id}/api_keys//{api_key_id}',
+    '/organization/projects/:project_id/api_keys/:api_key_id',
     {
       schema: {
         params: apiKeyReadParamsSchema,
@@ -85,7 +85,7 @@ export const apiKeysModule: FastifyPluginAsyncJsonSchemaToTs = async (app) => {
   );
 
   app.post<{ Params: ApiKeyUpdateParams; Body: ApiKeyUpdateBody }>(
-    '/organization/projects/{project_id}/api_keys/{api_key_id}',
+    '/organization/projects/:project_id/api_keys/:api_key_id',
     {
       schema: {
         params: apiKeyUpdateParamsSchema,
@@ -99,7 +99,7 @@ export const apiKeysModule: FastifyPluginAsyncJsonSchemaToTs = async (app) => {
   );
 
   app.get<{ Querystring: ApiKeysListQuery; Params: ApiKeyListParams }>(
-    '/organization/projects/{project_id}/api_keys',
+    '/organization/projects/:project_id/api_keys',
     {
       schema: {
         querystring: apiKeysListQuerySchema,
@@ -112,7 +112,7 @@ export const apiKeysModule: FastifyPluginAsyncJsonSchemaToTs = async (app) => {
   );
 
   app.delete<{ Params: ApiKeyDeleteParams }>(
-    '/organization/projects/{project_id}/api_keys/{api_key_id}',
+    '/organization/projects/:project_id/api_keys/:api_key_id',
     {
       schema: {
         params: apiKeyDeleteParamsSchema,

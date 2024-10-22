@@ -40,7 +40,7 @@ export function toDto(apiKey: Loaded<ProjectApiKey>, sensitiveId?: string): ApiK
     id: apiKey.id,
     name: apiKey.name,
     created_at: dayjs(apiKey.createdAt).unix(),
-    sensitive_id: sensitiveId
+    sensitive_id: typeof sensitiveId === 'string' ? sensitiveId : undefined
   };
 }
 
@@ -67,7 +67,7 @@ export async function createApiKey({
 
   await ORM.em.persistAndFlush(apiKey);
 
-  return toDto(apiKey, key);
+  return toDto(apiKey, keyValue);
 }
 
 export async function readApiKey({
