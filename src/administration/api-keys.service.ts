@@ -28,7 +28,7 @@ import { getProjectPrincipal } from './helpers';
 import { Project } from './entities/project.entity';
 
 import { createDeleteResponse } from '@/utils/delete';
-import { generateApiKey, scryptApiKey } from '@/auth/utils';
+import { API_KEY_PREFIX, generateApiKey, scryptApiKey } from '@/auth/utils';
 import { getUpdatedValue } from '@/utils/update';
 import { createPaginatedResponse, getListCursor } from '@/utils/pagination';
 import { ORM } from '@/database';
@@ -63,16 +63,19 @@ export async function createApiKey({
     key,
     createdBy: ref(authorProjectPrincipal),
     project: ref(project),
-    redactedValue: keyValue.replace(
-      keyValue.substring(5, keyValue.length - 3),
-      '*'.repeat(keyValue.length - 8)
-    )
+    redactedValue: redactProjectKeyValue(keyValue)
   });
 
   await ORM.em.persistAndFlush(apiKey);
 
   return toDto(apiKey, keyValue);
 }
+
+export const redactProjectKeyValue = (key: string) =>
+  key.replace(
+    key.substring(API_KEY_PREFIX.length + 2, key.length - 2),
+    '*'.repeat(key.length - 12)
+  );
 
 async function getApiKey({ project_id, api_key_id }: { project_id: string; api_key_id: string }) {
   const projectPrincipal = getProjectPrincipal();

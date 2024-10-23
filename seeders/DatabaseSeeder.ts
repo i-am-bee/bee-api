@@ -28,16 +28,17 @@ import { User } from '@/users/entities/user.entity';
 import { getDefaultModel } from '@/runs/execution/factory';
 import { SystemTools } from '@/tools/entities/tool-calls/system-call.entity';
 import { ProjectApiKey } from '@/administration/entities/project-api-key.entity';
-import { scryptApiKey } from '@/auth/utils';
+import { API_KEY_PREFIX, scryptApiKey } from '@/auth/utils';
 import {
   ORGANIZATION_ID_DEFAULT,
   ORGANIZATION_OWNER_ID_DEFAULT,
   PROJECT_ADMIN_ID_DEFAULT,
   PROJECT_ID_DEFAULT
 } from '@/config';
+import { redactProjectKeyValue } from '@/administration/api-keys.service';
 
 const USER_EXTERNAL_ID = 'test';
-const PROJECT_API_KEY = 'sk-testkey';
+const PROJECT_API_KEY = `${API_KEY_PREFIX}testkey`;
 
 export class DatabaseSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
@@ -85,7 +86,8 @@ export class DatabaseSeeder extends Seeder {
       key: scryptApiKey(PROJECT_API_KEY),
       name: 'test key',
       createdBy: ref(projectUser),
-      project: ref(project)
+      project: ref(project),
+      redactedValue: redactProjectKeyValue(PROJECT_API_KEY)
     });
     const assistant = new Assistant({
       model: getDefaultModel(),
