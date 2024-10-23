@@ -36,10 +36,14 @@ export class ProjectApiKey extends ProjectAdministrationScopedEntity {
   @Property()
   key: string;
 
-  constructor({ key, name, ...rest }: ProjectApiKeyInput) {
+  @Property()
+  redactedValue: string;
+
+  constructor({ key, name, redactedValue, ...rest }: ProjectApiKeyInput) {
     super(rest);
     this.key = key;
     this.name = name;
+    this.redactedValue = redactedValue;
   }
 
   override async authorize(_: EventArgs<any>) {
@@ -51,4 +55,4 @@ export class ProjectApiKey extends ProjectAdministrationScopedEntity {
 }
 
 export type ProjectApiKeyInput = ProjectAdministrationScopedEntityInput &
-  Pick<ProjectApiKey, 'key' | 'name'>;
+  Pick<ProjectApiKey, 'key' | 'name' | 'redactedValue'>;

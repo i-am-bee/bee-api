@@ -40,7 +40,7 @@ export function toDto(apiKey: Loaded<ProjectApiKey>, sensitiveId?: string): ApiK
     id: apiKey.id,
     name: apiKey.name,
     created_at: dayjs(apiKey.createdAt).unix(),
-    sensitive_id: typeof sensitiveId === 'string' ? sensitiveId : undefined
+    secret: typeof sensitiveId === 'string' ? sensitiveId : apiKey.redactedValue
   };
 }
 
@@ -62,7 +62,11 @@ export async function createApiKey({
     name,
     key,
     createdBy: ref(authorProjectPrincipal),
-    project: ref(project)
+    project: ref(project),
+    redactedValue: keyValue.replace(
+      keyValue.substring(5, keyValue.length - 3),
+      '*'.repeat(keyValue.length - 8)
+    )
   });
 
   await ORM.em.persistAndFlush(apiKey);
@@ -70,13 +74,28 @@ export async function createApiKey({
   return toDto(apiKey, keyValue);
 }
 
+async function getApiKey({ project_id, api_key_id }: { project_id: string; api_key_id: string }) {
+  const projectPrincipal = getProjectPrincipal();
+  // validate project is inside the Org
+  const project = await ORM.em.getRepository(Project).findOneOrFail({ id: project_id });
+  if (projectPrincipal.project.id !== project.id) {
+    throw new APIError({
+      message: 'Project user mismatch',
+      code: APIErrorCode.INVALID_INPUT
+    });
+  }
+  const apiKey = await ORM.em
+    .getRepository(ProjectApiKey)
+    .findOneOrFail({ id: api_key_id, project: project_id });
+
+  return apiKey;
+}
+
 export async function readApiKey({
   api_key_id,
   project_id
 }: ApiKeyReadParams): Promise<ApiKeyReadResponse> {
-  const apiKey = await ORM.em
-    .getRepository(ProjectApiKey)
-    .findOneOrFail({ id: api_key_id, project: project_id });
+  const apiKey = await getApiKey({ project_id, api_key_id });
   return toDto(apiKey);
 }
 
@@ -85,9 +104,7 @@ export async function updateApiKey({
   project_id,
   name
 }: ApiKeyUpdateParams & ApiKeyUpdateBody): Promise<ApiKeyUpdateResponse> {
-  const apiKey = await ORM.em
-    .getRepository(ProjectApiKey)
-    .findOneOrFail({ id: api_key_id, project: project_id });
+  const apiKey = await getApiKey({ project_id, api_key_id });
 
   apiKey.name = getUpdatedValue(name, apiKey.name);
   await ORM.em.flush();
@@ -103,6 +120,8 @@ export async function listApiKeys({
   before,
   project_id
 }: ApiKeysListQuery & ApiKeysListParams): Promise<ApiKeysListResponse> {
+  // validate project is in the org
+  await ORM.em.getRepository(Project).findOneOrFail({ id: project_id });
   const filter: FilterQuery<ProjectApiKey> = { project: project_id };
 
   const cursor = await getListCursor<ProjectApiKey>(
@@ -117,9 +136,7 @@ export async function deleteApiKey({
   api_key_id,
   project_id
 }: ApiKeyDeleteParams): Promise<ApiKeyDeleteResponse> {
-  const apiKey = await ORM.em
-    .getRepository(ProjectApiKey)
-    .findOneOrFail({ id: api_key_id, project: project_id });
+  const apiKey = await getApiKey({ project_id, api_key_id });
 
   apiKey.delete();
   await ORM.em.flush();

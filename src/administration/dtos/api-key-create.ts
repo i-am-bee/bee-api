@@ -17,7 +17,7 @@
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 
 import { apiKeySchema } from './api-key.js';
-import { apiKeyListParamsSchema } from './api-keys-list.js';
+import { apiKeysListParamsSchema } from './api-keys-list.js';
 
 export const apiKeyCreateBodySchema = {
   type: 'object',
@@ -29,7 +29,7 @@ export const apiKeyCreateBodySchema = {
 } as const satisfies JSONSchema;
 export type ApiKeyCreateBody = FromSchema<typeof apiKeyCreateBodySchema>;
 
-export const apiKeyCreateParamsSchema = apiKeyListParamsSchema;
+export const apiKeyCreateParamsSchema = apiKeysListParamsSchema;
 export type ApiKeyCreateParams = FromSchema<typeof apiKeyCreateParamsSchema>;
 
 export const apiKeyCreateResponseSchema = apiKeySchema;

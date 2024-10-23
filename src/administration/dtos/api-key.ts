@@ -18,12 +18,13 @@ import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 
 export const apiKeySchema = {
   type: 'object',
-  required: ['object', 'id', 'name', 'created_at'],
+  required: ['object', 'id', 'name', 'created_at', 'secret'],
   properties: {
     object: { const: 'organization.project.api_key' },
     id: { type: 'string' },
     name: { type: 'string' },
-    created_at: { type: 'number' }
+    created_at: { type: 'number' },
+    secret: { type: 'string' }
   }
 } as const satisfies JSONSchema;
 export type ApiKey = FromSchema<typeof apiKeySchema>;

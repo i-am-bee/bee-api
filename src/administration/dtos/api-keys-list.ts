@@ -26,16 +26,6 @@ export type ApiKeysListQuery = FromSchema<typeof apiKeysListQuerySchema>;
 export const apiKeysListResponseSchema = withPagination(apiKeySchema);
 export type ApiKeysListResponse = FromSchema<typeof apiKeysListResponseSchema>;
 
-export const apiKeyListParamsSchema = {
-  type: 'object',
-  required: ['project_id'],
-  additionalProperties: false,
-  properties: {
-    project_id: { type: 'string' }
-  }
-} as const satisfies JSONSchema;
-export type ApiKeyListParams = FromSchema<typeof apiKeyListParamsSchema>;
-
 export const apiKeysListParamsSchema = {
   type: 'object',
   required: ['project_id'],

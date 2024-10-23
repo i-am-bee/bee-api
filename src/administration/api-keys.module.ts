@@ -21,6 +21,7 @@ import {
   ApiKeyCreateBody,
   apiKeyCreateBodySchema,
   ApiKeyCreateParams,
+  apiKeyCreateParamsSchema,
   apiKeyCreateResponseSchema
 } from './dtos/api-key-create';
 import {
@@ -36,7 +37,8 @@ import {
   apiKeyUpdateResponseSchema
 } from './dtos/api-key-update';
 import {
-  ApiKeyListParams,
+  apiKeysListParamsSchema,
+  ApiKeysListParams,
   ApiKeysListQuery,
   apiKeysListQuerySchema,
   apiKeysListResponseSchema
@@ -63,6 +65,7 @@ export const apiKeysModule: FastifyPluginAsyncJsonSchemaToTs = async (app) => {
     {
       schema: {
         body: apiKeyCreateBodySchema,
+        params: apiKeyCreateParamsSchema,
         response: { [StatusCodes.OK]: apiKeyCreateResponseSchema },
         tags: [Tag.BEE_API]
       },
@@ -98,11 +101,12 @@ export const apiKeysModule: FastifyPluginAsyncJsonSchemaToTs = async (app) => {
     async (req) => updateApiKey({ ...req.params, ...req.body })
   );
 
-  app.get<{ Querystring: ApiKeysListQuery; Params: ApiKeyListParams }>(
+  app.get<{ Querystring: ApiKeysListQuery; Params: ApiKeysListParams }>(
     '/organization/projects/:project_id/api_keys',
     {
       schema: {
         querystring: apiKeysListQuerySchema,
+        params: apiKeysListParamsSchema,
         response: { [StatusCodes.OK]: apiKeysListResponseSchema },
         tags: [Tag.BEE_API]
       },
