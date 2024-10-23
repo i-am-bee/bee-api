@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  langsmith: 0.1.41
+
 importers:
 
   .:
@@ -40,7 +43,7 @@ importers:
         version: 0.7.13
       '@ibm-generative-ai/node-sdk':
         specifier: ^3.2.3
-        version: 3.2.3(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8)))
+        version: 3.2.3(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))
       '@mikro-orm/core':
         specifier: 6.2.9
         version: 6.2.9
@@ -82,10 +85,10 @@ importers:
         version: 1.7.7
       bee-agent-framework:
         specifier: 0.0.33
-        version: 0.0.33(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.11.1)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8))))(@langchain/community@0.2.28(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8)))(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(groq-sdk@0.7.0)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))(sequelize@6.37.3)
+        version: 0.0.33(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.11.1)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))))(@langchain/community@0.2.28(@langchain/langgraph@0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(@langchain/langgraph@0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(groq-sdk@0.7.0)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))(sequelize@6.37.3)
       bee-observe-connector:
         specifier: 0.0.5
-        version: 0.0.5(bee-agent-framework@0.0.33(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.11.1)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8))))(@langchain/community@0.2.28(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8)))(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(groq-sdk@0.7.0)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))(sequelize@6.37.3))
+        version: 0.0.5(bee-agent-framework@0.0.33(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.11.1)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))))(@langchain/community@0.2.28(@langchain/langgraph@0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(@langchain/langgraph@0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(groq-sdk@0.7.0)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))(sequelize@6.37.3))
       bullmq:
         specifier: 5.8.1
         version: 5.8.1
@@ -1943,8 +1946,8 @@ packages:
   '@types/triple-beam@1.3.5':
     resolution: {integrity: sha512-6WaYesThRMCl19iryMYP7/x2OVgCtbIVflDGFpWnb9irXI3UjYE4AzmYuiUKY1AJstGijoY+MgUszMgRxIYTYw==}
 
-  '@types/uuid@10.0.0':
-    resolution: {integrity: sha512-7gqG38EyHgyP1S+7+xomFtL+ZNHcKv6DwNaCZmJmo1vgMugyF3TCnXVg4t1uk89mLNwnLtnY3TpOpCOyp1/xHQ==}
+  '@types/uuid@9.0.8':
+    resolution: {integrity: sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA==}
 
   '@types/validator@13.12.2':
     resolution: {integrity: sha512-6SlHBzUW8Jhf3liqrGGXyTJSIFe4nqlJ5A5KaMZ2l/vbM3Wh3KSybots/wfWVzNLK4D1NZluDlSQIbIEPx6oyA==}
@@ -3652,11 +3655,17 @@ packages:
       youtubei.js:
         optional: true
 
-  langsmith@0.1.66:
-    resolution: {integrity: sha512-ZhZ9g8t/qjj0oUWpvKLtUe3qxDL/N0wG0m+Ctkxf0keopYJkcMJg4/71jl6ZYyiSU8xlC27aixXOT0uvLhqcFA==}
+  langsmith@0.1.41:
+    resolution: {integrity: sha512-8R7s/225Pxmv0ipMfd6sqmWVsfHLQivYlQZ0vx5K+ReoknummTenQlVK8gapk3kqRMnzkrouuRHMhWjMR6RgUA==}
     peerDependencies:
+      '@langchain/core': '*'
+      langchain: '*'
       openai: '*'
     peerDependenciesMeta:
+      '@langchain/core':
+        optional: true
+      langchain:
+        optional: true
       openai:
         optional: true
 
@@ -5563,10 +5572,10 @@ snapshots:
 
   '@humanwhocodes/object-schema@2.0.3': {}
 
-  '@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8)))':
+  '@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))':
     dependencies:
       '@ai-zen/node-fetch-event-source': 2.1.4
-      '@langchain/core': 0.2.33(openai@4.67.3(zod@3.23.8))
+      '@langchain/core': 0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
       fetch-retry: 5.0.6
       http-status-codes: 2.3.0
       openapi-fetch: 0.8.2
@@ -5602,21 +5611,21 @@ snapshots:
 
   '@jsdevtools/ono@7.1.3': {}
 
-  '@langchain/community@0.2.28(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8))':
+  '@langchain/community@0.2.28(@langchain/langgraph@0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8))':
     dependencies:
-      '@langchain/core': 0.2.33(openai@4.67.3(zod@3.23.8))
-      '@langchain/openai': 0.2.11
+      '@langchain/core': 0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
+      '@langchain/openai': 0.2.11(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))
       binary-extensions: 2.3.0
       expr-eval: 2.0.2
       flat: 5.0.2
       js-yaml: 4.1.0
       langchain: 0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8))
-      langsmith: 0.1.66(openai@4.67.3(zod@3.23.8))
+      langsmith: 0.1.41(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
       uuid: 10.0.0
       zod: 3.23.8
       zod-to-json-schema: 3.23.3(zod@3.23.8)
     optionalDependencies:
-      '@langchain/langgraph': 0.0.34(openai@4.67.3(zod@3.23.8))
+      '@langchain/langgraph': 0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
       '@zilliz/milvus2-sdk-node': 2.4.4
       duck-duck-scrape: 2.2.5
       google-auth-library: 9.14.2
@@ -5642,13 +5651,13 @@ snapshots:
       - peggy
       - pyodide
 
-  '@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8))':
+  '@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))':
     dependencies:
       ansi-styles: 5.2.0
       camelcase: 6.3.0
       decamelize: 1.2.0
       js-tiktoken: 1.0.15
-      langsmith: 0.1.66(openai@4.67.3(zod@3.23.8))
+      langsmith: 0.1.41(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
       mustache: 4.2.0
       p-queue: 6.6.2
       p-retry: 4.6.2
@@ -5656,15 +5665,16 @@ snapshots:
       zod: 3.23.8
       zod-to-json-schema: 3.23.3(zod@3.23.8)
     transitivePeerDependencies:
+      - langchain
       - openai
 
-  '@langchain/core@0.2.33(openai@4.68.1(zod@3.23.8))':
+  '@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.68.1(zod@3.23.8))':
     dependencies:
       ansi-styles: 5.2.0
       camelcase: 6.3.0
       decamelize: 1.2.0
       js-tiktoken: 1.0.15
-      langsmith: 0.1.66(openai@4.68.1(zod@3.23.8))
+      langsmith: 0.1.41(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.68.1(zod@3.23.8)))(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.68.1(zod@3.23.8))
       mustache: 4.2.0
       p-queue: 6.6.2
       p-retry: 4.6.2
@@ -5672,31 +5682,35 @@ snapshots:
       zod: 3.23.8
       zod-to-json-schema: 3.23.3(zod@3.23.8)
     transitivePeerDependencies:
+      - langchain
       - openai
 
-  '@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8))':
+  '@langchain/langgraph@0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))':
     dependencies:
-      '@langchain/core': 0.2.33(openai@4.67.3(zod@3.23.8))
+      '@langchain/core': 0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
       uuid: 10.0.0
       zod: 3.23.8
     transitivePeerDependencies:
+      - langchain
       - openai
 
-  '@langchain/openai@0.2.11':
+  '@langchain/openai@0.2.11(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))':
     dependencies:
-      '@langchain/core': 0.2.33(openai@4.68.1(zod@3.23.8))
+      '@langchain/core': 0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.68.1(zod@3.23.8))
       js-tiktoken: 1.0.15
       openai: 4.68.1(zod@3.23.8)
       zod: 3.23.8
       zod-to-json-schema: 3.23.3(zod@3.23.8)
     transitivePeerDependencies:
       - encoding
+      - langchain
 
-  '@langchain/textsplitters@0.0.3(openai@4.67.3(zod@3.23.8))':
+  '@langchain/textsplitters@0.0.3(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))':
     dependencies:
-      '@langchain/core': 0.2.33(openai@4.67.3(zod@3.23.8))
+      '@langchain/core': 0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
       js-tiktoken: 1.0.15
     transitivePeerDependencies:
+      - langchain
       - openai
 
   '@lukeed/ms@2.0.2': {}
@@ -6779,7 +6793,7 @@ snapshots:
 
   '@types/triple-beam@1.3.5': {}
 
-  '@types/uuid@10.0.0': {}
+  '@types/uuid@9.0.8': {}
 
   '@types/validator@13.12.2': {}
 
@@ -7134,18 +7148,18 @@ snapshots:
 
   base64-js@1.5.1: {}
 
-  bee-agent-framework@0.0.33(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.11.1)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8))))(@langchain/community@0.2.28(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8)))(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(groq-sdk@0.7.0)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))(sequelize@6.37.3):
-    dependencies:
+  ? bee-agent-framework@0.0.33(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.11.1)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))))(@langchain/community@0.2.28(@langchain/langgraph@0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(@langchain/langgraph@0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(groq-sdk@0.7.0)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))(sequelize@6.37.3)
+  : dependencies:
       '@ai-zen/node-fetch-event-source': 2.1.4
       '@connectrpc/connect': 1.6.1(@bufbuild/protobuf@1.10.0)
       '@connectrpc/connect-node': 1.6.1(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.6.1(@bufbuild/protobuf@1.10.0))
       '@googleapis/customsearch': 3.2.0
       '@grpc/grpc-js': 1.11.1
       '@grpc/proto-loader': 0.7.13
-      '@ibm-generative-ai/node-sdk': 3.2.3(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8)))
-      '@langchain/community': 0.2.28(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8))
-      '@langchain/core': 0.2.33(openai@4.67.3(zod@3.23.8))
-      '@langchain/langgraph': 0.0.34(openai@4.67.3(zod@3.23.8))
+      '@ibm-generative-ai/node-sdk': 3.2.3(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))
+      '@langchain/community': 0.2.28(@langchain/langgraph@0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8))
+      '@langchain/core': 0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
+      '@langchain/langgraph': 0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
       '@streamparser/json': 0.0.21
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
@@ -7183,9 +7197,9 @@ snapshots:
       - debug
       - encoding
 
-  bee-observe-connector@0.0.5(bee-agent-framework@0.0.33(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.11.1)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8))))(@langchain/community@0.2.28(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8)))(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(groq-sdk@0.7.0)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))(sequelize@6.37.3)):
-    dependencies:
-      bee-agent-framework: 0.0.33(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.11.1)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8))))(@langchain/community@0.2.28(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8)))(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(groq-sdk@0.7.0)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))(sequelize@6.37.3)
+  ? bee-observe-connector@0.0.5(bee-agent-framework@0.0.33(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.11.1)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))))(@langchain/community@0.2.28(@langchain/langgraph@0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(@langchain/langgraph@0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(groq-sdk@0.7.0)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))(sequelize@6.37.3))
+  : dependencies:
+      bee-agent-framework: 0.0.33(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.11.1)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))))(@langchain/community@0.2.28(@langchain/langgraph@0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(@langchain/langgraph@0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(groq-sdk@0.7.0)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))(sequelize@6.37.3)
       openapi-fetch: 0.11.3
       remeda: 2.16.0
 
@@ -8563,14 +8577,14 @@ snapshots:
 
   langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)):
     dependencies:
-      '@langchain/core': 0.2.33(openai@4.67.3(zod@3.23.8))
-      '@langchain/openai': 0.2.11
-      '@langchain/textsplitters': 0.0.3(openai@4.67.3(zod@3.23.8))
+      '@langchain/core': 0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
+      '@langchain/openai': 0.2.11(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))
+      '@langchain/textsplitters': 0.0.3(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
       binary-extensions: 2.3.0
       js-tiktoken: 1.0.15
       js-yaml: 4.1.0
       jsonpointer: 5.0.1
-      langsmith: 0.1.66(openai@4.67.3(zod@3.23.8))
+      langsmith: 0.1.41(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
       openapi-types: 12.1.3
       p-retry: 4.6.2
       uuid: 10.0.0
@@ -8587,26 +8601,30 @@ snapshots:
       - encoding
       - openai
 
-  langsmith@0.1.66(openai@4.67.3(zod@3.23.8)):
+  langsmith@0.1.41(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)):
     dependencies:
-      '@types/uuid': 10.0.0
+      '@types/uuid': 9.0.8
       commander: 10.0.1
       p-queue: 6.6.2
       p-retry: 4.6.2
       semver: 7.6.3
-      uuid: 10.0.0
+      uuid: 9.0.1
     optionalDependencies:
+      '@langchain/core': 0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
+      langchain: 0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8))
       openai: 4.67.3(zod@3.23.8)
 
-  langsmith@0.1.66(openai@4.68.1(zod@3.23.8)):
+  langsmith@0.1.41(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.68.1(zod@3.23.8)))(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.68.1(zod@3.23.8)):
     dependencies:
-      '@types/uuid': 10.0.0
+      '@types/uuid': 9.0.8
       commander: 10.0.1
       p-queue: 6.6.2
       p-retry: 4.6.2
       semver: 7.6.3
-      uuid: 10.0.0
+      uuid: 9.0.1
     optionalDependencies:
+      '@langchain/core': 0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(openai@4.68.1(zod@3.23.8))
+      langchain: 0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8))
       openai: 4.68.1(zod@3.23.8)
 
   levn@0.4.1:
