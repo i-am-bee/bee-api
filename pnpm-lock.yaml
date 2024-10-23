@@ -84,8 +84,8 @@ importers:
         specifier: 0.0.33
         version: 0.0.33(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.11.1)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8))))(@langchain/community@0.2.28(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8)))(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(groq-sdk@0.7.0)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))(sequelize@6.37.3)
       bee-observe-connector:
-        specifier: 0.0.4
-        version: 0.0.4(bee-agent-framework@0.0.33(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.11.1)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8))))(@langchain/community@0.2.28(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8)))(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(groq-sdk@0.7.0)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))(sequelize@6.37.3))
+        specifier: 0.0.5
+        version: 0.0.5(bee-agent-framework@0.0.33(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.11.1)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8))))(@langchain/community@0.2.28(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8)))(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(groq-sdk@0.7.0)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))(sequelize@6.37.3))
       bullmq:
         specifier: 5.8.1
         version: 5.8.1
@@ -2245,8 +2245,8 @@ packages:
       openai-chat-tokens: ^0.2.8
       sequelize: ^6.37.3
 
-  bee-observe-connector@0.0.4:
-    resolution: {integrity: sha512-rEehLp67h/R+vD3NF513Zlxv13ZisyDrmdSWN5zCsjpNjQNxBNnJcsMDzdPiWZKLt2coVdqijwW3AFqCPFtqMA==}
+  bee-observe-connector@0.0.5:
+    resolution: {integrity: sha512-veiHn7u4sEPUgMMrNCJ/yuS6hVPE/qSxIJzaGAyolEsF0HXIxP8HdZdGkkZPrq0fUVXXiKBCwIQtt7cAnpYT8g==}
     peerDependencies:
       bee-agent-framework: '>=0.0.27 <0.1.0'
 
@@ -4356,6 +4356,9 @@ packages:
 
   remeda@2.14.0:
     resolution: {integrity: sha512-OSOhr9gGcb3AshMxlu9YnnUtKSkeYhj+AxWiWGfVh3HolYtJP5IF9vC1j1tq15uI7lxCPVd9qnnp43dOvZ840A==}
+
+  remeda@2.16.0:
+    resolution: {integrity: sha512-HOymkGg58HW4LT8MBEabQEdW76YsqcRNNFPXPrOrnYm+/9Pmk0b9fm8PKgQxoRPa6WDLnRM/LxTXkHdXf9Ab0w==}
 
   require-directory@2.1.1:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}
@@ -7180,10 +7183,11 @@ snapshots:
       - debug
       - encoding
 
-  bee-observe-connector@0.0.4(bee-agent-framework@0.0.33(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.11.1)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8))))(@langchain/community@0.2.28(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8)))(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(groq-sdk@0.7.0)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))(sequelize@6.37.3)):
+  bee-observe-connector@0.0.5(bee-agent-framework@0.0.33(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.11.1)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8))))(@langchain/community@0.2.28(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8)))(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(groq-sdk@0.7.0)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))(sequelize@6.37.3)):
     dependencies:
       bee-agent-framework: 0.0.33(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.11.1)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8))))(@langchain/community@0.2.28(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0))(openai@4.67.3(zod@3.23.8)))(@langchain/core@0.2.33(openai@4.67.3(zod@3.23.8)))(@langchain/langgraph@0.0.34(openai@4.67.3(zod@3.23.8)))(groq-sdk@0.7.0)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))(sequelize@6.37.3)
       openapi-fetch: 0.11.3
+      remeda: 2.16.0
 
   bee-proto@0.0.2:
     dependencies:
@@ -9299,6 +9303,10 @@ snapshots:
       set-function-name: 2.0.2
 
   remeda@2.14.0:
+    dependencies:
+      type-fest: 4.26.1
+
+  remeda@2.16.0:
     dependencies:
       type-fest: 4.26.1
 
