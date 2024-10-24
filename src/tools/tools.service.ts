@@ -493,7 +493,7 @@ export async function listTools({
             inputSchema: wikipediaTool.inputSchema,
             isExternal: true,
             userDescription:
-              'Retrieve detailed information from Wikipedia.org on a wide range of topics, including famous individuals, locations, organizations, and historical events. Ideal for obtaining comprehensive overviews or specific details on well-documented subjects. May not be suitable for lesser-known or more recent topics. The information is subject to community edits which can be inaccurate.'
+              'Retrieve detailed information from [Wikipedia.org](https://wikipedia.org) on a wide range of topics, including famous individuals, locations, organizations, and historical events. Ideal for obtaining comprehensive overviews or specific details on well-documented subjects. May not be suitable for lesser-known or more recent topics. The information is subject to community edits which can be inaccurate.'
           },
           {
             type: ToolType.SYSTEM,
@@ -513,7 +513,7 @@ export async function listTools({
             inputSchema: arXivTool.inputSchema,
             isExternal: true,
             userDescription:
-              'Retrieve abstracts of research articles published on ArXiv.org, along with their titles, authors, publication dates, and categories. Ideal for retrieving high-level information about academic papers. The full text of articles is not provided, making it unsuitable for full-text searches or advanced analytics.'
+              'Retrieve abstracts of research articles published on [ArXiv.org](http://arxiv.org), along with their titles, authors, publication dates, and categories. Ideal for retrieving high-level information about academic papers. The full text of articles is not provided, making it unsuitable for full-text searches or advanced analytics.'
           },
           {
             type: ToolType.SYSTEM,
