@@ -30,9 +30,10 @@ import { SimilarityToolOutput } from 'bee-agent-framework/tools/similarity';
 import { GoogleSearchTool } from 'bee-agent-framework/tools/search/googleSearch';
 import { uniqueBy } from 'remeda';
 import { z } from 'zod';
-import { PromptTemplate } from 'bee-agent-framework/template';
+import { LLMChatTemplates } from 'bee-agent-framework/adapters/shared/llmChatTemplates';
 import { DuckDuckGoSearchTool } from 'bee-agent-framework/tools/search/duckDuckGoSearch';
 import { SearchToolOptions, SearchToolOutput } from 'bee-agent-framework/tools/search/base';
+import { PromptTemplate } from 'bee-agent-framework/template';
 
 import { AgentContext } from '../execute.js';
 import { getRunVectorStores } from '../helpers.js';
@@ -185,7 +186,24 @@ export async function getTools(run: LoadedRun, context: AgentContext): Promise<F
                   llm: codeLLM,
                   promptTemplate: new PromptTemplate({
                     schema: z.object({ input: z.string() }),
-                    template: `Your task is to fix provided Python Code that may or may not contain a syntax error.\nIMPORTANT: the output must not contain any additional comments or explanation.\n\nInput:\n{{input}}\n\nOutput:\n`
+                    template: LLMChatTemplates.get('llama3.1').template.render({
+                      messages: [
+                        {
+                          system: [
+                            `Your task is to fix the provided code that may or may not contain a syntax error.\nIMPORTANT: the output must NOT contain any additional comments or explanation, and must NOT be wrapped in a markdown code block.`
+                          ],
+                          user: [],
+                          assistant: [],
+                          ipython: []
+                        },
+                        {
+                          system: [],
+                          user: [`{{input}}`],
+                          assistant: [],
+                          ipython: []
+                        }
+                      ]
+                    })
                   })
                 }
               : undefined

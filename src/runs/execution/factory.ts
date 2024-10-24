@@ -177,7 +177,7 @@ export function createCodeLLM(backend: LLMBackend = LLM_BACKEND) {
       });
       return new IBMvLLM({
         client: vllmClient,
-        modelId: 'ibm/granite-34b-code-instruct',
+        modelId: 'meta-llama/llama-3-1-70b-instruct',
         parameters: {
           method: 'GREEDY',
           stopping: { include_stop_sequence: false, max_new_tokens: MAX_NEW_TOKENS }
@@ -188,7 +188,7 @@ export function createCodeLLM(backend: LLMBackend = LLM_BACKEND) {
       bamClient ??= new BAMClient({ apiKey: BAM_API_KEY ?? undefined });
       return new BAMLLM({
         client: bamClient,
-        modelId: 'ibm/granite-34b-code-instruct',
+        modelId: 'meta-llama/llama-3-1-70b-instruct',
         parameters: {
           decoding_method: 'greedy',
           include_stop_sequence: false,
@@ -200,7 +200,7 @@ export function createCodeLLM(backend: LLMBackend = LLM_BACKEND) {
       if (!WATSONX_API_KEY) throw new Error('Missing WATSONX_API_KEY');
       if (!WATSONX_PROJECT_ID) throw new Error('Missing WATSONX_PROJECT_ID');
       return new WatsonXLLM({
-        modelId: 'ibm/granite-34b-code-instruct',
+        modelId: 'meta-llama/llama-3-1-70b-instruct',
         apiKey: WATSONX_API_KEY,
         projectId: WATSONX_PROJECT_ID,
         region: WATSONX_REGION ?? undefined,
