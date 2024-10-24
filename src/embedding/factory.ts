@@ -34,7 +34,8 @@ import {
   OLLAMA_URL,
   OPENAI_API_KEY,
   WATSONX_API_KEY,
-  WATSONX_PROJECT_ID
+  WATSONX_PROJECT_ID,
+  WATSONX_REGION
 } from '@/config';
 
 export function getDefaultEmbeddingModel(backend: EmbeddingBackend = EMBEDDING_BACKEND) {
@@ -81,7 +82,8 @@ export async function createEmbeddingAdapter(
       const llm = new WatsonXLLM({
         modelId: 'foobar',
         apiKey: WATSONX_API_KEY,
-        projectId: WATSONX_PROJECT_ID
+        projectId: WATSONX_PROJECT_ID,
+        region: WATSONX_REGION ?? undefined
       });
       // @ts-expect-error use protected property
       const client = llm.client;

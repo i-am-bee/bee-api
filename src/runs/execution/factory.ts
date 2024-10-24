@@ -48,8 +48,11 @@ import {
   OLLAMA_URL,
   OPENAI_API_KEY,
   WATSONX_API_KEY,
-  WATSONX_PROJECT_ID
+  WATSONX_PROJECT_ID,
+  WATSONX_REGION
 } from '@/config';
+
+const MAX_NEW_TOKENS = 4096;
 
 export function getDefaultModel(backend: LLMBackend = LLM_BACKEND) {
   switch (backend) {
@@ -94,6 +97,10 @@ export function createChatLLM(run: Loaded<Run>, backend: LLMBackend = LLM_BACKEN
             ...parameters.sampling,
             top_p: run.topP ?? parameters.sampling?.top_p,
             temperature: run.temperature ?? parameters.sampling?.temperature
+          },
+          stopping: {
+            ...parameters.stopping,
+            max_new_tokens: MAX_NEW_TOKENS
           }
         })
       });
@@ -105,7 +112,8 @@ export function createChatLLM(run: Loaded<Run>, backend: LLMBackend = LLM_BACKEN
         modelId: run.model,
         parameters: {
           top_p: run.topP,
-          temperature: run.temperature
+          temperature: run.temperature,
+          num_predict: MAX_NEW_TOKENS
         }
       });
     }
@@ -116,7 +124,8 @@ export function createChatLLM(run: Loaded<Run>, backend: LLMBackend = LLM_BACKEN
         modelId: run.model as OpenAI.ChatModel,
         parameters: {
           top_p: run.topP,
-          temperature: run.temperature
+          temperature: run.temperature,
+          max_completion_tokens: MAX_NEW_TOKENS
         }
       });
     }
@@ -127,7 +136,8 @@ export function createChatLLM(run: Loaded<Run>, backend: LLMBackend = LLM_BACKEN
         parameters: (parameters) => ({
           ...parameters,
           top_p: run.topP ?? parameters.top_p,
-          temperature: run.temperature ?? parameters.temperature
+          temperature: run.temperature ?? parameters.temperature,
+          max_new_tokens: MAX_NEW_TOKENS
         })
       });
     }
@@ -137,10 +147,12 @@ export function createChatLLM(run: Loaded<Run>, backend: LLMBackend = LLM_BACKEN
       return WatsonXChatLLM.fromPreset(run.model as WatsonXChatLLMPresetModel, {
         apiKey: WATSONX_API_KEY,
         projectId: WATSONX_PROJECT_ID,
+        region: WATSONX_REGION ?? undefined,
         parameters: (parameters) => ({
           ...parameters,
           top_p: run.topP ?? parameters.top_p,
-          temperature: run.temperature ?? parameters.temperature
+          temperature: run.temperature ?? parameters.temperature,
+          max_new_tokens: MAX_NEW_TOKENS
         })
       });
     }
@@ -165,18 +177,22 @@ export function createCodeLLM(backend: LLMBackend = LLM_BACKEND) {
       });
       return new IBMvLLM({
         client: vllmClient,
-        modelId: 'meta-llama/llama-3-1-70b-instruct',
-        parameters: { method: 'GREEDY', stopping: { include_stop_sequence: false } }
+        modelId: 'ibm/granite-34b-code-instruct',
+        parameters: {
+          method: 'GREEDY',
+          stopping: { include_stop_sequence: false, max_new_tokens: MAX_NEW_TOKENS }
+        }
       });
     }
     case LLMBackend.BAM: {
       bamClient ??= new BAMClient({ apiKey: BAM_API_KEY ?? undefined });
       return new BAMLLM({
         client: bamClient,
-        modelId: 'meta-llama/llama-3-1-70b-instruct',
+        modelId: 'ibm/granite-34b-code-instruct',
         parameters: {
           decoding_method: 'greedy',
-          include_stop_sequence: false
+          include_stop_sequence: false,
+          max_new_tokens: MAX_NEW_TOKENS
         }
       });
     }
@@ -184,13 +200,14 @@ export function createCodeLLM(backend: LLMBackend = LLM_BACKEND) {
       if (!WATSONX_API_KEY) throw new Error('Missing WATSONX_API_KEY');
       if (!WATSONX_PROJECT_ID) throw new Error('Missing WATSONX_PROJECT_ID');
       return new WatsonXLLM({
-        modelId: 'meta-llama/llama-3-1-70b-instruct',
+        modelId: 'ibm/granite-34b-code-instruct',
         apiKey: WATSONX_API_KEY,
         projectId: WATSONX_PROJECT_ID,
+        region: WATSONX_REGION ?? undefined,
         parameters: {
           decoding_method: 'greedy',
           include_stop_sequence: false,
-          max_new_tokens: 2048
+          max_new_tokens: MAX_NEW_TOKENS
         }
       });
     }

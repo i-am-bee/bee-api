@@ -185,7 +185,7 @@ export async function getTools(run: LoadedRun, context: AgentContext): Promise<F
                   llm: codeLLM,
                   promptTemplate: new PromptTemplate({
                     schema: z.object({ input: z.string() }),
-                    template: `Your task is to fix the provided code that may or may not contain a syntax error.\nIMPORTANT: the output must not contain any additional comments or explanation.\n\nInput:\n{{input}}\n\nOutput:\n`
+                    template: `Your task is to fix provided Python Code that may or may not contain a syntax error.\nIMPORTANT: the output must not contain any additional comments or explanation.\n\nInput:\n{{input}}\n\nOutput:\n`
                   })
                 }
               : undefined

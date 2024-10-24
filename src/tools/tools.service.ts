@@ -482,7 +482,8 @@ export async function listTools({
             ...searchTool,
             inputSchema: searchTool.inputSchema,
             isExternal: true,
-            userDescription: 'Retrieve real-time search results from across the internet.'
+            userDescription:
+              "Retrieve real-time search results from across the internet, including news, current events, or content from specific websites or domains. Leverages Google's indexing and search algorithms to provide relevant results, rather than functioning as a web scraper."
           },
           {
             type: ToolType.SYSTEM,
@@ -492,7 +493,7 @@ export async function listTools({
             inputSchema: wikipediaTool.inputSchema,
             isExternal: true,
             userDescription:
-              'Retrieve detailed information from Wikipedia.org on a wide range of topics.'
+              'Retrieve detailed information from Wikipedia.org on a wide range of topics, including famous individuals, locations, organizations, and historical events. Ideal for obtaining comprehensive overviews or specific details on well-documented subjects. May not be suitable for lesser-known or more recent topics. The information is subject to community edits which can be inaccurate.'
           },
           {
             type: ToolType.SYSTEM,
@@ -502,7 +503,7 @@ export async function listTools({
             inputSchema: weatherTool.inputSchema,
             isExternal: true,
             userDescription:
-              'Get real-time weather forecasts for up to 16 days and past data for 30 days.'
+              'Retrieve real-time weather forecasts including detailed information on temperature, wind speed, and precipitation. Access forecasts predicting weather up to 16 days in the future and archived forecasts for weather up to 30 days in the past. Ideal for obtaining up-to-date weather predictions and recent historical weather trends.'
           },
           {
             type: ToolType.SYSTEM,
@@ -512,7 +513,7 @@ export async function listTools({
             inputSchema: arXivTool.inputSchema,
             isExternal: true,
             userDescription:
-              'Retrieve abstracts of research articles published on ArXiv.org, along with their titles, authors, publication dates, and categories.'
+              'Retrieve abstracts of research articles published on ArXiv.org, along with their titles, authors, publication dates, and categories. Ideal for retrieving high-level information about academic papers. The full text of articles is not provided, making it unsuitable for full-text searches or advanced analytics.'
           },
           {
             type: ToolType.SYSTEM,
@@ -521,7 +522,8 @@ export async function listTools({
             ...readFile,
             inputSchema: readFile.inputSchema,
             isExternal: false,
-            userDescription: 'Read and interpret basic files.'
+            userDescription:
+              'Read and interpret basic files to deliver summaries, highlight key points, and facilitate file comprehension. Ideal for straightforward tasks requiring access to raw data without any processing. Text (.txt, .md, .html) and JSON files (application/json) are supported up to 5 MB. PDF (.pdf) and text-based image files (.jpg, .jpeg, .png, .tiff, .bmp, .gif) are supported by the WDU text extraction service, limited to the content window of our base model, Llama 3.1 70B, which is 5 MB. The WDU text extraction service is used to extract text from image and PDF files, while text file types are handled by the LLM directly.'
           }
         ]
       : [];
@@ -546,7 +548,8 @@ export async function listTools({
       ...fileSearch,
       inputSchema: fileSearch.inputSchema,
       isExternal: false,
-      userDescription: 'Access and interpret file content by using advanced search techniques.'
+      userDescription:
+        'Read and interpret larger or more complex files using advanced search techniques where contextual understanding is required. Content parsing and chunking is used to break down large volumes of data into manageable pieces for effective analysis. Embeddings (numerical representations that capture the meaning and context of content) enable both traditional keyword and vector search. Vector search enhances the ability to identify similar content based on meaning, even if the exact words differ, improving the chances of identifying relevant information. Text (.txt, .md, .html) and JSON files (application/json) are supported up to 100 MB. PDF (.pdf) and text-based image files (.jpg, .jpeg, .png, .tiff, .bmp, .gif) are supported by the WDU text extraction service.'
     });
   }
   if (pythonTool && (!type || type.includes(ToolType.CODE_INTERPRETER))) {
@@ -558,7 +561,7 @@ export async function listTools({
       inputSchema: pythonTool.inputSchema,
       isExternal: true,
       userDescription:
-        'Execute Python code for various tasks, including data analysis, file processing, and visualizations.'
+        'Execute Python code for various tasks, including data analysis, file processing, and visualizations. Supports the installation of any library such as NumPy, Pandas, SciPy, and Matplotlib. Users can create new files or convert existing files, which are then made available for download.'
     });
   }
 

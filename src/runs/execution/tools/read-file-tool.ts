@@ -36,25 +36,25 @@ export class ReadFileTool extends Tool<StringToolOutput, ReadFileToolOptions> {
   description = 'Retrieve file content.';
   inputSchema() {
     return z.object({
-      id:
+      filename:
         this.options.files.length === 1
-          ? z
-              .literal(this.options.files[0].id)
-              .describe(`Id of the file with name ${this.options.files[0].filename}`)
+          ? z.literal(this.options.files[0].filename).describe(`Name of the file to read`)
           : z
               .union(
-                this.options.files.map((file) =>
-                  z.literal(file.id).describe(`Id of the file with name ${file.filename}`)
-                ) as [ZodLiteral<string>, ZodLiteral<string>, ...ZodLiteral<string>[]]
+                this.options.files.map((file) => z.literal(file.filename)) as [
+                  ZodLiteral<string>,
+                  ZodLiteral<string>,
+                  ...ZodLiteral<string>[]
+                ]
               )
-              .describe('File id.')
+              .describe('Name of the file to read.')
     });
   }
 
-  protected async _run({ id }: ToolInput<ReadFileTool>): Promise<StringToolOutput> {
-    const file = this.options.files.find((file) => file.id === id);
+  protected async _run({ filename }: ToolInput<ReadFileTool>): Promise<StringToolOutput> {
+    const file = this.options.files.find((file) => file.filename === filename);
     if (!file) {
-      throw new ToolError(`File ${id} not found.`);
+      throw new ToolError(`File ${filename} not found.`);
     }
     try {
       const fileObject = await getExtractedFileObject(file);
