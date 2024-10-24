@@ -19,8 +19,7 @@ import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 export const autoChunkingStrategySchema = {
   type: 'object',
   title: 'Auto Chunking Strategy',
-  description:
-    'The default strategy. This strategy currently uses a `max_chunk_size_tokens` of `400` and `chunk_overlap_tokens` of `200`.',
+  description: 'Automatic strategy, uses semantic-aware chunking.',
   additionalProperties: false,
   properties: { type: { type: 'string', description: 'Always `auto`.', enum: ['auto'] } },
   required: ['type']
@@ -57,7 +56,7 @@ export const chunkingStrategyRequestParamSchema = {
   type: 'object',
   description:
     'The chunking strategy used to chunk the file(s). If not set, will use the `auto` strategy.',
-  oneOf: [autoChunkingStrategySchema, staticChunkingStrategySchema]
+  oneOf: [autoChunkingStrategySchema]
 } as const satisfies JSONSchema;
 
 export type ChunkingStrategyRequestParam = FromSchema<typeof chunkingStrategyRequestParamSchema>;

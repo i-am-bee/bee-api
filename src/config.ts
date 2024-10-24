@@ -23,6 +23,7 @@ import {
   SearchToolBackend
 } from './runs/execution/constants';
 import { EmbeddingBackend } from './embedding/constants';
+import { ExtractionBackend } from './files/extraction/constants';
 
 import { QueueName } from '@/jobs/constants.js';
 
@@ -82,6 +83,7 @@ export const AUTH_AUDIENCE = getEnv('AUTH_AUDIENCE');
 // Backends
 export const LLM_BACKEND = getEnum('LLM_BACKEND', Object.values(LLMBackend));
 export const EMBEDDING_BACKEND = getEnum('EMBEDDING_BACKEND', Object.values(EmbeddingBackend));
+export const EXTRACTION_BACKEND = getEnum('EXTRACTION_BACKEND', Object.values(ExtractionBackend));
 
 export const OLLAMA_URL = getEnv('OLLAMA_URL', null);
 
@@ -102,6 +104,8 @@ export const CAIKIT_URL = getEnv('CAIKIT_URL', null);
 export const CAIKIT_CA_CERT = getEnv('CAIKIT_CA_CERT', null);
 export const CAIKIT_CERT = getEnv('CAIKIT_CERT', null);
 export const CAIKIT_KEY = getEnv('CAIKIT_KEY', null);
+
+export const WDU_URL = getEnv('WDU_URL', null);
 
 export const BEE_CODE_INTERPRETER_URL = getEnv('BEE_CODE_INTERPRETER_URL', null);
 export const BEE_CODE_INTERPRETER_CA_CERT = getEnv('BEE_CODE_INTERPRETER_CA_CERT', null);
@@ -159,8 +163,6 @@ export const HTTP_PROXY_URL = getEnv('HTTP_PROXY_URL', null);
 if (MILVUS_USE_TLS && (!MILVUS_CA_CERT || !MILVUS_CERT || !MILVUS_KEY)) {
   throw new Error('MILVUS TLS is enabled but required certificates are not provided');
 }
-
-export const WDU_URL = getEnv('WDU_URL', null);
 
 // cannot import QueueName object due to cyclic import, using this weaker type-check
 const allowedQueues = Object.values(QueueName);

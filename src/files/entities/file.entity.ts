@@ -18,7 +18,9 @@ import { randomUUID } from 'node:crypto';
 
 import { Embedded, Entity, Enum, Property } from '@mikro-orm/core';
 
-import { Extraction } from './extraction.entity.js';
+import { UnstructuredOpensourceExtraction } from './extractions/unstructured-opensource-extraction.entity.js';
+import { WDUExtraction } from './extractions/wdu-extraction.entity.js';
+import { UnstructuredAPIExtraction } from './extractions/unstructured-api-extraction.entity.js';
 
 import { ProjectScopedEntity, ProjectScopedEntityInput } from '@/common/project-scoped.entity.js';
 
@@ -50,7 +52,7 @@ export class File extends ProjectScopedEntity {
   storageId: string;
 
   @Embedded({ object: true })
-  extraction?: Extraction;
+  extraction?: UnstructuredAPIExtraction | UnstructuredOpensourceExtraction | WDUExtraction;
 
   constructor({ purpose, bytes, filename, contentHash, storageId, ...rest }: FilePurposeInput) {
     super(rest);

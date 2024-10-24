@@ -17,9 +17,11 @@
 import { Embeddable, Enum } from '@mikro-orm/core';
 
 import { StaticChunkingStrategy } from './static-chunking-strategy.entity.js';
+import { AutoChunkingStrategy } from './auto-chunking.strategy.entity.js';
 
 export const ChunkingStrategyType = {
-  STATIC: 'static'
+  STATIC: 'static',
+  AUTO: 'auto'
 } as const;
 export type ChunkingStrategyType = (typeof ChunkingStrategyType)[keyof typeof ChunkingStrategyType];
 
@@ -29,4 +31,4 @@ export abstract class ChunkingStrategy {
   type!: ChunkingStrategyType;
 }
 
-export type AnyChunkingStrategy = StaticChunkingStrategy;
+export type AnyChunkingStrategy = AutoChunkingStrategy | StaticChunkingStrategy;

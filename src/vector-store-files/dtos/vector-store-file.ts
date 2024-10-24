@@ -17,7 +17,7 @@
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 import { omit } from 'remeda';
 
-import { staticChunkingStrategySchema } from './chunking-strategy.js';
+import { autoChunkingStrategySchema, staticChunkingStrategySchema } from './chunking-strategy.js';
 
 import { VectorStoreFileStatus } from '@/vector-store-files/entities/vector-store-file.entity.js';
 import { errorSchema } from '@/errors/dtos/error.js';
@@ -59,7 +59,7 @@ export const vectorStoreFileSchema = {
     chunking_strategy: {
       type: 'object',
       description: 'The strategy used to chunk the file.',
-      oneOf: [staticChunkingStrategySchema]
+      oneOf: [autoChunkingStrategySchema, staticChunkingStrategySchema]
     }
   },
   required: ['id', 'object', 'usage_bytes', 'created_at', 'vector_store_id', 'status', 'last_error']

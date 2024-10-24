@@ -14,20 +14,11 @@
  * limitations under the License.
  */
 
-import { Embeddable, Property } from '@mikro-orm/core';
+import { Embeddable } from '@mikro-orm/core';
 
-@Embeddable()
-export class Extraction {
-  @Property()
-  jobId?: string;
+import { ChunkingStrategy, ChunkingStrategyType } from './chunking-strategy.entity.js';
 
-  @Property()
-  storageId?: string;
-
-  constructor(input: ExtractionInput) {
-    this.jobId = input.jobId;
-    this.storageId = input.storageId;
-  }
+@Embeddable({ discriminatorValue: ChunkingStrategyType.AUTO })
+export class AutoChunkingStrategy extends ChunkingStrategy {
+  type = ChunkingStrategyType.AUTO;
 }
-
-export type ExtractionInput = Pick<Extraction, 'jobId' | 'storageId'>;

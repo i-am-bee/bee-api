@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-import { randomUUID } from 'node:crypto';
-
 import { Job } from 'bullmq';
 import { RequestContext } from '@mikro-orm/core';
 
-import { File } from '../entities/file.entity.js';
-import { s3Client } from '../files.service.js';
-import { Extraction } from '../entities/extraction.entity.js';
-import { extract } from '../extraction/extract.js';
+import { ExtractionBackend } from '../extraction/constants';
+import { extract } from '../extraction/extract';
 
-import { ORM } from '@/database.js';
-import { createQueue } from '@/jobs/bullmq.js';
-import { QueueName } from '@/jobs/constants.js';
-import { S3_BUCKET_FILE_STORAGE } from '@/config.js';
+import { ORM } from '@/database';
+import { createQueue } from '@/jobs/bullmq';
+import { QueueName } from '@/jobs/constants';
+import { File } from '@/files/entities/file.entity';
 
-async function jobHandler(job: Job<{ fileId: string }>) {
+async function jobHandler(job: Job<{ fileId: string; backend: ExtractionBackend }>) {
   return RequestContext.create(ORM.em, async () => {
     const file = await ORM.em.getRepository(File).findOneOrFail(
       { id: job.data.fileId },
@@ -37,34 +33,20 @@ async function jobHandler(job: Job<{ fileId: string }>) {
         filters: { deleted: false }
       }
     );
-
-    const extraction = await extract(
-      file.filename,
-      s3Client
-        .getObject({
-          Bucket: S3_BUCKET_FILE_STORAGE,
-          Key: file.storageId
-        })
-        .createReadStream()
-    );
-    const extractionObject = await s3Client
-      .upload({
-        Bucket: S3_BUCKET_FILE_STORAGE,
-        Key: randomUUID(),
-        Body: extraction
-      })
-      .promise();
-    file.extraction = new Extraction({ jobId: job.id, storageId: extractionObject.Key });
-
-    await ORM.em.flush();
+    await extract(file);
   });
 }
 
-export const { queue, worker } = createQueue({
-  name: QueueName.FILES_EXTRACTION,
+export const { queue: nodeQueue } = createQueue({
+  name: QueueName.FILES_EXTRACTION_NODE,
   jobHandler,
-  jobsOptions: { attempts: 5 },
-  workerOptions: {
-    concurrency: 100
-  }
+  jobsOptions: { attempts: 5 }
+});
+
+export const { queue: pythonQueue } = createQueue<
+  { fileId: string; backend: ExtractionBackend },
+  unknown
+>({
+  name: QueueName.FILES_EXTRACTION_PYTHON,
+  jobsOptions: { attempts: 5 }
 });

@@ -51,7 +51,7 @@ async function jobHandler(job: Job<{ vectorStoreFileId: string }>) {
   });
 }
 
-export const { queue, worker } = createQueue({
+export const { queue } = createQueue({
   name: QueueName.VECTOR_STORES_FILE_PROCESSOR,
   jobHandler,
   jobsOptions: { attempts: 1 }

@@ -14,28 +14,22 @@
  * limitations under the License.
  */
 
-import { ChunkingStrategyRequestParam } from '@/vector-store-files/dtos/chunking-strategy.js';
-import { StaticChunkingStrategy } from '@/vector-store-files/entities/chunking-strategy/static-chunking-strategy.entity.js';
-import { ChunkingStrategy } from '@/vector-store-files/entities/chunking-strategy/chunking-strategy.entity.js';
-import {
-  VECTOR_STORE_DEFAULT_CHUNK_OVERLAP_TOKENS,
-  VECTOR_STORE_DEFAULT_MAX_CHUNK_SIZE_TOKENS
-} from '@/vector-stores/constants.js';
+import { NotImplementedError } from 'bee-agent-framework';
 
-export function determineChunkingStrategy(param?: ChunkingStrategyRequestParam): ChunkingStrategy {
-  const defaultStrategy = new StaticChunkingStrategy({
-    max_chunk_size_tokens: VECTOR_STORE_DEFAULT_MAX_CHUNK_SIZE_TOKENS,
-    chunk_overlap_tokens: VECTOR_STORE_DEFAULT_CHUNK_OVERLAP_TOKENS
-  });
-  if (!param) return defaultStrategy;
+import { AutoChunkingStrategy } from '../entities/chunking-strategy/auto-chunking.strategy.entity';
+
+import { ChunkingStrategyRequestParam } from '@/vector-store-files/dtos/chunking-strategy.js';
+import { AnyChunkingStrategy } from '@/vector-store-files/entities/chunking-strategy/chunking-strategy.entity.js';
+
+export function determineChunkingStrategy(
+  param?: ChunkingStrategyRequestParam
+): AnyChunkingStrategy {
+  if (!param) return new AutoChunkingStrategy();
 
   switch (param.type) {
     case 'auto':
-      return defaultStrategy;
-    case 'static':
-      return new StaticChunkingStrategy({
-        max_chunk_size_tokens: param.static.max_chunk_size_tokens,
-        chunk_overlap_tokens: param.static.chunk_overlap_tokens
-      });
+      return new AutoChunkingStrategy();
+    default:
+      throw new NotImplementedError('Chunking strategy not supported');
   }
 }

@@ -16,11 +16,13 @@
 
 import { Embedded, Entity, Enum, Index, ManyToOne, Property, Ref } from '@mikro-orm/core';
 
+import { AutoChunkingStrategy } from './chunking-strategy/auto-chunking.strategy.entity';
+import { StaticChunkingStrategy } from './chunking-strategy/static-chunking-strategy.entity';
+
 import { ProjectScopedEntity, ProjectScopedEntityInput } from '@/common/project-scoped.entity';
 import { VectorStore } from '@/vector-stores/entities/vector-store.entity.js';
 import { File } from '@/files/entities/file.entity.js';
 import { APIError } from '@/errors/error.entity.js';
-import { ChunkingStrategy } from '@/vector-store-files/entities/chunking-strategy/chunking-strategy.entity.js';
 
 export const VectorStoreFileStatus = {
   IN_PROGRESS: 'in_progress',
@@ -61,7 +63,7 @@ export class VectorStoreFile extends ProjectScopedEntity {
   file: Ref<File>;
 
   @Embedded({ object: true })
-  chunkingStrategy: ChunkingStrategy;
+  chunkingStrategy: AutoChunkingStrategy | StaticChunkingStrategy;
 
   constructor({ file, vectorStore, chunkingStrategy, ...rest }: VectorStoreFileInput) {
     super(rest);

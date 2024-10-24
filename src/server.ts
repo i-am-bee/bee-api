@@ -104,7 +104,7 @@ try {
   await createCronJobs();
 
   // Bullmq workers
-  runWorkers(RUN_BULLMQ_WORKERS);
+  await runWorkers(RUN_BULLMQ_WORKERS);
 
   await app.listen({ port: PORT, host: '0.0.0.0' });
 } catch (err) {

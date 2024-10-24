@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import path from 'node:path';
 
+import { Utils } from '@mikro-orm/core';
+import { globby } from 'globby';
 import { DefaultJobOptions, Job, Queue, Worker, WorkerOptions } from 'bullmq';
 import { isTruthy } from 'remeda';
 
@@ -77,13 +80,13 @@ function addCallbacks(worker: Worker, queue: Queue) {
   });
 }
 
-const Queues = new Map<QueueName, { queue: Queue; worker: Worker }>();
+const Workers = new Map<QueueName, Worker>();
 
 interface CreateQueueInput<T, U> {
   name: QueueName;
   jobsOptions?: DefaultJobOptions;
   workerOptions?: Partial<Omit<WorkerOptions, 'autorun'>>;
-  jobHandler: (job: Job<T>) => Promise<U>;
+  jobHandler?: (job: Job<T>) => Promise<U>;
 }
 
 export function createQueue<T, U>({
@@ -101,33 +104,29 @@ export function createQueue<T, U>({
     getQueueLogger(name).error({ err }, `Queue has failed`);
   });
 
-  const worker = new Worker(
-    name,
-    (job) => jobLocalStorage.run({ job }, () => jobHandler(job)),
+  if (jobHandler) {
+    const worker = new Worker(
+      name,
+      (job) => jobLocalStorage.run({ job }, () => jobHandler(job)),
 
-    {
-      // We need to set autorun to false otherwise the worker might pick up stuff while ORM is not ready
-      autorun: false,
-      ...workerOptions,
-      connection: connection.options
-    }
-  );
+      {
+        // We need to set autorun to false otherwise the worker might pick up stuff while ORM is not ready
+        autorun: false,
+        ...workerOptions,
+        connection: connection.options
+      }
+    );
+    addCallbacks(worker, queue);
+    Workers.set(name, worker);
+  }
 
-  addCallbacks(worker, queue);
-
-  Queues.set(name, { queue, worker });
-
-  return { queue, worker };
+  return { queue };
 }
 
-export function runWorkers(queueNames: QueueName[]) {
-  queueNames.forEach((queueName) => {
-    if (!Queues.has(queueName)) throw Error(`Worker for ${queueName} has not been registered!`);
-  });
-  const workers = queueNames
-    .map((name) => Queues.get(name))
-    .filter(isTruthy)
-    .map(({ worker }) => worker);
+export async function runWorkers(queueNames: QueueName[]) {
+  await discoverQueues();
+
+  const workers = queueNames.map((name) => Workers.get(name)).filter(isTruthy);
 
   workers.forEach((worker) => worker.run());
 
@@ -135,7 +134,16 @@ export function runWorkers(queueNames: QueueName[]) {
 }
 
 export async function closeAllWorkers() {
-  await Promise.all([...Queues.values()].map(({ worker }) => worker.close()));
+  await Promise.all([...Workers.values()].map((worker) => worker.close()));
   connection.quit();
   logger.info('Workers shutdown successfully');
+}
+
+export async function discoverQueues() {
+  const isTsNode = Utils.detectTsNode();
+  const queueGlobs = isTsNode ? './**/*.queue.ts' : './**/*.queue.js';
+  const cwd = isTsNode ? `${process.cwd()}/src` : `${process.cwd()}/dist`;
+  const queues = await globby(queueGlobs, { cwd });
+  logger.info({ queues }, `Discovered queues.`);
+  await Promise.all(queues.map((file) => import(path.join(cwd, file))));
 }

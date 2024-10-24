@@ -19,6 +19,7 @@ import { RequestContext } from '@mikro-orm/core';
 
 import { File } from '../entities/file.entity.js';
 import { s3Client } from '../files.service.js';
+import { removeExtraction } from '../extraction/helpers.js';
 
 import { ORM } from '@/database.js';
 import { createQueue } from '@/jobs/bullmq.js';
@@ -55,15 +56,11 @@ async function jobHandler(_: Job) {
               .deleteObject({ Bucket: S3_BUCKET_FILE_STORAGE, Key: file.storageId })
               .promise();
             file.storageId = '';
+            await ORM.em.flush();
           }
 
           if (file.extraction) {
-            if (file.extraction?.storageId && file.extraction.storageId !== file.storageId) {
-              await s3Client
-                .deleteObject({ Bucket: S3_BUCKET_FILE_STORAGE, Key: file.extraction.storageId })
-                .promise();
-            }
-            file.extraction = undefined;
+            await removeExtraction(file);
           }
 
           const vectoreStoreFiles = await ORM.em.getRepository(VectorStoreFile).find({ file });
@@ -89,7 +86,7 @@ async function jobHandler(_: Job) {
   );
 }
 
-export const { queue, worker } = createQueue({
+export const { queue } = createQueue({
   name: QueueName.FILES_CLEANUP,
   jobHandler,
   jobsOptions: { attempts: 1 },
