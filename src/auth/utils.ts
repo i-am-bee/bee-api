@@ -42,7 +42,7 @@ interface AuthTypeUnknown {
 type AuthType = AuthTypeAccessToken | AuthTypeApiKey | AuthTypeUnknown;
 
 const BEARER_PREFIX = 'Bearer ';
-const API_KEY_PREFIX = 'sk-';
+export const API_KEY_PREFIX = 'sk-proj-';
 
 const API_KEY_SIZE = 32;
 

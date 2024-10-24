@@ -30,10 +30,10 @@ import { requestContext } from '@fastify/request-context';
 
 import { BaseEntity, BaseEntityInput } from '../../common/base.entity.js';
 
-import { getProjectPrincipal } from '@/administration/helpers.js';
+import { getOrganizationUser, getProjectPrincipal } from '@/administration/helpers.js';
 import type { Project } from '@/administration/entities/project.entity.js';
 import type { ProjectPrincipal } from '@/administration/entities/project-principal.entity.js';
-import { ProjectRole } from '@/administration/entities/constants.js';
+import { OrganizationUserRole, ProjectRole } from '@/administration/entities/constants.js';
 import { APIError, APIErrorCode } from '@/errors/error.entity.js';
 import { inJob, inSeeder } from '@/context.js';
 
@@ -43,6 +43,11 @@ export const projectAdministrationAccessFilter = async (
 ) => {
   if (inJob() || inSeeder()) return;
 
+  const orgUser = requestContext.get('organizationUser');
+  if (orgUser?.role === OrganizationUserRole.OWNER && type === 'read') {
+    return;
+  }
+
   const projectPrincipal = requestContext.get('projectPrincipal');
   if (!projectPrincipal) return { _id: null };
 
@@ -51,7 +56,7 @@ export const projectAdministrationAccessFilter = async (
       if (projectPrincipal.role === ProjectRole.ADMIN) return { project: projectPrincipal.project };
       else
         return {
-          _id: projectPrincipal.id,
+          createdBy: projectPrincipal.id,
           project: projectPrincipal.project
         };
     default:
@@ -92,6 +97,11 @@ export abstract class ProjectAdministrationScopedEntity extends BaseEntity {
   @BeforeDelete()
   async authorize(_: EventArgs<any>) {
     if (inJob() || inSeeder()) return;
+
+    const orgUser = getOrganizationUser();
+    if (orgUser.role === OrganizationUserRole.OWNER) {
+      return;
+    }
 
     const projectPrincipal = getProjectPrincipal();
     if (
