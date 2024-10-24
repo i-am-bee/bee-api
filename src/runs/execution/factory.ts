@@ -39,7 +39,7 @@ import { Run } from '../entities/run.entity';
 import { LLMBackend } from './constants';
 
 import {
-  BAM_API_KEY,
+  GENAI_API_KEY,
   IBM_VLLM_CERT_CHAIN,
   IBM_VLLM_PRIVATE_KEY,
   IBM_VLLM_ROOT_CERT,
@@ -130,7 +130,7 @@ export function createChatLLM(run: Loaded<Run>, backend: LLMBackend = LLM_BACKEN
       });
     }
     case LLMBackend.BAM: {
-      bamClient ??= new BAMClient({ apiKey: BAM_API_KEY ?? undefined });
+      bamClient ??= new BAMClient({ apiKey: GENAI_API_KEY ?? undefined });
       return BAMChatLLM.fromPreset(run.model as BAMChatLLMPresetModel, {
         client: bamClient,
         parameters: (parameters) => ({
@@ -185,7 +185,7 @@ export function createCodeLLM(backend: LLMBackend = LLM_BACKEND) {
       });
     }
     case LLMBackend.BAM: {
-      bamClient ??= new BAMClient({ apiKey: BAM_API_KEY ?? undefined });
+      bamClient ??= new BAMClient({ apiKey: GENAI_API_KEY ?? undefined });
       return new BAMLLM({
         client: bamClient,
         modelId: 'ibm/granite-34b-code-instruct',

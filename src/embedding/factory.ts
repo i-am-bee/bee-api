@@ -29,7 +29,7 @@ import { BAMEmbedding } from './adapters/bam-embedding';
 import { WatsonXEmbedding } from './adapters/watsonx-embedding';
 
 import {
-  BAM_API_KEY,
+  GENAI_API_KEY,
   EMBEDDING_BACKEND,
   OLLAMA_URL,
   OPENAI_API_KEY,
@@ -73,7 +73,7 @@ export async function createEmbeddingAdapter(
       openAIClient ??= new OpenAI({ apiKey: OPENAI_API_KEY ?? undefined });
       return new OpenAIEmbedding(model, openAIClient);
     case EmbeddingBackend.BAM:
-      bamClient ??= new BAMClient({ apiKey: BAM_API_KEY ?? undefined });
+      bamClient ??= new BAMClient({ apiKey: GENAI_API_KEY ?? undefined });
       return new BAMEmbedding(model, bamClient);
     case EmbeddingBackend.WATSONX: {
       if (!WATSONX_API_KEY) throw new Error('Missing WATSONX_API_KEY');
