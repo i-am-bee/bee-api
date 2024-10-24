@@ -513,7 +513,7 @@ export async function listTools({
             inputSchema: arXivTool.inputSchema,
             isExternal: true,
             userDescription:
-              'Retrieve abstracts of research articles published on [ArXiv.org](http://arxiv.org), along with their titles, authors, publication dates, and categories. Ideal for retrieving high-level information about academic papers. The full text of articles is not provided, making it unsuitable for full-text searches or advanced analytics.'
+              'Retrieve abstracts of research articles published on [ArXiv.org](https://arxiv.org), along with their titles, authors, publication dates, and categories. Ideal for retrieving high-level information about academic papers. The full text of articles is not provided, making it unsuitable for full-text searches or advanced analytics.'
           },
           {
             type: ToolType.SYSTEM,
