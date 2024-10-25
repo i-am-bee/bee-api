@@ -32,7 +32,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            iambeeagent/bee-api:latest
-            iambeeagent/bee-api:${{ steps.get_version.outputs.VERSION }}
-          cache-from: type=registry,ref=iambeeagent/bee-api:buildcache
-          cache-to: type=registry,ref=iambeeagent/bee-api:buildcache,mode=max
+            i-am-bee/bee-api:latest
+            i-am-bee/bee-api:${{ steps.get_version.outputs.VERSION }}
+          cache-from: type=registry,ref=i-am-bee/bee-api:buildcache
+          cache-to: type=registry,ref=i-am-bee/bee-api:buildcache,mode=max
