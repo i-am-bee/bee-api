@@ -38,7 +38,8 @@ export async function getListCursor<T extends BaseEntity>(
     limit,
     order,
     order_by,
-    populate
+    populate,
+    filters
   }: PaginatedParameters & FindByCursorOptions<T, any, any>,
   repo: EntityRepository<any> // TODO: better typing,
 ): Promise<Cursor<T>> {
@@ -52,7 +53,8 @@ export async function getListCursor<T extends BaseEntity>(
       id: aftr.id
     },
     orderBy: [{ [snakeToCamel(order_by)]: order }, { id: order }],
-    populate
+    populate,
+    filters
   });
 
   return cursor;

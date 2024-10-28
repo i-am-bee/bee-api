@@ -52,9 +52,15 @@ import {
   createApiKey,
   deleteApiKey,
   listApiKeys,
+  listOrganizationApiKeys,
   readApiKey,
   updateApiKey
 } from './api-keys.service';
+import {
+  OrganizationApiKeysListQuery,
+  organizationApiKeysListQuerySchema,
+  organizationApiKeysListResponseSchema
+} from './dtos/organization-api-keys-list';
 
 import { AuthSecret } from '@/auth/utils';
 import { Tag } from '@/swagger.js';
@@ -126,5 +132,18 @@ export const apiKeysModule: FastifyPluginAsyncJsonSchemaToTs = async (app) => {
       preHandler: app.auth([AuthSecret.ACCESS_TOKEN])
     },
     async (req) => deleteApiKey(req.params)
+  );
+
+  app.get<{ Querystring: OrganizationApiKeysListQuery }>(
+    '/organization/api_keys',
+    {
+      schema: {
+        querystring: organizationApiKeysListQuerySchema,
+        response: { [StatusCodes.OK]: organizationApiKeysListResponseSchema },
+        tags: [Tag.BEE_API]
+      },
+      preHandler: app.auth([AuthSecret.ACCESS_TOKEN])
+    },
+    async (req) => listOrganizationApiKeys(req.query)
   );
 };

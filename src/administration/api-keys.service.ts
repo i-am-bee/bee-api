@@ -24,8 +24,13 @@ import { ApiKeyReadParams, ApiKeyReadResponse } from './dtos/api-key-read';
 import { ApiKeyUpdateBody, ApiKeyUpdateParams, ApiKeyUpdateResponse } from './dtos/api-key-update';
 import { ApiKeysListParams, ApiKeysListQuery, ApiKeysListResponse } from './dtos/api-keys-list';
 import { ApiKeyDeleteParams, ApiKeyDeleteResponse } from './dtos/api-key-delete';
-import { getProjectPrincipal } from './helpers';
+import { getOrganizationUser, getProjectPrincipal } from './helpers';
 import { Project } from './entities/project.entity';
+import { OrganizationApiKeysListQuery } from './dtos/organization-api-keys-list';
+import { ProjectPrincipal } from './entities/project-principal.entity';
+import { PrincipalType } from './entities/principals/principal.entity';
+import { OrganizationUserRole, ProjectRole } from './entities/constants';
+import { toDto as toProjectDto } from './projects.service.js';
 
 import { createDeleteResponse } from '@/utils/delete';
 import { API_KEY_PREFIX, generateApiKey, scryptApiKey } from '@/auth/utils';
@@ -34,13 +39,14 @@ import { createPaginatedResponse, getListCursor } from '@/utils/pagination';
 import { ORM } from '@/database';
 import { APIError, APIErrorCode } from '@/errors/error.entity';
 
-export function toDto(apiKey: Loaded<ProjectApiKey>, sensitiveId?: string): ApiKeyDto {
+export function toDto(apiKey: Loaded<ProjectApiKey, 'project'>, sensitiveId?: string): ApiKeyDto {
   return {
     object: 'organization.project.api_key',
     id: apiKey.id,
     name: apiKey.name,
     created_at: dayjs(apiKey.createdAt).unix(),
-    secret: typeof sensitiveId === 'string' ? sensitiveId : apiKey.redactedValue
+    secret: typeof sensitiveId === 'string' ? sensitiveId : apiKey.redactedValue,
+    project: toProjectDto(apiKey.project.$)
   };
 }
 
@@ -68,7 +74,7 @@ export async function createApiKey({
 
   await ORM.em.persistAndFlush(apiKey);
 
-  return toDto(apiKey, keyValue);
+  return toDto(apiKey as Loaded<ProjectApiKey, 'project'>, keyValue);
 }
 
 export const redactProjectKeyValue = (key: string) =>
@@ -89,7 +95,7 @@ async function getApiKey({ project_id, api_key_id }: { project_id: string; api_k
   }
   const apiKey = await ORM.em
     .getRepository(ProjectApiKey)
-    .findOneOrFail({ id: api_key_id, project: project_id });
+    .findOneOrFail({ id: api_key_id, project: project_id }, { populate: ['project'] });
 
   return apiKey;
 }
@@ -125,11 +131,11 @@ export async function listApiKeys({
 }: ApiKeysListQuery & ApiKeysListParams): Promise<ApiKeysListResponse> {
   // validate project is in the org
   await ORM.em.getRepository(Project).findOneOrFail({ id: project_id });
-  const filter: FilterQuery<ProjectApiKey> = { project: project_id };
+  const filter: FilterQuery<Loaded<ProjectApiKey, 'project'>> = { project: project_id };
 
-  const cursor = await getListCursor<ProjectApiKey>(
+  const cursor = await getListCursor<Loaded<ProjectApiKey, 'project'>>(
     filter,
-    { limit, order, order_by, after, before },
+    { limit, order, order_by, after, before, populate: ['project'] },
     ORM.em.getRepository(ProjectApiKey)
   );
   return createPaginatedResponse(cursor, toDto);
@@ -145,4 +151,52 @@ export async function deleteApiKey({
   await ORM.em.flush();
 
   return createDeleteResponse(api_key_id, 'organization.project.api_key');
+}
+
+export async function listOrganizationApiKeys({
+  limit,
+  order,
+  order_by,
+  after,
+  before,
+  search
+}: OrganizationApiKeysListQuery) {
+  const filter: FilterQuery<Loaded<ProjectApiKey, 'project'>> = {};
+  const organizationUser = getOrganizationUser();
+
+  if (organizationUser.role !== OrganizationUserRole.OWNER) {
+    // get all project principals for organization user
+    const projectPrincipals = await ORM.em.getRepository(ProjectPrincipal).find(
+      {
+        principal: { type: PrincipalType.USER, user: ref(organizationUser) }
+      },
+      { filters: { projectAdministrationAccess: false } }
+    );
+
+    filter.$or = projectPrincipals.map((principal) =>
+      principal.role === ProjectRole.ADMIN
+        ? { project: principal.project }
+        : {
+            createdBy: principal.id,
+            project: principal.project
+          }
+    );
+  } else {
+    // get all project for organization user
+    const projects = await ORM.em.getRepository(Project).findAll();
+    // filter api-keys only by project
+    filter.project = { $in: projects.map((p) => p.id) };
+  }
+
+  if (search) {
+    const regexp = new RegExp(search, 'i');
+    filter.name = regexp;
+  }
+
+  const cursor = await getListCursor<Loaded<ProjectApiKey, 'project'>>(
+    filter,
+    { limit, order, order_by, after, before, filters: { projectAdministrationAccess: false } },
+    ORM.em.getRepository(ProjectApiKey)
+  );
+  return createPaginatedResponse(cursor, toDto);
 }
