@@ -22,7 +22,7 @@ import { WikipediaTool } from 'bee-agent-framework/tools/search/wikipedia';
 import { Tool as FrameworkTool } from 'bee-agent-framework/tools/base';
 import { ZodTypeAny } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
-import { drop, dropWhile, groupBy, pipe, prop, sortBy, take, takeWhile } from 'remeda';
+import { drop, dropWhile, groupBy, isDefined, pipe, prop, sortBy, take, takeWhile } from 'remeda';
 import { OpenMeteoTool } from 'bee-agent-framework/tools/weather/openMeteo';
 import { ArXivTool } from 'bee-agent-framework/tools/arxiv';
 import { PythonTool } from 'bee-agent-framework/tools/python/python';
@@ -79,6 +79,7 @@ type SystemTool = Pick<FrameworkTool, 'description' | 'name' | 'inputSchema'> & 
   createdAt: Date;
   isExternal: boolean;
   userDescription?: string;
+  metadata?: any;
 };
 
 export function toToolCallDto(toolCall: Loaded<AnyToolCall, 'fileContainers.file'>): ToolCall {
@@ -253,7 +254,7 @@ export function toDto(tool: AnyTool | SystemTool): ToolDto {
       is_external: tool.isExternal,
       created_at: dayjs(tool.createdAt).unix(),
       user_description: tool.userDescription ?? null,
-      metadata: {},
+      metadata: tool.metadata,
       json_schema: JSON.stringify(
         '_def' in tool.inputSchema()
           ? zodToJsonSchema(tool.inputSchema() as ZodTypeAny)
@@ -450,6 +451,128 @@ export async function createToolResources(
   return resources;
 }
 
+function getSystemTools() {
+  const arXivTool = new ArXivTool();
+  const searchTool = createSearchTool();
+  const wikipediaTool = new WikipediaTool();
+  const weatherTool = new OpenMeteoTool();
+  const pythonTool = new PythonTool({
+    codeInterpreter: { url: BEE_CODE_INTERPRETER_URL ?? '' },
+    storage: createPythonStorage([], null)
+  });
+  const fileSearch = new FileSearchTool({ vectorStores: [], maxNumResults: 0 });
+  const readFile = new ReadFileTool({ files: [], fileSize: 0 });
+
+  const systemTools = new Map<string, SystemTool>();
+
+  systemTools.set(SystemTools.WEB_SEARCH, {
+    type: ToolType.SYSTEM,
+    id: SystemTools.WEB_SEARCH,
+    createdAt: new Date('2024-07-24'),
+    ...searchTool,
+    inputSchema: searchTool.inputSchema,
+    isExternal: true,
+    metadata: {
+      $ui_description_short: 'Retrieve real-time search results from across the internet'
+    },
+    userDescription:
+      "Retrieve real-time search results from across the internet, including news, current events, or content from specific websites or domains. Leverages Google's indexing and search algorithms to provide relevant results, rather than functioning as a web scraper."
+  });
+  systemTools.set(SystemTools.WIKIPEDIA, {
+    type: ToolType.SYSTEM,
+    id: SystemTools.WIKIPEDIA,
+    createdAt: new Date('2024-07-24'),
+    ...wikipediaTool,
+    inputSchema: wikipediaTool.inputSchema,
+    isExternal: true,
+    metadata: {
+      $ui_description_short:
+        'Retrieve detailed information from [Wikipedia.org](https://wikipedia.org) on a wide range of topics'
+    },
+    userDescription:
+      'Retrieve detailed information from [Wikipedia.org](https://wikipedia.org) on a wide range of topics, including famous individuals, locations, organizations, and historical events. Ideal for obtaining comprehensive overviews or specific details on well-documented subjects. May not be suitable for lesser-known or more recent topics. The information is subject to community edits which can be inaccurate.'
+  });
+  systemTools.set(SystemTools.WEATHER, {
+    type: ToolType.SYSTEM,
+    id: SystemTools.WEATHER,
+    createdAt: new Date('2024-07-25'),
+    ...weatherTool,
+    inputSchema: weatherTool.inputSchema,
+    isExternal: true,
+    metadata: {
+      $ui_description_short:
+        'Get real-time weather forecasts for up to 16 days and past data for 30 days'
+    },
+    userDescription:
+      'Retrieve real-time weather forecasts including detailed information on temperature, wind speed, and precipitation. Access forecasts predicting weather up to 16 days in the future and archived forecasts for weather up to 30 days in the past. Ideal for obtaining up-to-date weather predictions and recent historical weather trends.'
+  });
+  systemTools.set(SystemTools.ARXIV, {
+    type: ToolType.SYSTEM,
+    id: SystemTools.ARXIV,
+    createdAt: new Date('2024-07-25'),
+    ...arXivTool,
+    inputSchema: arXivTool.inputSchema,
+    isExternal: true,
+    metadata: {
+      $ui_description_short:
+        'Retrieve abstracts of research articles published on [ArXiv.org](https://arxiv.org), along with their titles, authors, publication dates, and categories'
+    },
+    userDescription:
+      'Retrieve abstracts of research articles published on [ArXiv.org](https://arxiv.org), along with their titles, authors, publication dates, and categories. Ideal for retrieving high-level information about academic papers. The full text of articles is not provided, making it unsuitable for full-text searches or advanced analytics.'
+  });
+  systemTools.set('read_file', {
+    type: ToolType.SYSTEM,
+    id: 'read_file',
+    createdAt: new Date('2024-10-02'),
+    ...readFile,
+    inputSchema: readFile.inputSchema,
+    isExternal: false,
+    metadata: {
+      $ui_description_short: 'Read and interpret basic files'
+    },
+    userDescription:
+      'Read and interpret basic files to deliver summaries, highlight key points, and facilitate file comprehension. Ideal for straightforward tasks requiring access to raw data without any processing. Text (.txt, .md, .html) and JSON files (application/json) are supported up to 5 MB. PDF (.pdf) and text-based image files (.jpg, .jpeg, .png, .tiff, .bmp, .gif) are supported by the WDU text extraction service, limited to the content window of our base model, Llama 3.1 70B, which is 5 MB. The WDU text extraction service is used to extract text from image and PDF files, while text file types are handled by the LLM directly.'
+  });
+  systemTools.set('function', {
+    type: ToolType.FUNCTION,
+    id: 'function',
+    createdAt: new Date('2024-07-31'),
+    description: 'Function to be executed by the user with parameters supplied by the assistant',
+    name: 'Function',
+    inputSchema: () => ({}),
+    isExternal: false
+  });
+  systemTools.set('file_search', {
+    type: ToolType.FILE_SEARCH,
+    id: 'file_search',
+    createdAt: new Date('2024-07-31'),
+    ...fileSearch,
+    inputSchema: fileSearch.inputSchema,
+    isExternal: false,
+    metadata: {
+      $ui_description_short: 'Access and interpret file content by using advanced search techniques'
+    },
+    userDescription:
+      'Read and interpret larger or more complex files using advanced search techniques where contextual understanding is required. Content parsing and chunking is used to break down large volumes of data into manageable pieces for effective analysis. Embeddings (numerical representations that capture the meaning and context of content) enable both traditional keyword and vector search. Vector search enhances the ability to identify similar content based on meaning, even if the exact words differ, improving the chances of identifying relevant information. Text (.txt, .md, .html) and JSON files (application/json) are supported up to 100 MB. PDF (.pdf) and text-based image files (.jpg, .jpeg, .png, .tiff, .bmp, .gif) are supported by the WDU text extraction service.'
+  });
+  systemTools.set('code_interpreter', {
+    type: ToolType.CODE_INTERPRETER,
+    id: 'code_interpreter',
+    createdAt: new Date('2024-07-01'),
+    ...pythonTool,
+    inputSchema: pythonTool.inputSchema,
+    isExternal: true,
+    metadata: {
+      $ui_description_short:
+        'Execute Python code for various tasks, including data analysis, file processing, and visualizations'
+    },
+    userDescription:
+      'Execute Python code for various tasks, including data analysis, file processing, and visualizations. Supports the installation of any library such as NumPy, Pandas, SciPy, and Matplotlib. Users can create new files or convert existing files, which are then made available for download.'
+  });
+
+  return systemTools;
+}
+
 export async function listTools({
   limit,
   after,
@@ -459,115 +582,33 @@ export async function listTools({
   type,
   search
 }: ToolsListQuery): Promise<ToolsListResponse> {
-  const arXivTool = new ArXivTool();
-  const searchTool = createSearchTool();
-  const wikipediaTool = new WikipediaTool();
-  const weatherTool = new OpenMeteoTool();
-  const pythonTool = BEE_CODE_INTERPRETER_URL
-    ? new PythonTool({
-        codeInterpreter: { url: BEE_CODE_INTERPRETER_URL },
-        storage: createPythonStorage([], null)
-      })
-    : null;
-  const fileSearch = new FileSearchTool({ vectorStores: [], maxNumResults: 0 });
-  const readFile = new ReadFileTool({ files: [], fileSize: 0 });
+  const allSystemTools = getSystemTools();
 
-  const systemTools: SystemTool[] =
+  const systemTools: (SystemTool | undefined)[] =
     !type || type.includes(ToolType.SYSTEM)
       ? [
-          {
-            type: ToolType.SYSTEM,
-            id: SystemTools.WEB_SEARCH,
-            createdAt: new Date('2024-07-24'),
-            ...searchTool,
-            inputSchema: searchTool.inputSchema,
-            isExternal: true,
-            userDescription:
-              "Retrieve real-time search results from across the internet, including news, current events, or content from specific websites or domains. Leverages Google's indexing and search algorithms to provide relevant results, rather than functioning as a web scraper."
-          },
-          {
-            type: ToolType.SYSTEM,
-            id: SystemTools.WIKIPEDIA,
-            createdAt: new Date('2024-07-24'),
-            ...wikipediaTool,
-            inputSchema: wikipediaTool.inputSchema,
-            isExternal: true,
-            userDescription:
-              'Retrieve detailed information from [Wikipedia.org](https://wikipedia.org) on a wide range of topics, including famous individuals, locations, organizations, and historical events. Ideal for obtaining comprehensive overviews or specific details on well-documented subjects. May not be suitable for lesser-known or more recent topics. The information is subject to community edits which can be inaccurate.'
-          },
-          {
-            type: ToolType.SYSTEM,
-            id: SystemTools.WEATHER,
-            createdAt: new Date('2024-07-25'),
-            ...weatherTool,
-            inputSchema: weatherTool.inputSchema,
-            isExternal: true,
-            userDescription:
-              'Retrieve real-time weather forecasts including detailed information on temperature, wind speed, and precipitation. Access forecasts predicting weather up to 16 days in the future and archived forecasts for weather up to 30 days in the past. Ideal for obtaining up-to-date weather predictions and recent historical weather trends.'
-          },
-          {
-            type: ToolType.SYSTEM,
-            id: SystemTools.ARXIV,
-            createdAt: new Date('2024-07-25'),
-            ...arXivTool,
-            inputSchema: arXivTool.inputSchema,
-            isExternal: true,
-            userDescription:
-              'Retrieve abstracts of research articles published on [ArXiv.org](https://arxiv.org), along with their titles, authors, publication dates, and categories. Ideal for retrieving high-level information about academic papers. The full text of articles is not provided, making it unsuitable for full-text searches or advanced analytics.'
-          },
-          {
-            type: ToolType.SYSTEM,
-            id: 'read_file',
-            createdAt: new Date('2024-10-02'),
-            ...readFile,
-            inputSchema: readFile.inputSchema,
-            isExternal: false,
-            userDescription:
-              'Read and interpret basic files to deliver summaries, highlight key points, and facilitate file comprehension. Ideal for straightforward tasks requiring access to raw data without any processing. Text (.txt, .md, .html) and JSON files (application/json) are supported up to 5 MB. PDF (.pdf) and text-based image files (.jpg, .jpeg, .png, .tiff, .bmp, .gif) are supported by the WDU text extraction service, limited to the content window of our base model, Llama 3.1 70B, which is 5 MB. The WDU text extraction service is used to extract text from image and PDF files, while text file types are handled by the LLM directly.'
-          }
+          allSystemTools.get(SystemTools.WEB_SEARCH),
+          allSystemTools.get(SystemTools.WIKIPEDIA),
+          allSystemTools.get(SystemTools.WEATHER),
+          allSystemTools.get(SystemTools.ARXIV),
+          allSystemTools.get('read_file')
         ]
       : [];
 
   if (!type || type.includes(ToolType.FUNCTION)) {
-    systemTools.push({
-      type: ToolType.FUNCTION,
-      id: 'function',
-      createdAt: new Date('2024-07-31'),
-      description: 'Function to be executed by the user with parameters supplied by the assistant',
-      name: 'Function',
-      inputSchema: () => ({}),
-      isExternal: false
-    });
+    systemTools.push(allSystemTools.get('function'));
   }
 
   if (!type || type.includes(ToolType.FILE_SEARCH)) {
-    systemTools.push({
-      type: ToolType.FILE_SEARCH,
-      id: 'file_search',
-      createdAt: new Date('2024-07-31'),
-      ...fileSearch,
-      inputSchema: fileSearch.inputSchema,
-      isExternal: false,
-      userDescription:
-        'Read and interpret larger or more complex files using advanced search techniques where contextual understanding is required. Content parsing and chunking is used to break down large volumes of data into manageable pieces for effective analysis. Embeddings (numerical representations that capture the meaning and context of content) enable both traditional keyword and vector search. Vector search enhances the ability to identify similar content based on meaning, even if the exact words differ, improving the chances of identifying relevant information. Text (.txt, .md, .html) and JSON files (application/json) are supported up to 100 MB. PDF (.pdf) and text-based image files (.jpg, .jpeg, .png, .tiff, .bmp, .gif) are supported by the WDU text extraction service.'
-    });
+    systemTools.push(allSystemTools.get('file_search'));
   }
-  if (pythonTool && (!type || type.includes(ToolType.CODE_INTERPRETER))) {
-    systemTools.push({
-      type: ToolType.CODE_INTERPRETER,
-      id: 'code_interpreter',
-      createdAt: new Date('2024-07-01'),
-      ...pythonTool,
-      inputSchema: pythonTool.inputSchema,
-      isExternal: true,
-      userDescription:
-        'Execute Python code for various tasks, including data analysis, file processing, and visualizations. Supports the installation of any library such as NumPy, Pandas, SciPy, and Matplotlib. Users can create new files or convert existing files, which are then made available for download.'
-    });
+  if (BEE_CODE_INTERPRETER_URL && (!type || type.includes(ToolType.CODE_INTERPRETER))) {
+    systemTools.push(allSystemTools.get(ToolType.CODE_INTERPRETER));
   }
 
   const userTools =
     !type || type.includes(ToolType.USER) ? await ORM.em.getRepository(Tool).find({}) : [];
-  const tools = [...systemTools, ...userTools].filter((tool) => {
+  const tools = [...systemTools.filter(isDefined), ...userTools].filter((tool) => {
     if (search) {
       const regexp = new RegExp(`.*${search}.*`, 'gi');
       return regexp.test(tool.name) || regexp.test(tool.description);
@@ -763,6 +804,10 @@ export async function updateTool({
 }
 
 export async function readTool({ tool_id }: ToolReadParams): Promise<ToolReadResponse> {
+  const systemTool = getSystemTools().get(tool_id);
+  if (systemTool) {
+    return toDto(systemTool);
+  }
   const tool = await ORM.em.getRepository<AnyTool>(Tool).findOneOrFail({ id: tool_id });
   return toDto(tool);
 }
