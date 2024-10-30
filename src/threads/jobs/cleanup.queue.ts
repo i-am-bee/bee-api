@@ -77,7 +77,7 @@ async function jobHandler() {
 
             const vectorStores = await ORM.em
               .getRepository(VectorStore)
-              .find({ dependsOn: threadId }, { filters: { deleted: false } });
+              .find({ dependsOn: threadId }, { filters: { deleted: false }, populate: ['files'] });
             await Promise.all(
               vectorStores.map(async (vs) => {
                 await deleteVectorStoreFiles(vs.files.slice());
