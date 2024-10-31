@@ -515,7 +515,7 @@ function getSystemTools() {
     isExternal: true,
     metadata: {
       $ui_description_short:
-        'Retrieve abstracts of research articles published on [ArXiv.org](https://arxiv.org), along with their titles, authors, publication dates, and categories'
+        'Retrieve abstracts of research articles from [ArXiv.org](https://arxiv.org), including titles, authors, publication dates, and categories'
     },
     userDescription:
       'Retrieve abstracts of research articles published on [ArXiv.org](https://arxiv.org), along with their titles, authors, publication dates, and categories. Ideal for retrieving high-level information about academic papers. The full text of articles is not provided, making it unsuitable for full-text searches or advanced analytics.'
