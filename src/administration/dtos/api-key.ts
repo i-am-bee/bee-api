@@ -20,12 +20,13 @@ import { projectSchema } from './project';
 
 export const apiKeySchema = {
   type: 'object',
-  required: ['object', 'id', 'name', 'created_at', 'secret', 'project'],
+  required: ['object', 'id', 'name', 'created_at', 'secret', 'project', 'last_used_at'],
   properties: {
     object: { const: 'organization.project.api_key' },
     id: { type: 'string' },
     name: { type: 'string' },
     created_at: { type: 'number' },
+    last_used_at: { type: 'number', nullable: true },
     secret: { type: 'string' },
     project: projectSchema
   }

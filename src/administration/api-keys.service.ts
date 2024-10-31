@@ -46,7 +46,8 @@ export function toDto(apiKey: Loaded<ProjectApiKey, 'project'>, sensitiveId?: st
     name: apiKey.name,
     created_at: dayjs(apiKey.createdAt).unix(),
     secret: typeof sensitiveId === 'string' ? sensitiveId : apiKey.redactedValue,
-    project: toProjectDto(apiKey.project.$)
+    project: toProjectDto(apiKey.project.$),
+    last_used_at: apiKey.lastUsedAt ? dayjs(apiKey.lastUsedAt).unix() : null
   };
 }
 
