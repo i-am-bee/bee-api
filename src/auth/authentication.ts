@@ -120,6 +120,8 @@ const authApiKey = async (request: FastifyRequest, apiKey: string) => {
       code: APIErrorCode.AUTH_ERROR
     });
   }
+  key.lastUsedAt = new Date();
+  ORM.em.flush();
   request.requestContext.set('apiKey', key);
   request.requestContext.set('projectPrincipal', key.createdBy.$);
 };

@@ -39,6 +39,9 @@ export class ProjectApiKey extends ProjectAdministrationScopedEntity {
   @Property()
   redactedValue: string;
 
+  @Property()
+  lastUsedAt?: Date;
+
   constructor({ key, name, redactedValue, ...rest }: ProjectApiKeyInput) {
     super(rest);
     this.key = key;
