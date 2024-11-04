@@ -43,8 +43,8 @@ export async function getListCursor<T extends BaseEntity>(
   }: PaginatedParameters & FindByCursorOptions<T, any, any>,
   repo: EntityRepository<any> // TODO: better typing,
 ): Promise<Cursor<T>> {
-  const aftr = after ? await repo.findOneOrFail({ id: after }) : undefined;
-  const bfr = before ? await repo.findOneOrFail({ id: before }) : undefined;
+  const aftr = after ? await repo.findOneOrFail({ id: after }, { filters }) : undefined;
+  const bfr = before ? await repo.findOneOrFail({ id: before }, { filters }) : undefined;
   const cursor = await repo.findByCursor(where, {
     ...(aftr ? { first: limit } : {}),
     ...(bfr ? { last: limit } : {}),
