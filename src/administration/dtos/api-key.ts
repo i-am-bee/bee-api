@@ -16,11 +16,14 @@
 
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 
+import { PrincipalType } from '../entities/principals/principal.entity';
+
 import { projectSchema } from './project';
+import { projectUserSchema } from './project-user';
 
 export const apiKeySchema = {
   type: 'object',
-  required: ['object', 'id', 'name', 'created_at', 'secret', 'project', 'last_used_at'],
+  required: ['object', 'id', 'name', 'created_at', 'secret', 'project', 'last_used_at', 'owner'],
   properties: {
     object: { const: 'organization.project.api_key' },
     id: { type: 'string' },
@@ -28,7 +31,15 @@ export const apiKeySchema = {
     created_at: { type: 'number' },
     last_used_at: { type: 'number', nullable: true },
     secret: { type: 'string' },
-    project: projectSchema
+    project: projectSchema,
+    owner: {
+      required: ['type'],
+      properties: {
+        type: { type: 'string', enum: Object.values(PrincipalType) },
+        [PrincipalType.USER]: projectUserSchema,
+        [PrincipalType.SERVICE_ACCOUNT]: {} // TODO service account
+      }
+    }
   }
 } as const satisfies JSONSchema;
 export type ApiKey = FromSchema<typeof apiKeySchema>;
