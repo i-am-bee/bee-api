@@ -28,6 +28,7 @@ import { ProjectApiKey } from '@/administration/entities/project-api-key.entity.
 import { ProjectPrincipal } from '@/administration/entities/project-principal.entity.js';
 import { OrganizationUser } from '@/administration/entities/organization-user.entity.js';
 import { PrincipalType } from '@/administration/entities/principals/principal.entity.js';
+import { getLogger } from '@/logger.js';
 
 export async function getTrustedIdentity(request: FastifyRequest) {
   const authType = determineAuthType(request);
@@ -120,10 +121,13 @@ const authApiKey = async (request: FastifyRequest, apiKey: string) => {
       code: APIErrorCode.AUTH_ERROR
     });
   }
-  key.lastUsedAt = new Date();
   request.requestContext.set('apiKey', key);
   request.requestContext.set('projectPrincipal', key.createdBy.$);
-  await ORM.em.flush();
+  try {
+    await ORM.em.nativeUpdate(ProjectApiKey, { id: key.id }, { lastUsedAt: new Date() });
+  } catch (e) {
+    getLogger().warn('lastUsedAt not updated');
+  }
 };
 
 export type AuthFn = (allowedTypes?: AuthSecret[]) => (request: FastifyRequest) => Promise<void>;
