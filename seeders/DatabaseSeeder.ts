@@ -51,7 +51,7 @@ export class DatabaseSeeder extends Seeder {
 
     const user = new User({
       externalId: USER_EXTERNAL_ID,
-      name: 'Test user',
+      name: process.env.SEEDER_USER_NAME ?? 'Test user',
       email: 'test@email.com'
     });
     const organization = new Organization({ createdBy: ref(user), name: 'Default Organization' });
