@@ -52,11 +52,6 @@ export const projectAdministrationAccessFilter = async (
   if (!projectPrincipal) return { _id: null };
 
   switch (type) {
-    case 'update':
-      return {
-        createdBy: projectPrincipal.id,
-        project: projectPrincipal.project
-      };
     case 'read':
       if (projectPrincipal.role === ProjectRole.ADMIN) return { project: projectPrincipal.project };
       else

@@ -124,7 +124,12 @@ const authApiKey = async (request: FastifyRequest, apiKey: string) => {
   request.requestContext.set('apiKey', key);
   request.requestContext.set('projectPrincipal', key.createdBy.$);
   try {
-    await ORM.em.nativeUpdate(ProjectApiKey, { id: key.id }, { lastUsedAt: new Date() });
+    await ORM.em.nativeUpdate(
+      ProjectApiKey,
+      { id: key.id },
+      { lastUsedAt: new Date() },
+      { filters: { projectAdministrationAccess: false } }
+    );
   } catch (e) {
     getLogger().warn('lastUsedAt not updated');
   }
