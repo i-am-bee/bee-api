@@ -121,9 +121,9 @@ const authApiKey = async (request: FastifyRequest, apiKey: string) => {
     });
   }
   key.lastUsedAt = new Date();
-  await ORM.em.flush();
   request.requestContext.set('apiKey', key);
   request.requestContext.set('projectPrincipal', key.createdBy.$);
+  await ORM.em.flush();
 };
 
 export type AuthFn = (allowedTypes?: AuthSecret[]) => (request: FastifyRequest) => Promise<void>;

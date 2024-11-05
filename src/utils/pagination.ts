@@ -46,7 +46,7 @@ export async function getListCursor<T extends BaseEntity>(
   const aftr = after ? await repo.findOneOrFail({ id: after }, { filters }) : undefined;
   const bfr = before ? await repo.findOneOrFail({ id: before }, { filters }) : undefined;
   const cursor = await repo.findByCursor(where, {
-    ...(aftr ? { first: limit } : {}),
+    ...(!bfr ? { first: limit } : {}),
     ...(bfr ? { last: limit } : {}),
     before: bfr && { [snakeToCamel(order_by)]: bfr[snakeToCamel(order_by) as keyof T], id: bfr.id },
     after: aftr && {
