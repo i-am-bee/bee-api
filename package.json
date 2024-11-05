@@ -1,6 +1,6 @@
 {
   "name": "bee-api",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "license": "Apache-2.0",
   "author": "IBM Corp.",
   "type": "module",
@@ -18,7 +18,8 @@
     "lint": "eslint ./",
     "ts:check": "tsc --noEmit",
     "grpc:generate-types": "proto-loader-gen-types --defaults --keepCase --oneofs --longs=Number --enums=String --grpcLib=@grpc/grpc-js --outDir=./src/embedding/adapters/caikit/grpc/types ./src/embedding/adapters/caikit/grpc/protos/*.proto",
-    "copyright": "./scripts/copyright.sh"
+    "copyright": "./scripts/copyright.sh",
+    "release": "release-it"
   },
   "dependencies": {
     "@appsignal/opentelemetry-instrumentation-bullmq": "^0.7.3",
@@ -78,6 +79,7 @@
   },
   "devDependencies": {
     "@mikro-orm/cli": "6.2.9",
+    "@release-it/conventional-changelog": "^9.0.2",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20.14.1",
     "@types/yauzl": "^2.10.3",
@@ -94,6 +96,7 @@
     "openapi-typescript": "^7.0.2",
     "pino-pretty": "^11.1.0",
     "prettier": "^3.3.0",
+    "release-it": "^17.10.0",
     "tsc-files": "^1.1.4",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.11.2",
