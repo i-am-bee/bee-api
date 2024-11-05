@@ -3,9 +3,16 @@
     <h1 align="center">Bee API</h1>
 </p>
 
-OpenAI-compatible Assistants API backed by [Bee Agent Framework](https://github.com/i-am-bee/bee-agent-framework)
+
+<p align="center">
+  <h4 align="center">OpenAI-compatible Assistants API backed by <a href="https://github.com/i-am-bee/bee-agent-framework">Bee Agent Framework</a></h4>
+</p>
 
 ## Getting started
+
+> [!TIP]
+>
+> 🚀 The fastest way to setup Bee (UI + API) is through [Bee Stack](https://github.com/i-am-bee/bee-stack).
 
 1. Create `.env` (from `.env.example`) and fill in values.
 2. Run `pnpm install` to install dependencies.
