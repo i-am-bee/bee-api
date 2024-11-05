@@ -17,6 +17,7 @@
 import { requestContext } from '@fastify/request-context';
 
 import { APIError, APIErrorCode } from '@/errors/error.entity';
+import { API_KEY_PREFIX } from '@/auth/utils';
 
 export function getOrganizationUser() {
   const orgUser = requestContext.get('organizationUser');
@@ -31,3 +32,9 @@ export function getProjectPrincipal() {
     throw new APIError({ message: 'Project principal not found', code: APIErrorCode.NOT_FOUND });
   return projectPrincipal;
 }
+
+export const redactProjectKeyValue = (key: string) =>
+  key.replace(
+    key.substring(API_KEY_PREFIX.length + 2, key.length - 2),
+    '*'.repeat(key.length - 12)
+  );

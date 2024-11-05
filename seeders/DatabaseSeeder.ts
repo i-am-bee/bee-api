@@ -35,7 +35,7 @@ import {
   PROJECT_ADMIN_ID_DEFAULT,
   PROJECT_ID_DEFAULT
 } from '@/config';
-import { redactProjectKeyValue } from '@/administration/api-keys.service';
+import { redactProjectKeyValue } from '@/administration/helpers';
 
 const USER_EXTERNAL_ID = 'test';
 const PROJECT_API_KEY = `${API_KEY_PREFIX}testkey`;

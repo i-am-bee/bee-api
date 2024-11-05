@@ -24,7 +24,7 @@ import { ApiKeyReadParams, ApiKeyReadResponse } from './dtos/api-key-read';
 import { ApiKeyUpdateBody, ApiKeyUpdateParams, ApiKeyUpdateResponse } from './dtos/api-key-update';
 import { ApiKeysListParams, ApiKeysListQuery, ApiKeysListResponse } from './dtos/api-keys-list';
 import { ApiKeyDeleteParams, ApiKeyDeleteResponse } from './dtos/api-key-delete';
-import { getOrganizationUser, getProjectPrincipal } from './helpers';
+import { getOrganizationUser, getProjectPrincipal, redactProjectKeyValue } from './helpers';
 import { Project } from './entities/project.entity';
 import { OrganizationApiKeysListQuery } from './dtos/organization-api-keys-list';
 import { ProjectPrincipal } from './entities/project-principal.entity';
@@ -34,7 +34,7 @@ import { toDto as toProjectDto } from './projects.service.js';
 import { toProjectUserDto } from './project-users.service';
 
 import { createDeleteResponse } from '@/utils/delete';
-import { API_KEY_PREFIX, generateApiKey, scryptApiKey } from '@/auth/utils';
+import { generateApiKey, scryptApiKey } from '@/auth/utils';
 import { getUpdatedValue } from '@/utils/update';
 import { createPaginatedResponse, getListCursor } from '@/utils/pagination';
 import { ORM } from '@/database';
@@ -93,12 +93,6 @@ export async function createApiKey({
   const loadedApiKey = await getApiKey({ project_id: apiKey.project.id, api_key_id: apiKey.id });
   return toDto(loadedApiKey, keyValue);
 }
-
-export const redactProjectKeyValue = (key: string) =>
-  key.replace(
-    key.substring(API_KEY_PREFIX.length + 2, key.length - 2),
-    '*'.repeat(key.length - 12)
-  );
 
 async function getApiKey({
   project_id,
