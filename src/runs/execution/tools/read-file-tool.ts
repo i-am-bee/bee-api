@@ -21,7 +21,8 @@ import {
   Tool,
   ToolError
 } from 'bee-agent-framework/tools/base';
-import { ZodLiteral, z } from 'zod';
+import { z } from 'zod';
+import { hasAtLeast } from 'remeda';
 
 import { getExtractedFileObject } from '@/files/files.service.js';
 import { File } from '@/files/entities/file.entity.js';
@@ -35,19 +36,14 @@ export class ReadFileTool extends Tool<StringToolOutput, ReadFileToolOptions> {
   name = `ReadFile`;
   description = 'Retrieve file content.';
   inputSchema() {
+    const fileNames = this.options.files.map((file) => z.literal(file.filename));
+
     return z.object({
-      filename:
-        this.options.files.length === 1
-          ? z.literal(this.options.files[0].filename).describe(`Name of the file to read`)
-          : z
-              .union(
-                this.options.files.map((file) => z.literal(file.filename)) as [
-                  ZodLiteral<string>,
-                  ZodLiteral<string>,
-                  ...ZodLiteral<string>[]
-                ]
-              )
-              .describe('Name of the file to read.')
+      filename: hasAtLeast(fileNames, 2)
+        ? z.union(fileNames).describe('Name of the file to read.')
+        : hasAtLeast(fileNames, 1)
+          ? fileNames[0].describe(`Name of the file to read`)
+          : z.literal('non_existing_file').describe('No files available.')
     });
   }
 

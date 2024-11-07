@@ -315,36 +315,36 @@ export async function createToolCall(
 ) {
   if (tool instanceof FileSearchTool) {
     return new FileSearchCall({
-      input: tool.inputSchema().parse(input).query
+      input: await tool.parse(input).then((result) => result.query)
     });
   } else if (tool instanceof WikipediaSimilaritySearchTool) {
     return new SystemCall({
       toolId: SystemTools.WIKIPEDIA,
-      input: tool.inputSchema().parse(input)
+      input: await tool.parse(input)
     });
   } else if (tool instanceof GoogleSearchTool || tool instanceof DuckDuckGoSearchTool) {
     return new SystemCall({
       toolId: SystemTools.WEB_SEARCH,
-      input: tool.inputSchema().parse(input)
+      input: await tool.parse(input)
     });
   } else if (tool instanceof OpenMeteoTool) {
     return new SystemCall({
       toolId: SystemTools.WEATHER,
-      input: tool.inputSchema().parse(input)
+      input: await tool.parse(input)
     });
   } else if (tool instanceof ArXivTool) {
     return new SystemCall({
       toolId: SystemTools.ARXIV,
-      input: tool.inputSchema().parse(input)
+      input: await tool.parse(input)
     });
   } else if (tool instanceof PythonTool) {
     return new CodeInterpreterCall({
-      input: (await tool.inputSchema()).parse(input).code
+      input: await tool.parse(input).then((result) => result.code)
     });
   } else if (tool instanceof ReadFileTool) {
     return new SystemCall({
       toolId: SystemTools.READ_FILE,
-      input: tool.inputSchema().parse(input)
+      input: await tool.parse(input)
     });
   } else if (tool instanceof FunctionTool) {
     return new FunctionCall({ name: tool.name, arguments: JSON.stringify(input) });

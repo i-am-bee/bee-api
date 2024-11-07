@@ -470,7 +470,7 @@ function getSystemTools() {
     id: SystemTools.WEB_SEARCH,
     createdAt: new Date('2024-07-24'),
     ...searchTool,
-    inputSchema: searchTool.inputSchema,
+    inputSchema: searchTool.inputSchema.bind(searchTool),
     isExternal: true,
     metadata: {
       $ui_description_short: 'Retrieve real-time search results from across the internet'
@@ -483,7 +483,7 @@ function getSystemTools() {
     id: SystemTools.WIKIPEDIA,
     createdAt: new Date('2024-07-24'),
     ...wikipediaTool,
-    inputSchema: wikipediaTool.inputSchema,
+    inputSchema: wikipediaTool.inputSchema.bind(wikipediaTool),
     isExternal: true,
     metadata: {
       $ui_description_short:
@@ -497,7 +497,7 @@ function getSystemTools() {
     id: SystemTools.WEATHER,
     createdAt: new Date('2024-07-25'),
     ...weatherTool,
-    inputSchema: weatherTool.inputSchema,
+    inputSchema: weatherTool.inputSchema.bind(weatherTool),
     isExternal: true,
     metadata: {
       $ui_description_short:
@@ -511,7 +511,7 @@ function getSystemTools() {
     id: SystemTools.ARXIV,
     createdAt: new Date('2024-07-25'),
     ...arXivTool,
-    inputSchema: arXivTool.inputSchema,
+    inputSchema: arXivTool.inputSchema.bind(arXivTool),
     isExternal: true,
     metadata: {
       $ui_description_short:
@@ -525,7 +525,7 @@ function getSystemTools() {
     id: 'read_file',
     createdAt: new Date('2024-10-02'),
     ...readFile,
-    inputSchema: readFile.inputSchema,
+    inputSchema: readFile.inputSchema.bind(readFile),
     isExternal: false,
     metadata: {
       $ui_description_short: 'Read and interpret basic files'
@@ -547,7 +547,7 @@ function getSystemTools() {
     id: 'file_search',
     createdAt: new Date('2024-07-31'),
     ...fileSearch,
-    inputSchema: fileSearch.inputSchema,
+    inputSchema: fileSearch.inputSchema.bind(fileSearch),
     isExternal: false,
     metadata: {
       $ui_description_short: 'Access and interpret file content by using advanced search techniques'
@@ -560,7 +560,7 @@ function getSystemTools() {
     id: 'code_interpreter',
     createdAt: new Date('2024-07-01'),
     ...pythonTool,
-    inputSchema: pythonTool.inputSchema,
+    inputSchema: pythonTool.inputSchema.bind(pythonTool),
     isExternal: true,
     metadata: {
       $ui_description_short:

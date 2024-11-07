@@ -83,7 +83,7 @@ export function createStreamingHandler(ctx: AgentContext) {
         details: new RunStepToolCalls({
           toolCalls: [ctx.toolCall]
         }),
-        metadata: data.iteration.tool_caption ? { caption: data.iteration.tool_caption } : {},
+        metadata: {},
         event: createEventFromMeta(meta)
       });
       await ORM.em.persistAndFlush(ctx.runStep);
