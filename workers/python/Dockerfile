@@ -1,9 +1,12 @@
-FROM downloads.unstructured.io/unstructured-io/unstructured:0.16.4
+FROM quay.io/unstructured-io/base-images:wolfi-base-latest as base
+
+USER root
 
 # Configure Poetry
 ENV POETRY_VERSION=1.8.3
 
 RUN pip3.11 install poetry==${POETRY_VERSION}
+ENV PATH="${PATH}:/root/.local/bin"
 
 WORKDIR /app
 
@@ -13,4 +16,4 @@ RUN poetry install
 
 COPY workers/python/python/ ./python/
 
-CMD ["python3.11", "python/main.py"]
+CMD ["poetry", "run", "python", "python/main.py"]
