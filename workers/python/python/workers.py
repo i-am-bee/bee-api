@@ -37,14 +37,18 @@ async def run_workers(names: List[str]):
     # TODO add autodiscovery
     import extraction.extraction
 
+    tasks = []
     for name in names:
         worker = workers.get(name)
         if worker is not None:
-            asyncio.ensure_future(worker.run())
+            task = asyncio.create_task(worker.run())
             logger.info("Worker started")
+            tasks.append(task)
 
-
-async def shutdown_workers():
-    for worker in workers.values():
-        if worker.running:
-            await worker.close()
+    async def shutdown_workers():
+        for worker in workers.values():
+            if worker.running:
+                await worker.close()
+        for task in tasks:
+            await task
+    return shutdown_workers

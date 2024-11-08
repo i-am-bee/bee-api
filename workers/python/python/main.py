@@ -2,7 +2,7 @@ import asyncio
 import signal
 
 from logger import logger
-from workers import run_workers, shutdown_workers
+from workers import run_workers
 from config import config
 
 
@@ -18,7 +18,7 @@ async def main():
     signal.signal(signal.SIGTERM, signal_handler)
     signal.signal(signal.SIGINT, signal_handler)
 
-    await run_workers(config.run_bullmq_workers)
+    shutdown_workers = await run_workers(config.run_bullmq_workers)
     logger.info("Workers started")
 
     # Wait until the shutdown event is set
