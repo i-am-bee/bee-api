@@ -33,22 +33,23 @@ def create_worker(queue_name: str, processor, opts):
     return worker
 
 
+Runners = list[tuple[Worker, asyncio.Task]]
+
+
 async def run_workers(names: List[str]):
     # TODO add autodiscovery
     import extraction.extraction
 
-    tasks = []
+    tuples: Runners = []
     for name in names:
         worker = workers.get(name)
         if worker is not None:
             task = asyncio.create_task(worker.run())
-            logger.info("Worker started")
-            tasks.append(task)
+            tuples.append((worker, task))
+    return tuples
 
-    async def shutdown_workers():
-        for worker in workers.values():
-            if worker.running:
-                await worker.close()
-        for task in tasks:
-            await task
-    return shutdown_workers
+
+async def shutdown_workers(runners: Runners):
+    for (worker, task) in runners:
+        await worker.close()
+        await task
