@@ -50,7 +50,7 @@ async def unstructuredExtraction(file):
     )
     await asyncio.to_thread(pipeline.run)
 
-    result = database.get_collection('file').update_one(
+    result = await database.get_collection('file').update_one(
         {"_id": file["_id"]}, {"$set": {"extraction.jobId": None, "extraction.storageId": f"{EXTRACTION_DIR}/{config.s3_bucket_file_storage}/{storage_id}.json"}})
     if result.modified_count == 0:
         raise RuntimeError("File not found")

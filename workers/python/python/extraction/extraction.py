@@ -12,7 +12,7 @@ async def processExtraction(job: Job, job_token):
     data = job.data
     file_id = data['fileId']
 
-    file = database.get_collection('file').find_one({"_id": file_id})
+    file = await database.get_collection('file').find_one({"_id": file_id})
     if file is None:
         raise RuntimeError("File not found")
     extraction = file["extraction"]
