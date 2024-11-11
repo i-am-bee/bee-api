@@ -177,7 +177,7 @@ export async function getExtractedChunks(file: Loaded<File>) {
   switch (extraction.backend) {
     case ExtractionBackend.WDU: {
       const text = await getExtractedText(file);
-      const splitter = new RecursiveCharacterTextSplitter();
+      const splitter = new RecursiveCharacterTextSplitter({ chunkSize: 400, chunkOverlap: 200 });
       const documents = await splitter.createDocuments([text], undefined);
       return documents.map((doc) => doc.pageContent);
     }
