@@ -77,16 +77,18 @@ export async function executeRun(run: LoadedRun) {
   const publish = createPublisher(run);
 
   // create messages and add file ids to message content
-  const messages = run.thread.$.messages.$.filter((message) => !message.deletedAt).map(
-    (message) =>
-      new BaseMessage(
-        message.role,
-        `${message.content}${message.attachments && message.attachments.length > 0 ? `\n\nFiles:\n${message.attachments.map((attachment) => (attachment as Loaded<Attachment, 'file'>).file.$.filename).join('\n')}` : ''}`,
-        {
-          createdAt: message.createdAt
-        }
-      )
+  const messages = run.thread.$.messages.$.filter((message) => !message.deletedAt).map((message) =>
+    message.role === 'tool_call'
+      ? new BaseMessage('assistant', message.content, { createdAt: message.createdAt })
+      : new BaseMessage(
+          message.role,
+          `${message.content}${message.attachments && message.attachments.length > 0 ? `\n\nFiles:\n${message.attachments.map((attachment) => (attachment as Loaded<Attachment, 'file'>).file.$.filename).join('\n')}` : ''}`,
+          {
+            createdAt: message.createdAt
+          }
+        )
   );
+  console.log(messages);
 
   // add all files from the message attachments to the thread tool_resources
   const attachments = run.thread.$.messages.$.getItems()

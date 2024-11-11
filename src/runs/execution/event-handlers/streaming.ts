@@ -42,6 +42,7 @@ import { createApproveChannel, toRunDto } from '@/runs/runs.service';
 import { RequiredToolApprove } from '@/runs/entities/requiredToolApprove.entity';
 import { ToolApprovalType } from '@/runs/entities/toolApproval.entity';
 import { ToolType } from '@/tools/entities/tool/tool.entity';
+import { last } from 'remeda';
 
 const agentToolExecutionTime = new Summary({
   name: 'agent_tool_execution_time_seconds',
@@ -168,7 +169,7 @@ export function createStreamingHandler(ctx: AgentContext) {
     emitter.on('toolError', ({ data }) => onError(ctx)(data.error));
 
     // onUpdate follows with a flush and publish
-    emitter.on('update', async ({ data, update, meta }) => {
+    emitter.on('update', async ({ data, update, meta, memory }) => {
       if (update.key === 'final_answer') {
         if (!ctx.message) {
           logger.warn({ successCall: data }, 'Agent success with missing message');
@@ -191,6 +192,19 @@ export function createStreamingHandler(ctx: AgentContext) {
         }
         if (update.key === 'thought' && ctx.runStep.details instanceof RunStepThought) {
           ctx.runStep.details.content = data.thought ?? ctx.runStep.details.content;
+        }
+        if (update.key === 'tool_output') {
+          await ORM.em.persistAndFlush(
+            new Message({
+              project: ctx.run.project,
+              role: 'tool_call',
+              content: last(memory.messages)?.text ?? '',
+              thread: ctx.run.thread,
+              run: ref(ctx.run),
+              createdBy: ctx.run.createdBy,
+              status: MessageStatus.COMPLETED
+            })
+          );
         }
         if (meta.success) {
           ctx.runStep.status = RunStepStatus.COMPLETED;

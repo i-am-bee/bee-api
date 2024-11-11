@@ -202,7 +202,8 @@ export async function listMessages({
   const bfr = before ? await repo.findOneOrFail({ id: before }) : undefined;
   const cursor = await repo.findByCursor(
     {
-      thread: thread_id
+      thread: thread_id,
+      role: { $ne: 'tool_call' }
     },
     {
       first: limit,

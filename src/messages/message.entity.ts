@@ -27,7 +27,8 @@ import {
 
 export const MessageRole = {
   USER: 'user',
-  ASSISTANT: 'assistant'
+  ASSISTANT: 'assistant',
+  TOOL_CALL: 'tool_call'
 } as const;
 export type MessageRole = (typeof MessageRole)[keyof typeof MessageRole];
 
