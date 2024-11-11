@@ -16,10 +16,12 @@
 
 import { Job } from 'bullmq';
 import { RequestContext } from '@mikro-orm/core';
+import { AWSError } from 'ibm-cos-sdk';
 
 import { File } from '../entities/file.entity.js';
 import { s3Client } from '../files.service.js';
 import { removeExtraction } from '../extraction/helpers.js';
+import { isS3Error } from '../utils/s3.js';
 
 import { ORM } from '@/database.js';
 import { createQueue } from '@/jobs/bullmq.js';
@@ -60,7 +62,15 @@ async function jobHandler(_: Job) {
           }
 
           if (file.extraction) {
-            await removeExtraction(file);
+            try {
+              await removeExtraction(file);
+            } catch (err) {
+              if (isS3Error(err) && (err as AWSError).code === 'NotFound') {
+                // Resource has been already removed, likely in the block above
+              } else {
+                throw err;
+              }
+            }
           }
 
           const vectoreStoreFiles = await ORM.em.getRepository(VectorStoreFile).find({ file });
