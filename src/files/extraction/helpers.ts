@@ -156,16 +156,9 @@ export async function getExtractedText(file: Loaded<File>) {
     case ExtractionBackend.UNSTRUCTURED_OPENSOURCE:
     case ExtractionBackend.UNSTRUCTURED_API: {
       if (!extraction.storageId) throw new Error('Extraction missing');
-      const object = await s3Client
-        .getObject({
-          Bucket: S3_BUCKET_FILE_STORAGE,
-          Key: extraction.storageId
-        })
-        .promise();
-      const body = object.Body;
-      if (!body) throw new Error('Invalid Body of a file');
-      const data = body.toString('utf-8');
-      const elements = JSON.parse(data) as UnstructuredExtractionDocument;
+      const elements = JSON.parse(
+        await readTextFile(extraction.storageId)
+      ) as UnstructuredExtractionDocument;
       return elements.map((element) => element.text).join('');
     }
   }
@@ -184,19 +177,25 @@ export async function getExtractedChunks(file: Loaded<File>) {
     case ExtractionBackend.UNSTRUCTURED_OPENSOURCE:
     case ExtractionBackend.UNSTRUCTURED_API: {
       if (!extraction.storageId) throw new Error('Extraction missing');
-      const object = await s3Client
-        .getObject({
-          Bucket: S3_BUCKET_FILE_STORAGE,
-          Key: extraction.storageId
-        })
-        .promise();
-      const body = object.Body;
-      if (!body) throw new Error('Invalid Body of a file');
-      const data = body.toString('utf-8');
-      const elements = JSON.parse(data) as UnstructuredExtractionDocument;
+      const elements = JSON.parse(
+        await readTextFile(extraction.storageId)
+      ) as UnstructuredExtractionDocument;
       return elements
         .filter((element) => element.type === 'CompositeElement')
         .map((element) => element.text);
     }
   }
+}
+
+async function readTextFile(key: string) {
+  const object = await s3Client
+    .getObject({
+      Bucket: S3_BUCKET_FILE_STORAGE,
+      Key: key
+    })
+    .promise();
+  const body = object.Body;
+  if (!body) throw new Error('Invalid Body of a file');
+  const data = body.toString('utf-8');
+  return data;
 }
