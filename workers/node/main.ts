@@ -15,10 +15,6 @@
  */
 
 import * as http from 'node:http';
-import path from 'node:path';
-
-import { Utils } from '@mikro-orm/core';
-import { globby } from 'globby';
 
 import { runWorkers } from '@/jobs/bullmq.js';
 import { PORT, RUN_BULLMQ_WORKERS } from '@/config.js';
@@ -27,18 +23,8 @@ import { createTerminus } from '@/terminus.js';
 
 const logger = getLogger();
 
-async function discoverQueues() {
-  const isTsNode = Utils.detectTsNode();
-  const queueGlobs = isTsNode ? './**/*.queue.ts' : './**/*.queue.js';
-  const cwd = isTsNode ? `${process.cwd()}/src` : `${process.cwd()}/dist`;
-  const queues = await globby(queueGlobs, { cwd });
-  logger.info({ queues }, `Discovered queues.`);
-  await Promise.all(queues.map((file) => import(path.join(cwd, file))));
-}
-
 try {
-  await discoverQueues();
-  runWorkers(RUN_BULLMQ_WORKERS);
+  await runWorkers(RUN_BULLMQ_WORKERS);
   const server = http.createServer((_, res) => res.writeHead(404).end());
   createTerminus(server);
   server.listen({ port: PORT, host: '0.0.0.0' });

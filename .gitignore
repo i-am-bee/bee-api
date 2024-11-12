@@ -46,3 +46,7 @@ yarn-error.log*
 
 # WebStorm
 .idea
+
+# Python
+.venv
+__pycache__

@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-import { RequestContext } from '@mikro-orm/core';
+import { Migration } from '@mikro-orm/migrations-mongodb';
 
-import { ORM } from '@/database.js';
-import { createQueue } from '@/jobs/bullmq.js';
-import { cleanupVectorStores } from '@/vector-store-files/execution/clean-up-vector-db.js';
-import { QueueName } from '@/jobs/constants.js';
+import { File } from '@/files/entities/file.entity';
+import { ExtractionBackend } from '@/files/extraction/constants';
 
-async function jobHandler() {
-  return RequestContext.create(ORM.em, async () => cleanupVectorStores());
+export class Migration20241106150011 extends Migration {
+  async up(): Promise<void> {
+    await this.getCollection(File).updateMany(
+      { extraction: { $exists: true } },
+      { $set: { extraction: { backend: ExtractionBackend.WDU } } },
+      { session: this.ctx }
+    );
+  }
 }
-
-export const { queue } = createQueue({
-  name: QueueName.VECTOR_STORES_CLEANUP,
-  jobHandler,
-  jobsOptions: { attempts: 1 }
-});

@@ -24,8 +24,8 @@ import {
 import { z } from 'zod';
 import { hasAtLeast } from 'remeda';
 
-import { getExtractedFileObject } from '@/files/files.service.js';
 import { File } from '@/files/entities/file.entity.js';
+import { getExtractedText } from '@/files/extraction/helpers';
 
 export interface ReadFileToolOptions extends BaseToolOptions {
   fileSize: number;
@@ -53,10 +53,10 @@ export class ReadFileTool extends Tool<StringToolOutput, ReadFileToolOptions> {
       throw new ToolError(`File ${filename} not found.`);
     }
     try {
-      const fileObject = await getExtractedFileObject(file);
-      if ((fileObject.ContentLength ?? 0) > this.options.fileSize) {
+      const text = await getExtractedText(file);
+      if (text.length > this.options.fileSize) {
         throw new ToolError(
-          `The file is too big (${fileObject.ContentLength} bytes). Maximum allowed size is ${this.options.fileSize} bytes`,
+          `The text is too big (${text.length} characters). Maximum allowed size is ${this.options.fileSize} characters`,
           [],
           {
             isFatal: false,
@@ -65,7 +65,7 @@ export class ReadFileTool extends Tool<StringToolOutput, ReadFileToolOptions> {
         );
       }
 
-      return new StringToolOutput('file content: \n' + fileObject.Body?.toString());
+      return new StringToolOutput('file content: \n' + text);
     } catch {
       throw new ToolError('This file is not a text file and can not be read.', [], {
         isFatal: false,

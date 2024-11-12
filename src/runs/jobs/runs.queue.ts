@@ -88,7 +88,7 @@ async function jobHandler(job: Job<{ runId: string }>) {
   });
 }
 
-export const { queue, worker } = createQueue({
+export const { queue } = createQueue({
   name: QueueName.RUNS,
   jobHandler,
   jobsOptions: { attempts: 1 },

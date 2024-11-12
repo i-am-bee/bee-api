@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-import { RequestContext } from '@mikro-orm/core';
+import { Embeddable, Property } from '@mikro-orm/core';
 
-import { ORM } from '@/database.js';
-import { createQueue } from '@/jobs/bullmq.js';
-import { cleanupVectorStores } from '@/vector-store-files/execution/clean-up-vector-db.js';
-import { QueueName } from '@/jobs/constants.js';
+import { Extraction } from './extraction.entity';
 
-async function jobHandler() {
-  return RequestContext.create(ORM.em, async () => cleanupVectorStores());
+import { ExtractionBackend } from '@/files/extraction/constants';
+
+@Embeddable({ discriminatorValue: ExtractionBackend.WDU })
+export class WDUExtraction extends Extraction {
+  backend = ExtractionBackend.WDU;
+
+  @Property()
+  storageId?: string;
+
+  constructor({ storageId, ...rest }: WDUExtractionInput) {
+    super(rest);
+    this.storageId = storageId;
+  }
 }
 
-export const { queue } = createQueue({
-  name: QueueName.VECTOR_STORES_CLEANUP,
-  jobHandler,
-  jobsOptions: { attempts: 1 }
-});
+export type WDUExtractionInput = Pick<WDUExtraction, 'jobId' | 'storageId'>;

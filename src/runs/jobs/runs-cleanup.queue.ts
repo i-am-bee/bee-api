@@ -33,7 +33,7 @@ async function jobHandler() {
   });
 }
 
-export const { queue, worker } = createQueue({
+export const { queue } = createQueue({
   name: QueueName.RUNS_CLEANUP,
   jobHandler,
   jobsOptions: { attempts: 1 },

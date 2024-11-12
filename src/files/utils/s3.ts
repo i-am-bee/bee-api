@@ -14,19 +14,4 @@
  * limitations under the License.
  */
 
-import { RequestContext } from '@mikro-orm/core';
-
-import { ORM } from '@/database.js';
-import { createQueue } from '@/jobs/bullmq.js';
-import { cleanupVectorStores } from '@/vector-store-files/execution/clean-up-vector-db.js';
-import { QueueName } from '@/jobs/constants.js';
-
-async function jobHandler() {
-  return RequestContext.create(ORM.em, async () => cleanupVectorStores());
-}
-
-export const { queue } = createQueue({
-  name: QueueName.VECTOR_STORES_CLEANUP,
-  jobHandler,
-  jobsOptions: { attempts: 1 }
-});
+export const isS3Error = (e: any) => 'code' in e && 'message' in e && 'time' in e;

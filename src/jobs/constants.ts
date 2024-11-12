@@ -20,7 +20,8 @@ export const QueueName = {
   THREADS_CLEANUP: 'threads:cleanup',
   VECTOR_STORES_CLEANUP: 'vectorStores:cleanup',
   VECTOR_STORES_FILE_PROCESSOR: 'vectorStores:fileProcessor',
-  FILES_EXTRACTION: 'files:extraction',
+  FILES_EXTRACTION_NODE: 'files:extraction:node',
+  FILES_EXTRACTION_PYTHON: 'files:extraction:python',
   FILES_CLEANUP: 'files:cleanup'
 } as const;
 export type QueueName = (typeof QueueName)[keyof typeof QueueName];

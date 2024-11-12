@@ -14,28 +14,35 @@
  * limitations under the License.
  */
 
-import { Readable } from 'node:stream';
 import { promisify } from 'node:util';
 
+import { Loaded } from '@mikro-orm/core';
 import yauzl, { Options, ZipFile } from 'yauzl';
 
-import { WDU_URL } from '@/config.js';
+import { File } from '../entities/file.entity';
+import { s3Client } from '../files.service';
+import { WDUExtraction } from '../entities/extractions/wdu-extraction.entity';
+
+import { ExtractionBackend } from './constants';
+
+import { S3_BUCKET_FILE_STORAGE, WDU_URL } from '@/config.js';
 import { toBuffer } from '@/utils/streams.js';
+import { ORM } from '@/database';
 
-export function canBeExtracted(mimeType: string) {
-  if (!WDU_URL) return false;
-  // allowed types are specified in WDU docs
-  return [
-    'application/pdf',
-    'image/jpeg',
-    'image/png',
-    'image/tiff',
-    'image/bmp',
-    'image/gif'
-  ].includes(mimeType);
-}
+async function wduExtract(file: Loaded<File>) {
+  const head = await s3Client
+    .headObject({
+      Bucket: S3_BUCKET_FILE_STORAGE,
+      Key: file.storageId
+    })
+    .promise();
 
-export async function extract(filename: string, content: Readable) {
+  if (head.ContentType?.startsWith('text/') || head.ContentType === 'application/json') {
+    file.extraction = new WDUExtraction({ storageId: file.storageId });
+    await ORM.em.flush();
+    return;
+  }
+
   if (!WDU_URL) throw new Error('Missing WDU_URL');
   const response = await fetch(new URL('/api/v1/task/doc-processing', WDU_URL), {
     method: 'POST',
@@ -46,8 +53,17 @@ export async function extract(filename: string, content: Readable) {
       model_id: 'doc_processing',
       inputs: {
         file: {
-          filename,
-          data: (await toBuffer(content)).toString('base64')
+          filename: file.filename,
+          data: (
+            await toBuffer(
+              s3Client
+                .getObject({
+                  Bucket: S3_BUCKET_FILE_STORAGE,
+                  Key: file.storageId
+                })
+                .createReadStream()
+            )
+          ).toString('base64')
         }
       },
       parameters: {
@@ -87,4 +103,16 @@ export async function extract(filename: string, content: Readable) {
   if (!dataBufferPromise) throw new Error('Response is missing serialized extraction');
 
   return (await dataBufferPromise).toString('utf8');
+}
+
+export async function extract(file: Loaded<File>) {
+  const extraction = file.extraction;
+  if (!extraction) throw new Error('No extraction data');
+  switch (extraction.backend) {
+    case ExtractionBackend.WDU:
+      await wduExtract(file);
+      return;
+    default:
+      throw new Error(`Backend ${extraction.backend} is not supported`);
+  }
 }

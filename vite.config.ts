@@ -25,6 +25,7 @@ export default {
     lib: {
       entry: [
         ...glob.sync(resolve(__dirname, 'src/**/*.ts')),
+        ...glob.sync(resolve(__dirname, 'workers/node/**/*.ts')),
         ...glob.sync(resolve(__dirname, 'seeders/**/*.ts'))
       ],
       formats: ['es']

@@ -19,7 +19,7 @@ import { DelayedError, Job } from 'bullmq';
 
 import { File } from '../entities/file.entity.js';
 
-import { queue as extractionQueue } from '@/files/jobs/extraction.queue.js';
+import { nodeQueue, pythonQueue } from '@/files/jobs/extraction.queue.js';
 
 export async function waitForExtraction(
   job: Job,
@@ -33,7 +33,9 @@ export async function waitForExtraction(
       if (!file.extraction.storageId) {
         if (!file.extraction.jobId) throw new Error('Extraction job not found');
 
-        const extractionJob = await extractionQueue.getJob(file.extraction.jobId);
+        const extractionJob =
+          (await nodeQueue.getJob(file.extraction.jobId)) ??
+          (await pythonQueue.getJob(file.extraction.jobId));
         if (!extractionJob) throw new Error('Extraction job not found');
 
         const state = await extractionJob.getState();
@@ -41,7 +43,8 @@ export async function waitForExtraction(
         if (state == 'failed') {
           throw new Error('Extraction job failed, unable to proceed');
         }
-        if (state !== 'completed') {
+        // Extraction (or posprocessing) hasn't completed yet
+        if (state !== 'completed' || !file.extraction.storageId) {
           await job.moveToDelayed(Date.now() + 3000, job.token);
           throw new DelayedError();
         }
