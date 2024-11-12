@@ -11,7 +11,7 @@
     "start:dev:nowatch": "tsx src/server.ts | pino-pretty --singleLine",
     "start:dev:workers": "concurrently npm:start:dev:workers:*",
     "start:dev:workers:node": "tsx watch workers/node/main.ts | pino-pretty --singleLine",
-    "start:dev:workers:python": "python workers/python/main.py",
+    "start:dev:workers:python": "bash -c 'cd workers/python && poetry run python python/main.py'",
     "test:e2e": "vitest run tests/e2e",
     "test:e2e:watch": "vitest watch tests/e2e",
     "mikro-orm": "NODE_OPTIONS='--import tsx' mikro-orm --config ./src/mikro-orm.config.ts",
