@@ -20,7 +20,7 @@ from config import config
 
 cert = None
 if config.mongodb_ca_cert is not None:
-    cert = tempfile.NamedTemporaryFile(delete=False)
+    cert = tempfile.NamedTemporaryFile(delete=False, mode='w')
     cert.write(config.mongodb_ca_cert)
     cert.close()
 
