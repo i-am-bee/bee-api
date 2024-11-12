@@ -16,15 +16,15 @@ import asyncio
 from typing import List
 from bullmq import Worker
 from redis.asyncio import Redis
-from redis.connection import parse_url
+from redis.asyncio.connection import parse_url
 
 from logger import logger
 from config import config
 
 workers: dict[str, Worker] = dict()
 
-redis_client = Redis(**parse_url(config.redis_url),
-                     ssl_ca_data=config.redis_ca_cert, decode_responses=True)
+redis_client = Redis.from_url(
+    config.redis_url, ssl_ca_data=config.redis_ca_cert, decode_responses=True)
 
 
 def create_worker(queue_name: str, processor, opts):

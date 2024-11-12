@@ -23,7 +23,7 @@ export class Migration20241106150011 extends Migration {
   async up(): Promise<void> {
     await this.getCollection(File).updateMany(
       { extraction: { $exists: true } },
-      { $set: { extraction: { backend: ExtractionBackend.WDU } } },
+      { $set: { 'extraction.backend': ExtractionBackend.WDU } },
       { session: this.ctx }
     );
   }
