@@ -661,7 +661,8 @@ async function createCodeInterpreterTool(
       jsonSchema: customTool.inputSchema(),
       description: customTool.description,
       metadata: body.metadata,
-      userDescription: body.user_description
+      userDescription: body.user_description,
+      secrets: body.secrets
     });
 
     await ORM.em.persistAndFlush(tool);
@@ -766,6 +767,7 @@ export async function updateTool({
         );
         tool.jsonSchema = newCustomTool.inputSchema();
         tool.description = newCustomTool.description;
+        tool.secrets = getUpdatedValue(body.secrets, tool.secrets);
       } catch (err) {
         if (err instanceof CustomToolCreateError) {
           throw new APIError({

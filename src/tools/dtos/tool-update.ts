@@ -36,6 +36,7 @@ export const toolUpdateBodySchema = {
         source_code: {
           type: 'string'
         },
+        secrets: { type: 'array', items: { type: 'string' } },
         metadata: metadataSchema,
         user_description: { type: 'string' }
       }

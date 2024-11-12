@@ -29,12 +29,17 @@ export class CodeInterpreterTool extends Tool {
   @Property({ type: 'json' })
   jsonSchema!: JSONSchema;
 
-  constructor({ sourceCode, jsonSchema, ...rest }: CodeInterpreterToolInput) {
+  @Property()
+  secrets?: string[];
+
+  constructor({ sourceCode, jsonSchema, secrets, ...rest }: CodeInterpreterToolInput) {
     super(rest);
     this.sourceCode = sourceCode;
     this.jsonSchema = jsonSchema;
+    this.secrets = secrets;
   }
 }
 
 export type CodeInterpreterToolInput = ToolInput &
-  Pick<CodeInterpreterTool, 'sourceCode' | 'jsonSchema'>;
+  Pick<CodeInterpreterTool, 'sourceCode' | 'jsonSchema'> &
+  Partial<Pick<CodeInterpreterTool, 'secrets'>>;
