@@ -86,30 +86,42 @@ export async function scheduleExtraction(
 ) {
   switch (backend) {
     case ExtractionBackend.WDU: {
-      const job = await nodeQueue.add(QueueName.FILES_EXTRACTION_NODE, {
-        fileId: file.id,
-        backend
-      });
-      file.extraction = new WDUExtraction({ jobId: job.id });
+      file.extraction = new WDUExtraction({ jobId: file.id });
       await ORM.em.flush();
+      await nodeQueue.add(
+        QueueName.FILES_EXTRACTION_NODE,
+        {
+          fileId: file.id,
+          backend
+        },
+        { jobId: file.id }
+      );
       break;
     }
     case ExtractionBackend.UNSTRUCTURED_OPENSOURCE: {
-      const job = await pythonQueue.add(QueueName.FILES_EXTRACTION_PYTHON, {
-        fileId: file.id,
-        backend
-      });
-      file.extraction = new UnstructuredOpensourceExtraction({ jobId: job.id });
+      file.extraction = new UnstructuredOpensourceExtraction({ jobId: file.id });
       await ORM.em.flush();
+      await pythonQueue.add(
+        QueueName.FILES_EXTRACTION_PYTHON,
+        {
+          fileId: file.id,
+          backend
+        },
+        { jobId: file.id }
+      );
       break;
     }
     case ExtractionBackend.UNSTRUCTURED_API: {
-      const job = await pythonQueue.add(QueueName.FILES_EXTRACTION_PYTHON, {
-        fileId: file.id,
-        backend
-      });
-      file.extraction = new UnstructuredAPIExtraction({ jobId: job.id });
+      file.extraction = new UnstructuredAPIExtraction({ jobId: file.id });
       await ORM.em.flush();
+      await pythonQueue.add(
+        QueueName.FILES_EXTRACTION_PYTHON,
+        {
+          fileId: file.id,
+          backend
+        },
+        { jobId: file.id }
+      );
       break;
     }
   }
