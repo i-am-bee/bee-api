@@ -108,37 +108,45 @@ export function createStreamingHandler(ctx: AgentContext) {
           const client = createClient();
           await new Promise((resolve, reject) => {
             client.subscribe(createApproveChannel(ctx.run, toolCall), async (err) => {
-              if (err) {
+              try {
+                if (err) {
+                  reject(err);
+                } else {
+                  ctx.run.requireAction(
+                    new RequiredToolApprove({
+                      toolCalls: [...(ctx.run.requiredAction?.toolCalls ?? []), toolCall]
+                    })
+                  );
+                  await ORM.em.flush();
+                  await ctx.publish({
+                    event: 'thread.run.requires_action',
+                    data: toRunDto(ctx.run)
+                  });
+                  await ctx.publish({
+                    event: 'done',
+                    data: '[DONE]'
+                  });
+                }
+              } catch (err) {
                 reject(err);
-              } else {
-                ctx.run.requireAction(
-                  new RequiredToolApprove({
-                    toolCalls: [...(ctx.run.requiredAction?.toolCalls ?? []), toolCall]
-                  })
-                );
-                await ORM.em.flush();
-                await ctx.publish({
-                  event: 'thread.run.requires_action',
-                  data: toRunDto(ctx.run)
-                });
-                await ctx.publish({
-                  event: 'done',
-                  data: '[DONE]'
-                });
               }
             });
             client.on('message', async (_, approval) => {
-              ctx.run.submitAction();
-              await ORM.em.flush();
-              if (approval !== 'true') {
-                reject(
-                  new ToolError('User has not approved this tool to run.', [], {
-                    isFatal: false,
-                    isRetryable: false
-                  })
-                );
+              try {
+                ctx.run.submitAction();
+                await ORM.em.flush();
+                if (approval !== 'true') {
+                  reject(
+                    new ToolError('User has not approved this tool to run.', [], {
+                      isFatal: false,
+                      isRetryable: false
+                    })
+                  );
+                }
+                resolve(true);
+              } catch (err) {
+                reject(err);
               }
-              resolve(true);
             });
           });
         }

@@ -164,7 +164,6 @@ export class Run extends PrincipalScopedEntity {
   }
 
   fail(error: APIError) {
-    this.assertCurrentStatus(RunStatus.QUEUED, RunStatus.IN_PROGRESS);
     this.status = RunStatus.FAILED;
     this.failedAt = new Date();
     this.lastError = error;
