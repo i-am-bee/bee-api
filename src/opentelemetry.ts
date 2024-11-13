@@ -27,7 +27,7 @@ const ENV = process.env.ENVIRONMENT;
 
 export const opentelemetrySDK = new NodeSDK({
   resource: new resources.Resource({
-    [ATTR_SERVICE_NAME]: `bee-api${ENV ? `-${ENV}` : ''}`, // Instana works best over service names
+    [ATTR_SERVICE_NAME]: `bee-api`,
     [ATTR_DEPLOYMENT_ENVIRONMENT_NAME]: ENV
   }),
   metricReader: new metrics.PeriodicExportingMetricReader({ exporter: new OTLPMetricExporter() }),
