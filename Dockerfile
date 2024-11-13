@@ -50,5 +50,6 @@ USER node
 EXPOSE 4000
 
 ENV PORT 4000
+ENV BEE_FRAMEWORK_INSTRUMENTATION_ENABLED true
 
 CMD [ "node", "--enable-source-maps", "--experimental-loader=@opentelemetry/instrumentation/hook.mjs", "--import", "./dist/opentelemetry.js", "./dist/server.js" ]
