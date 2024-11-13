@@ -1,4 +1,4 @@
-FROM downloads.unstructured.io/unstructured-io/unstructured:latest
+FROM downloads.unstructured.io/unstructured-io/unstructured:0.16.5
 
 # Configure Poetry
 ENV POETRY_VERSION=1.8.3
