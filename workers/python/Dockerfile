@@ -1,12 +1,10 @@
-FROM quay.io/unstructured-io/base-images:wolfi-base-latest
-
-USER root
+FROM downloads.unstructured.io/unstructured-io/unstructured:latest
 
 # Configure Poetry
 ENV POETRY_VERSION=1.8.3
 
 RUN pip3.11 install poetry==${POETRY_VERSION}
-ENV PATH="${PATH}:/root/.local/bin"
+ENV PATH="${PATH}:/home/notebook-user/.local/bin"
 
 WORKDIR /app
 
