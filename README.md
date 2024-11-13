@@ -58,6 +58,40 @@ module ---> dto
 
 OpenAPI schema is auto-generated from the `dtos` and exposed on the `/docs` endpoint.
 
+## Starting the bee-api infrastructure
+
+The easiest way to run all the dependencies for the bee-api is to:
+
+- Clone the bee-stack repository https://github.com/i-am-bee/bee-stack
+- Navigate to the bee-stack directory.
+- Run the infrastructure:
+
+```
+./bee-stack.sh clean
+./bee-stack.sh:infra
+```
+
+- Then navigate back to the bee-api repository.
+- Install packages:
+
+```
+pnpm install
+```
+
+- Run the database seeder:
+
+```
+pnpm mikro-orm seeder:run
+```
+
+- Add values the env vars: CRYPTO_CIPHER_KEY, LLM_BACKEND, EMBEDDING_BACKEND.
+
+- Run the bee-api:
+
+```
+pnpm start:dev
+```
+
 ### Dependencies
 
 #### MongoDB
