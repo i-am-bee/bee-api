@@ -3,7 +3,6 @@
     <h1 align="center">Bee API</h1>
 </p>
 
-
 <p align="center">
   <h4 align="center">OpenAI-compatible Assistants API backed by <a href="https://github.com/i-am-bee/bee-agent-framework">Bee Agent Framework</a></h4>
 </p>
@@ -32,6 +31,7 @@ The Assistants API consists mostly of CRUDL endpoints for managing API resources
 ### Infrastructure
 
 The infrastructure consists of:
+
 - REST API server
 - MongoDB
 - Redis
@@ -41,11 +41,12 @@ The REST API server stores resources in MongoDB database. Redis is used by BullM
 ### Server
 
 The codebase contains several types of modules:
--  `*.modules.ts` containing endpoint handlers
--  `*.services.ts` containing services for the handlers
--  `dtos/*.ts` containing JSON schema definitions for resources
--  `*.entity.ts` containing ORM definitions for database entities
--  `*.queue.ts` containing BullMQ queues and workers for asynchronous execution
+
+- `*.modules.ts` containing endpoint handlers
+- `*.services.ts` containing services for the handlers
+- `dtos/*.ts` containing JSON schema definitions for resources
+- `*.entity.ts` containing ORM definitions for database entities
+- `*.queue.ts` containing BullMQ queues and workers for asynchronous execution
 
 These modules are connected in the following manner
 
@@ -56,3 +57,17 @@ module ---> dto
 ```
 
 OpenAPI schema is auto-generated from the `dtos` and exposed on the `/docs` endpoint.
+
+### Dependencies
+
+#### MongoDB
+
+```
+docker run -d -p 27017:27017 mongo:latest
+```
+
+#### Redis
+
+```
+ docker run -d -p 6379:6379 redis:latest
+```
