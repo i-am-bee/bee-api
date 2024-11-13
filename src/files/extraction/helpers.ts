@@ -74,7 +74,9 @@ export function supportsExtraction(
         'tsv',
         'xls',
         'xlsx',
-        'xml'
+        'xml',
+        'json',
+        'vtt'
       ].includes(extension);
     }
   }
