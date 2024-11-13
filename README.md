@@ -91,17 +91,3 @@ pnpm mikro-orm seeder:run
 ```
 pnpm start:dev
 ```
-
-### Dependencies
-
-#### MongoDB
-
-```
-docker run -d -p 27017:27017 mongo:latest
-```
-
-#### Redis
-
-```
- docker run -d -p 6379:6379 redis:latest
-```
