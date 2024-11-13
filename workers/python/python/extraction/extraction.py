@@ -24,13 +24,17 @@ EXTRACTION_QUEUE_NAME = "files:extraction:python"
 
 async def processExtraction(job: Job, job_token):
     data = job.data
-    file_id = data['fileId']
+    file_id = data.get('fileId')
+    if file_id is None:
+        raise RuntimeError("fileId not found")
 
     file = await database.get_collection('file').find_one({"_id": file_id})
     if file is None:
         raise RuntimeError("File not found")
-    extraction = file["extraction"]
-    backend = extraction["backend"]
+    extraction = file.get("extraction")
+    if extraction is None:
+        raise RuntimeError("Extraction not found")
+    backend = extraction.get("backend")
 
     if backend == ExtractionBackend.UNSTRUCTURED_OPENSOURCE or backend == ExtractionBackend.UNSTRUCTURED_API:
         await unstructuredExtraction(file)

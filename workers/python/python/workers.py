@@ -24,6 +24,7 @@ from config import config
 workers: dict[str, Worker] = dict()
 
 redis_client = Redis.from_url(
+    config.redis_url, decode_responses=True) if config.redis_ca_cert is None else Redis.from_url(
     config.redis_url, ssl_ca_data=config.redis_ca_cert, decode_responses=True)
 
 
