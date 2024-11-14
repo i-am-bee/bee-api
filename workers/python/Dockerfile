@@ -1,22 +1,70 @@
-FROM python:3.11-slim
+# Inspired by "Show and tell discussion" in the official poetry repository:
+# https://github.com/orgs/python-poetry/discussions/1879#discussioncomment-216865
 
+# `python-base` sets up all our shared environment variables
+FROM python:3.11-slim as python-base
+
+# python
+ENV PYTHONUNBUFFERED=1 \
+    # prevents python creating .pyc files
+    PYTHONDONTWRITEBYTECODE=1 \
+    \
+    # pip
+    PIP_NO_CACHE_DIR=off \
+    PIP_DISABLE_PIP_VERSION_CHECK=on \
+    PIP_DEFAULT_TIMEOUT=100 \
+    \
+    # poetry
+    # https://python-poetry.org/docs/configuration/#using-environment-variables
+    POETRY_VERSION=1.8.3 \
+    # make poetry install to this location
+    POETRY_HOME="/opt/poetry" \
+    # make poetry create the virtual environment in the project's root
+    # it gets named `.venv`
+    POETRY_VIRTUALENVS_IN_PROJECT=true \
+    # do not ask any interactive question
+    POETRY_NO_INTERACTION=1 \
+    \
+    # paths
+    # this is where our requirements + virtual environment will live
+    PYSETUP_PATH="/opt/pysetup" \
+    VENV_PATH="/opt/pysetup/.venv" \
+    # prepend poetry and venv to path
+    PATH="/opt/poetry/bin:/opt/pysetup/.venv/bin:$PATH"
+
+# install runtime dependencies
 RUN apt-get update && apt-get install libmagic-dev libpoppler-cpp-dev libreoffice pandoc tesseract-ocr -y
 
-RUN useradd -ms /bin/bash runner
-USER runner
 
-# Configure Poetry
+# `builder-base` stage is used to build deps + create our virtual environment
+FROM python-base as builder-base
+# install build dependencies
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y \
+    # deps for installing poetry
+    curl \
+    # deps for building python deps
+    build-essential
+
+# install poetry - respects $POETRY_VERSION & $POETRY_HOME
 ENV POETRY_VERSION=1.8.3
-
 RUN pip3.11 install poetry==${POETRY_VERSION}
-ENV PATH="${PATH}:/home/runner/.local/bin"
+
+# copy project requirement files here to ensure they will be cached.
+WORKDIR $PYSETUP_PATH
+COPY workers/python/poetry.lock workers/python/pyproject.toml ./
+
+# install runtime deps - uses $POETRY_VIRTUALENVS_IN_PROJECT internally
+RUN poetry install --no-dev --no-root
+
+
+FROM python-base as production
+
+# Copy dependencies
+COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 
 WORKDIR /app
 
-# Install dependencies
-COPY workers/python/poetry.lock workers/python/pyproject.toml ./
-RUN poetry install
+COPY workers/python/python/ .
 
-COPY workers/python/python/ ./python/
-
-CMD ["poetry", "run", "python", "python/main.py"]
+CMD [ "python3.11", "main.py"]
