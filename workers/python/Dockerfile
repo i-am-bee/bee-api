@@ -1,10 +1,15 @@
-FROM downloads.unstructured.io/unstructured-io/unstructured:0.16.5
+FROM python:3.11-slim
+
+RUN apt-get update && apt-get install libmagic-dev libpoppler-cpp-dev libreoffice pandoc tesseract-ocr -y
+
+RUN useradd -ms /bin/bash runner
+USER runner
 
 # Configure Poetry
 ENV POETRY_VERSION=1.8.3
 
 RUN pip3.11 install poetry==${POETRY_VERSION}
-ENV PATH="${PATH}:/home/notebook-user/.local/bin"
+ENV PATH="${PATH}:/home/runner/.local/bin"
 
 WORKDIR /app
 
