@@ -17,8 +17,6 @@ ENV PYTHONUNBUFFERED=1 \
     # poetry
     # https://python-poetry.org/docs/configuration/#using-environment-variables
     POETRY_VERSION=1.8.3 \
-    # make poetry install to this location
-    POETRY_HOME="/opt/poetry" \
     # make poetry create the virtual environment in the project's root
     # it gets named `.venv`
     POETRY_VIRTUALENVS_IN_PROJECT=true \
@@ -46,8 +44,7 @@ RUN apt-get update \
     # deps for building python deps
     build-essential
 
-# install poetry - respects $POETRY_VERSION & $POETRY_HOME
-ENV POETRY_VERSION=1.8.3
+# install poetry - respects $POETRY_VERSION
 RUN pip3.11 install poetry==${POETRY_VERSION}
 
 # copy project requirement files here to ensure they will be cached.
