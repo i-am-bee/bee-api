@@ -76,7 +76,7 @@ export async function assertRunsQuota(newRuns = 1) {
   });
   if (count + newRuns > DAILY_RUNS_QUOTA) {
     throw new APIError({
-      message: 'Your daily vector store file quota has been exceeded',
+      message: 'Your daily runs quota has been exceeded',
       code: APIErrorCode.TOO_MANY_REQUESTS
     });
   }
