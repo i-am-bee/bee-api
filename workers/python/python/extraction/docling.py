@@ -61,7 +61,7 @@ async def docling_extraction(file):
             await s3.meta.client.put_object(
                 Bucket=f"{config.s3_bucket_file_storage}",
                 Key=text_storage_id,
-                Body=json.dumps(markdown),
+                Body=markdown,
                 ContentType="text/markdown"
             )
             chunks_storage_id = f"{EXTRACTION_DIR}/{storage_id}/chunks.json"
