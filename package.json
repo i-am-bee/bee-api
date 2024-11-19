@@ -63,7 +63,6 @@
     "ioredis": "^5.4.1",
     "jose": "^5.6.3",
     "json-schema-to-ts": "^3.1.0",
-    "langchain": "^0.2.16",
     "mime": "^4.0.4",
     "ollama": "^0.5.9",
     "openai": "^4.67.3",
@@ -123,11 +122,6 @@
       "./mikro-orm.config.ts",
       "./dist/mikro-orm.config.js"
     ]
-  },
-  "pnpm": {
-    "overrides": {
-      "langsmith": "0.1.41"
-    }
   },
   "packageManager": "pnpm@9.0.6+sha1.648f6014eb363abb36618f2ba59282a9eeb3e879"
 }
