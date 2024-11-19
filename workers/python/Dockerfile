@@ -31,7 +31,7 @@ ENV PYTHONUNBUFFERED=1 \
     PATH="/opt/poetry/bin:/opt/pysetup/.venv/bin:$PATH"
 
 # install runtime dependencies
-RUN apt-get update && apt-get install libmagic-dev libpoppler-cpp-dev libreoffice pandoc tesseract-ocr -y
+RUN apt-get update && apt-get install wget libmagic-dev libpoppler-cpp-dev libreoffice pandoc tesseract-ocr -y
 
 
 # `builder-base` stage is used to build deps + create our virtual environment

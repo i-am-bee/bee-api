@@ -101,7 +101,7 @@ export async function scheduleExtraction(
       file.extraction = new DoclingExtraction({ jobId: file.id });
       await ORM.em.flush();
       if (file.mimeType?.startsWith('text/') || file.mimeType === 'application/json') {
-        await pythonQueue.add(
+        await nodeQueue.add(
           QueueName.FILES_EXTRACTION_NODE,
           {
             fileId: file.id,

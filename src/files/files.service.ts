@@ -207,26 +207,6 @@ export async function listFiles({
   return createPaginatedResponse(cursor, toFileDto);
 }
 
-export async function getExtractedFileStats(file: Loaded<File>) {
-  if (!file.extraction?.storageId) throw new Error('Extraction not found');
-  return s3Client
-    .headObject({
-      Bucket: S3_BUCKET_FILE_STORAGE,
-      Key: file.extraction.storageId
-    })
-    .promise();
-}
-
-export async function getExtractedFileObject(file: Loaded<File>) {
-  if (!file.extraction?.storageId) throw new Error('Extraction not found');
-  return s3Client
-    .getObject({
-      Bucket: S3_BUCKET_FILE_STORAGE,
-      Key: file.extraction.storageId
-    })
-    .promise();
-}
-
 export async function readFileContent({
   file_id
 }: FileContentReadParams): Promise<FileContentReadResponse> {
