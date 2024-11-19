@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.12](https://github.com/i-am-bee/bee-api/compare/v0.0.11...v0.0.12) (2024-11-15)
+
+### Bug Fixes
+
+* **build:** support execution under any user ([e1d32be](https://github.com/i-am-bee/bee-api/commit/e1d32be315abd36933059e554cff1a9c5cd2d342))
+
+## [0.0.11](https://github.com/i-am-bee/bee-api/compare/v0.0.10...v0.0.11) (2024-11-14)
+
 ## [0.0.10](https://github.com/i-am-bee/bee-api/compare/v0.0.9...v0.0.10) (2024-11-14)
 
 ## [0.0.9](https://github.com/i-am-bee/bee-api/compare/v0.0.8...v0.0.9) (2024-11-13)

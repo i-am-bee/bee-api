@@ -15,10 +15,8 @@
  */
 
 import { Loaded } from '@mikro-orm/core';
-import { TokenMemory } from 'bee-agent-framework/memory/tokenMemory';
 import { BaseMessage } from 'bee-agent-framework/llms/primitives/message';
 import { Version } from 'bee-agent-framework';
-import { BeeAgent } from 'bee-agent-framework/agents/bee/agent';
 import { Summary } from 'prom-client';
 import dayjs from 'dayjs';
 import { isTruthy } from 'remeda';
@@ -30,11 +28,10 @@ import { toRunDto } from '../runs.service.js';
 import {
   addFileToToolResource,
   checkFileExistsOnToolResource,
-  createToolResource,
-  getPromptTemplate
+  createAgent,
+  createToolResource
 } from './helpers.js';
 import { getTools } from './tools/helpers.js';
-import { createChatLLM } from './factory.js';
 
 import { ORM } from '@/database.js';
 import { getLogger } from '@/logger.js';
@@ -71,8 +68,6 @@ export type AgentContext = {
 
 export async function executeRun(run: LoadedRun) {
   const runLogger = getLogger().child({ runId: run.id });
-
-  const llm = createChatLLM(run);
 
   const publish = createPublisher(run);
 
@@ -125,25 +120,14 @@ export async function executeRun(run: LoadedRun) {
     run.thread.$.toolResources = toolResources;
   }
 
-  const memory = new TokenMemory({
-    llm
-  });
-  await memory.addMany(messages);
-
   run.start();
   await ORM.em.flush();
   await publish({ event: 'thread.run.in_progress', data: toRunDto(run) });
-
   const context = { run, publish } as AgentContext;
 
-  const agent = new BeeAgent({
-    llm,
-    memory,
-    tools: await getTools(run, context),
-    templates: {
-      system: getPromptTemplate(run)
-    }
-  });
+  const tools = await getTools(run, context);
+  const agent = createAgent(run, tools);
+  await agent.memory.addMany(messages);
 
   const cancellationController = new AbortController();
   const unsub = watchForCancellation(Run, run, () => cancellationController.abort());

@@ -57,6 +57,11 @@ RUN poetry install --no-dev --no-root
 
 FROM python-base as production
 
+# Make sure any user gets a directory
+RUN apt-get update && apt-get install --no-install-recommends -y libnss-unknown
+ENV HOME=/home
+RUN chmod a+w /home
+
 # Copy dependencies
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 
