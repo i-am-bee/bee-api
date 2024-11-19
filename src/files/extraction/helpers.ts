@@ -16,7 +16,7 @@
 
 import { Loaded } from '@mikro-orm/core';
 import mime from 'mime';
-import { splitString } from 'bee-agent-framework/internals/helpers/string';
+import { recursiveSplitString } from 'bee-agent-framework/internals/helpers/string';
 
 import { s3Client } from '../files.service';
 import { WDUExtraction } from '../entities/extractions/wdu-extraction.entity';
@@ -184,7 +184,11 @@ export async function getExtractedChunks(file: Loaded<File>) {
   switch (extraction.backend) {
     case ExtractionBackend.WDU: {
       const text = await getExtractedText(file);
-      const splitter = splitString(text, { size: 400, overlap: 200 });
+      const splitter = recursiveSplitString(text, {
+        size: 400,
+        overlap: 200,
+        separators: ['\n\n', '\n', ' ', '']
+      });
       return Array.from(splitter);
     }
     case ExtractionBackend.UNSTRUCTURED_OPENSOURCE:
