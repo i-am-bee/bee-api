@@ -84,6 +84,12 @@ pnpm install
 pnpm mikro-orm seeder:run
 ```
 
+- copy .env.example to .env
+
+```
+cp .env.example .env
+```
+
 - Add values the env vars: CRYPTO_CIPHER_KEY, LLM_BACKEND, EMBEDDING_BACKEND.
 
 - Run the bee-api:
