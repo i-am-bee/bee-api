@@ -67,9 +67,10 @@ COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 
 WORKDIR /app
 
-COPY workers/python/python/ .
-
 # Prepare worker resources.
-RUN python3.11 init_resources.py
+COPY workers/python/python/init_resources.py .
+RUN python3.11 init_resources.py    
+
+COPY workers/python/python/ .
 
 CMD ["python3.11", "main.py"]
