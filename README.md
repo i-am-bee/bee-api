@@ -68,7 +68,7 @@ The easiest way to run all the dependencies for the bee-api is to:
 
 ```
 ./bee-stack.sh clean
-./bee-stack.sh:infra
+./bee-stack.sh start:infra
 ```
 
 - Then navigate back to the bee-api repository.
