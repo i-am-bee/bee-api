@@ -49,6 +49,9 @@ export class File extends ProjectScopedEntity {
   contentHash!: string; // SHA256 hash of the file content
 
   @Property()
+  mimeType?: string;
+
+  @Property()
   storageId: string;
 
   @Embedded({ object: true })
@@ -66,5 +69,5 @@ export class File extends ProjectScopedEntity {
 }
 
 export type FilePurposeInput = ProjectScopedEntityInput &
-  Pick<File, 'purpose' | 'bytes' | 'filename' | 'contentHash'> &
+  Pick<File, 'purpose' | 'bytes' | 'filename' | 'contentHash' | 'mimeType'> &
   Partial<Pick<File, 'storageId'>>;

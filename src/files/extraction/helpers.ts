@@ -33,7 +33,7 @@ import { ORM } from '@/database';
 import { QueueName } from '@/jobs/constants';
 
 export function supportsExtraction(
-  mimeType: string,
+  mimeType: string = 'application/octet-stream',
   backend: ExtractionBackend = EXTRACTION_BACKEND
 ): boolean {
   switch (backend) {
