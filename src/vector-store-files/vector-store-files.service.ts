@@ -52,17 +52,17 @@ import { getServiceLogger } from '@/logger.js';
 import { toErrorDto } from '@/errors/plugin.js';
 import { QueueName } from '@/jobs/constants.js';
 import { getProjectPrincipal } from '@/administration/helpers.js';
+import { VECTOR_STORE_FILE_QUOTA_DAILY } from '@/config.js';
 
 const getFileLogger = (vectorStoreFileIds?: string[]) =>
   getServiceLogger('vector-store-files').child({ vectorStoreFileIds });
 
-const DAILY_VECTOR_STORE_FILES_QUOTA = 5;
 export async function assertVectorStoreFilesQuota(newFilesCount = 1) {
   const count = await ORM.em.getRepository(VectorStoreFile).count({
     createdBy: getProjectPrincipal(),
     createdAt: { $gte: dayjs().subtract(1, 'day').toDate() }
   });
-  if (count + newFilesCount > DAILY_VECTOR_STORE_FILES_QUOTA) {
+  if (count + newFilesCount > VECTOR_STORE_FILE_QUOTA_DAILY) {
     throw new APIError({
       message: 'Your daily vector store file quota has been exceeded',
       code: APIErrorCode.TOO_MANY_REQUESTS

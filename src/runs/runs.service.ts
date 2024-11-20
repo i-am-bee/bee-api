@@ -67,14 +67,14 @@ import { ToolCall } from '@/tools/entities/tool-calls/tool-call.entity.js';
 import { SystemTools } from '@/tools/entities/tool-calls/system-call.entity.js';
 import { ensureRequestContextData } from '@/context.js';
 import { getProjectPrincipal } from '@/administration/helpers.js';
+import { RUNS_QUOTA_DAILY } from '@/config.js';
 
-const DAILY_RUNS_QUOTA = 20;
 export async function assertRunsQuota(newRuns = 1) {
   const count = await ORM.em.getRepository(Run).count({
     createdBy: getProjectPrincipal(),
     createdAt: { $gte: dayjs().subtract(1, 'day').toDate() }
   });
-  if (count + newRuns > DAILY_RUNS_QUOTA) {
+  if (count + newRuns > RUNS_QUOTA_DAILY) {
     throw new APIError({
       message: 'Your daily runs quota has been exceeded',
       code: APIErrorCode.TOO_MANY_REQUESTS
