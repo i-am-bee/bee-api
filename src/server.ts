@@ -49,6 +49,7 @@ import { projectsModule } from './administration/projects.module.js';
 import { projectUsersModule } from './administration/project-users.module.js';
 import { organizationUsersModule } from './administration/organization-users.module.js';
 import { apiKeysModule } from './administration/api-keys.module.js';
+import { artifactsModule } from './artifacts/artifacts.module.js';
 
 const app = fastify({
   logger: fastifyLogger,
@@ -93,6 +94,7 @@ try {
   app.register(projectsModule, { prefix: '/v1' });
   app.register(projectUsersModule, { prefix: '/v1' });
   app.register(organizationUsersModule, { prefix: '/v1' });
+  app.register(artifactsModule, { prefix: '/v1' });
 
   app.register(uiModule, { prefix: '/v1' });
 
