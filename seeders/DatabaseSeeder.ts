@@ -36,6 +36,7 @@ import {
   PROJECT_ID_DEFAULT
 } from '@/config';
 import { redactProjectKeyValue } from '@/administration/helpers';
+import { Agent } from '@/runs/execution/constants';
 
 const USER_EXTERNAL_ID = 'test';
 const PROJECT_API_KEY = `${API_KEY_PREFIX}testkey`;
@@ -91,6 +92,7 @@ export class DatabaseSeeder extends Seeder {
     });
     const assistant = new Assistant({
       model: getDefaultModel(),
+      agent: Agent.BEE,
       tools: [
         {
           type: 'system',

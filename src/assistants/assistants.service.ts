@@ -55,6 +55,7 @@ export function toDto(assistant: Loaded<Assistant>): AssistantDto {
     metadata: assistant.metadata ?? {},
     created_at: dayjs(assistant.createdAt).unix(),
     model: assistant.model,
+    agent: assistant.agent,
     top_p: assistant.topP,
     temperature: assistant.temperature,
     system_prompt: assistant.systemPromptOverwrite
@@ -70,6 +71,7 @@ export async function createAssistant({
   metadata,
   top_p,
   model,
+  agent,
   temperature,
   system_prompt_overwrite
 }: AssistantCreateBody): Promise<AssistantCreateResponse> {
@@ -99,6 +101,7 @@ export async function createAssistant({
     metadata,
     topP: top_p ?? undefined,
     model: model ?? getDefaultModel(),
+    agent,
     temperature: temperature ?? undefined,
     systemPromptOverwrite: system_prompt_overwrite ?? undefined
   });
@@ -157,9 +160,14 @@ export async function listAssistants({
   before,
   order,
   order_by,
+  agent,
   search
 }: AssistantsListQuery): Promise<AssistantsListResponse> {
   const where: FilterQuery<Assistant> = {};
+
+  if (agent) {
+    where.agent = agent;
+  }
 
   if (search) {
     const regexp = new RegExp(search, 'i');

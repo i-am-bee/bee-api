@@ -33,10 +33,25 @@ import { WatsonXChatLLMPresetModel } from 'bee-agent-framework/adapters/watsonx/
 import { BAMLLM } from 'bee-agent-framework/adapters/bam/llm';
 import { IBMvLLM } from 'bee-agent-framework/adapters/ibm-vllm/llm';
 import { WatsonXLLM } from 'bee-agent-framework/adapters/watsonx/llm';
+import { ZodType } from 'zod';
+import { PromptTemplate } from 'bee-agent-framework';
+import { AnyTool } from 'bee-agent-framework/tools/base';
+import { GraniteBeeAgent } from 'bee-agent-framework/agents/granite/agent';
+import { StreamlitAgent } from 'bee-agent-framework/agents/experimental/streamlit/agent';
+import { GraniteBeeSystemPrompt } from 'bee-agent-framework/agents/granite/prompts';
+import { BeeAgent } from 'bee-agent-framework/agents/bee/agent';
+import { BeeSystemPrompt } from 'bee-agent-framework/agents/bee/prompts';
+import { ChatLLM, ChatLLMOutput } from 'bee-agent-framework/llms/chat';
+import { BaseMemory } from 'bee-agent-framework/memory/base';
 
 import { Run } from '../entities/run.entity';
 
-import { LLMBackend } from './constants';
+import { Agent, LLMBackend } from './constants';
+import {
+  createBeeStreamingHandler,
+  createStreamlitStreamingHandler
+} from './event-handlers/streaming';
+import { AgentContext } from './execute';
 
 import {
   BAM_API_KEY,
@@ -214,4 +229,68 @@ export function createCodeLLM(backend: LLMBackend = LLM_BACKEND) {
     default:
       return undefined;
   }
+}
+
+export function createAgentRun(
+  run: Loaded<Run, 'assistant'>,
+  { llm, tools, memory }: { llm: ChatLLM<ChatLLMOutput>; tools: AnyTool[]; memory: BaseMemory },
+  { signal, ctx }: { signal: AbortSignal; ctx: AgentContext }
+) {
+  const runArgs = [
+    { prompt: null }, // messages have been loaded to agent's memory
+    {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      signal,
+      execution: {
+        totalMaxRetries: 10,
+        maxRetriesPerStep: 3,
+        maxIterations: 10
+      }
+    }
+  ] as const;
+  switch (run.assistant.$.agent) {
+    case Agent.BEE: {
+      const agent = run.model.includes('granite')
+        ? new GraniteBeeAgent({
+            llm,
+            memory,
+            tools,
+            templates: { system: getPromptTemplate(run, GraniteBeeSystemPrompt) }
+          })
+        : new BeeAgent({
+            llm,
+            memory,
+            tools,
+            templates: { system: getPromptTemplate(run, BeeSystemPrompt) }
+          });
+      return [agent.run(...runArgs).observe(createBeeStreamingHandler(ctx)), agent];
+    }
+    case Agent.STREAMLIT: {
+      const agent = new StreamlitAgent({
+        llm,
+        memory
+      });
+      return [agent.run(...runArgs).observe(createStreamlitStreamingHandler(ctx)), agent];
+    }
+  }
+}
+
+function getPromptTemplate<T extends ZodType>(
+  run: Loaded<Run, 'assistant'>,
+  promptTemplate: PromptTemplate<T>
+): PromptTemplate<T> {
+  const instructions = run.additionalInstructions
+    ? `${run.instructions} ${run.additionalInstructions}`
+    : run.instructions;
+  return promptTemplate.fork((input) => ({
+    ...input,
+    ...(run.assistant.$.systemPromptOverwrite
+      ? { template: run.assistant.$.systemPromptOverwrite }
+      : {}),
+    defaults: {
+      ...input.defaults,
+      ...(instructions ? { instructions } : {})
+    }
+  }));
 }

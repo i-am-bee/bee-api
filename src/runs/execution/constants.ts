@@ -17,6 +17,12 @@
 export const RUN_EXPIRATION_MILLISECONDS = 10 * 60 * 1000;
 export const STATUS_POLL_INTERVAL = 5 * 1000;
 
+export const Agent = {
+  BEE: 'bee',
+  STREAMLIT: 'streamlit'
+} as const;
+export type Agent = (typeof Agent)[keyof typeof Agent];
+
 export const LLMBackend = {
   OLLAMA: 'ollama',
   IBM_VLLM: 'ibm-vllm',

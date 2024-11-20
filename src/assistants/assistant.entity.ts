@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Embedded, Entity, Property } from '@mikro-orm/core';
+import { Embedded, Entity, Enum, Property } from '@mikro-orm/core';
 
 import { ProjectScopedEntity, ProjectScopedEntityInput } from '@/common/project-scoped.entity';
 import { AnyToolUsage } from '@/tools/entities/tool-usages/tool-usage.entity.js';
@@ -28,12 +28,16 @@ import { AnyToolResource } from '@/tools/entities/tool-resources/tool-resource.e
 import { FileSearchResource } from '@/tools/entities/tool-resources/file-search-resources.entity.js';
 import { UserResource } from '@/tools/entities/tool-resources/user-resource.entity';
 import { SystemResource } from '@/tools/entities/tool-resources/system-resource.entity';
+import { Agent } from '@/runs/execution/constants';
 
 @Entity()
 export class Assistant extends ProjectScopedEntity {
   getIdPrefix(): string {
     return 'asst';
   }
+
+  @Enum(() => Agent)
+  agent: Agent;
 
   // Union must be defined in alphabetical order, otherwise Mikro-ORM won't discovered the auto-created virtual polymorphic entity
   @Embedded({ object: true })
@@ -71,6 +75,7 @@ export class Assistant extends ProjectScopedEntity {
     tools,
     toolResources,
     model,
+    agent,
     topP,
     temperature,
     systemPromptOverwrite,
@@ -84,6 +89,7 @@ export class Assistant extends ProjectScopedEntity {
     this.tools = tools;
     this.toolResources = toolResources;
     this.model = model;
+    this.agent = agent;
     this.topP = topP;
     this.temperature = temperature;
     this.systemPromptOverwrite = systemPromptOverwrite;
@@ -93,5 +99,8 @@ export class Assistant extends ProjectScopedEntity {
 export type AssistantInput = ProjectScopedEntityInput & {
   tools: AnyToolUsage[];
   toolResources?: AnyToolResource[];
-} & Pick<Assistant, 'instructions' | 'name' | 'description' | 'model' | 'systemPromptOverwrite'> &
+} & Pick<
+    Assistant,
+    'instructions' | 'name' | 'description' | 'model' | 'agent' | 'systemPromptOverwrite'
+  > &
   Partial<Pick<Assistant, 'topP' | 'temperature'>>;

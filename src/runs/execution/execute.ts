@@ -21,6 +21,8 @@ import { Summary } from 'prom-client';
 import dayjs from 'dayjs';
 import { isTruthy } from 'remeda';
 import { createObserveConnector } from 'bee-observe-connector';
+import { BeeAgent } from 'bee-agent-framework/agents/bee/agent';
+import { TokenMemory } from 'bee-agent-framework/memory/tokenMemory';
 
 import { Run } from '../entities/run.entity.js';
 import { toRunDto } from '../runs.service.js';
@@ -28,10 +30,10 @@ import { toRunDto } from '../runs.service.js';
 import {
   addFileToToolResource,
   checkFileExistsOnToolResource,
-  createAgent,
   createToolResource
 } from './helpers.js';
 import { getTools } from './tools/helpers.js';
+import { createAgentRun, createChatLLM } from './factory.js';
 
 import { ORM } from '@/database.js';
 import { getLogger } from '@/logger.js';
@@ -44,7 +46,6 @@ import { Trace } from '@/observe/entities/trace.entity.js';
 import { RunStep } from '@/run-steps/entities/run-step.entity.js';
 import { Message } from '@/messages/message.entity.js';
 import { AnyToolCall } from '@/tools/entities/tool-calls/tool-call.entity.js';
-import { createStreamingHandler } from '@/runs/execution/event-handlers/streaming.js';
 import { LoadedRun } from '@/runs/execution/types.js';
 import { UserResource } from '@/tools/entities/tool-resources/user-resource.entity.js';
 import { SystemResource } from '@/tools/entities/tool-resources/system-resource.entity.js';
@@ -59,7 +60,7 @@ const agentExecutionTime = new Summary({
 });
 
 export type AgentContext = {
-  run: Loaded<Run>;
+  run: Loaded<Run, 'assistant'>;
   publish: ReturnType<typeof createPublisher>;
   runStep?: Loaded<RunStep>;
   message?: Loaded<Message>;
@@ -126,8 +127,9 @@ export async function executeRun(run: LoadedRun) {
   const context = { run, publish } as AgentContext;
 
   const tools = await getTools(run, context);
-  const agent = createAgent(run, tools);
-  await agent.memory.addMany(messages);
+  const llm = createChatLLM(run);
+  const memory = new TokenMemory({ llm });
+  await memory.addMany(messages);
 
   const cancellationController = new AbortController();
   const unsub = watchForCancellation(Run, run, () => cancellationController.abort());
@@ -136,25 +138,18 @@ export async function executeRun(run: LoadedRun) {
 
   try {
     const endAgentExecutionTimer = agentExecutionTime.labels({ framework: Version }).startTimer();
-    const agentRunPromise = agent
-      .run(
-        { prompt: null }, // messages have been loaded to agent's memory
-        {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          signal: AbortSignal.any([cancellationController.signal, expirationSignal]),
-          execution: {
-            totalMaxRetries: 10,
-            maxRetriesPerStep: 3,
-            maxIterations: 10
-          }
-        }
-      )
-      .observe(createStreamingHandler(context));
+    const [agentRun, agent] = createAgentRun(
+      run,
+      { llm, tools, memory },
+      {
+        signal: AbortSignal.any([cancellationController.signal, expirationSignal]),
+        ctx: context
+      }
+    );
 
     // apply observe middleware only when the observe API is enabled
-    if (BEE_OBSERVE_API_URL && BEE_OBSERVE_API_AUTH_KEY) {
-      agentRunPromise.middleware(
+    if (BEE_OBSERVE_API_URL && BEE_OBSERVE_API_AUTH_KEY && agent instanceof BeeAgent) {
+      (agentRun as ReturnType<BeeAgent['run']>).middleware(
         createObserveConnector({
           api: {
             baseUrl: BEE_OBSERVE_API_URL,
@@ -180,7 +175,7 @@ export async function executeRun(run: LoadedRun) {
       );
     }
 
-    await agentRunPromise;
+    await agentRun;
 
     endAgentExecutionTimer();
     run.complete();
@@ -208,6 +203,5 @@ export async function executeRun(run: LoadedRun) {
   } finally {
     await publish({ event: 'done', data: '[DONE]' });
     unsub();
-    agent.destroy();
   }
 }
