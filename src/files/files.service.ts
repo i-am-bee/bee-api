@@ -130,7 +130,7 @@ export async function createFile({
     Bucket: S3_BUCKET_FILE_STORAGE,
     Key: file.storageId,
     Body: content.compose(passthroughHash),
-    ContentType: mimetype
+    ContentType: file.mimeType
   });
   const unsub = listenToSocketClose(req.socket, () => s3request.abort());
   s3request.on('httpUploadProgress', (progress) => {

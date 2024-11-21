@@ -57,7 +57,15 @@ export class File extends ProjectScopedEntity {
   @Embedded({ object: true })
   extraction?: UnstructuredAPIExtraction | UnstructuredOpensourceExtraction | WDUExtraction;
 
-  constructor({ purpose, bytes, filename, contentHash, storageId, ...rest }: FilePurposeInput) {
+  constructor({
+    purpose,
+    bytes,
+    filename,
+    contentHash,
+    storageId,
+    mimeType,
+    ...rest
+  }: FilePurposeInput) {
     super(rest);
 
     this.purpose = purpose;
@@ -65,6 +73,7 @@ export class File extends ProjectScopedEntity {
     this.filename = filename;
     this.contentHash = contentHash;
     this.storageId = storageId ?? randomUUID();
+    this.mimeType = mimeType;
   }
 }
 
