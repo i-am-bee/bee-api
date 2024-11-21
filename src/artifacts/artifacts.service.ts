@@ -65,7 +65,9 @@ export function toSharedDto(artifact: Loaded<Artifact>): ArtifactShared {
     source_code: (artifact as AppArtifact).sourceCode,
     share_url: artifact.accessSecret
       ? `/v1/artifacts/${artifact.id}/shared?secret=${artifact.accessSecret}`
-      : ''
+      : '',
+    name: artifact.name,
+    description: artifact.description ?? ''
   };
   switch (artifact.type) {
     case ArtifactType.APP:
@@ -94,7 +96,9 @@ export async function createArtifact(body: ArtifactCreateBody): Promise<Artifact
       message: ref(message),
       sourceCode: body.source_code,
       metadata: body.metadata,
-      accessSecret: body.shared === true ? getSecret() : undefined
+      accessSecret: body.shared === true ? getSecret() : undefined,
+      name: body.name,
+      description: body.description
     });
     await ORM.em.persistAndFlush(artifact);
     return toDto(artifact);
@@ -129,12 +133,16 @@ export async function readSharedArtifact({
 export async function updateArtifact({
   artifact_id,
   metadata,
+  name,
+  description,
   shared
 }: ArtifactUpdateParams & ArtifactUpdateBody): Promise<ArtifactUpdateResponse> {
   const artifact = await ORM.em.getRepository(Artifact).findOneOrFail({
     id: artifact_id
   });
   artifact.metadata = getUpdatedValue(metadata, artifact.metadata);
+  artifact.name = getUpdatedValue(name, artifact.name);
+  artifact.description = getUpdatedValue(description, artifact.description);
   if (shared === true) {
     artifact.accessSecret = getSecret();
   } else if (shared === false) {

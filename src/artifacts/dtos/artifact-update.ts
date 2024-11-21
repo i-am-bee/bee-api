@@ -29,7 +29,9 @@ export const artifactUpdateBodySchema = {
   additionalProperties: false,
   properties: {
     metadata: metadataSchema,
-    shared: { type: 'boolean' }
+    shared: { type: 'boolean' },
+    name: { type: 'string' },
+    description: { type: 'string' }
   }
 } as const satisfies JSONSchema;
 export type ArtifactUpdateBody = FromSchema<typeof artifactUpdateBodySchema>;

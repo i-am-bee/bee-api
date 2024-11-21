@@ -47,13 +47,21 @@ export abstract class Artifact extends PrincipalScopedEntity {
   @Property()
   accessSecret?: string;
 
-  constructor({ thread, message, ...rest }: ArtifactInput) {
+  @Property()
+  name: string;
+
+  @Property()
+  description?: string;
+
+  constructor({ thread, message, name, description, ...rest }: ArtifactInput) {
     super(rest);
     this.thread = thread;
     this.message = message;
+    this.name = name;
+    this.description = description;
   }
 }
 
 export type ArtifactInput = PrincipalScopedEntityInput &
-  Pick<Artifact, 'thread' | 'message'> &
-  Partial<Pick<Artifact, 'accessSecret'>>;
+  Pick<Artifact, 'thread' | 'message' | 'name'> &
+  Partial<Pick<Artifact, 'accessSecret' | 'description'>>;
