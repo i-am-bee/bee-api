@@ -23,6 +23,7 @@ import { WDUExtraction } from '../entities/extractions/wdu-extraction.entity';
 import { UnstructuredOpensourceExtraction } from '../entities/extractions/unstructured-opensource-extraction.entity';
 import { UnstructuredAPIExtraction } from '../entities/extractions/unstructured-api-extraction.entity';
 import { nodeQueue, pythonQueue } from '../jobs/extraction.queue';
+import { OCTET_STREAM_MIME_TYPE } from '../utils/mime';
 
 import { ExtractionBackend } from './constants';
 import { UnstructuredExtractionDocument } from './types';
@@ -33,7 +34,7 @@ import { ORM } from '@/database';
 import { QueueName } from '@/jobs/constants';
 
 export function supportsExtraction(
-  mimeType: string = 'application/octet-stream',
+  mimeType: string = OCTET_STREAM_MIME_TYPE,
   backend: ExtractionBackend = EXTRACTION_BACKEND
 ): boolean {
   switch (backend) {

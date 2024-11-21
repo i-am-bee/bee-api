@@ -20,7 +20,6 @@ import { FilterQuery, Loaded, ref, Ref } from '@mikro-orm/core';
 import ibm from 'ibm-cos-sdk';
 import { MultipartFile } from '@fastify/multipart';
 import dayjs from 'dayjs';
-import mime from 'mime';
 
 import { File } from './entities/file.entity.js';
 import { File as FileDto } from './dtos/file.js';
@@ -30,6 +29,7 @@ import { FileDeleteParams, FileDeleteResponse } from './dtos/file-delete.js';
 import { FilesListQuery, FilesListResponse } from './dtos/files-list.js';
 import { FileContentReadParams, FileContentReadResponse } from './dtos/file-content-read.js';
 import { scheduleExtraction, supportsExtraction } from './extraction/helpers.js';
+import { deriveMimeType } from './utils/mime.js';
 
 import { PassthroughHash } from '@/utils/streams.js';
 import { ORM } from '@/database.js';
@@ -119,7 +119,7 @@ export async function createFile({
     filename,
     bytes: 0,
     contentHash: '',
-    mimeType: mimetype ?? mime.getType(filename) ?? undefined,
+    mimeType: deriveMimeType(mimetype, filename),
     dependsOn
   });
 
@@ -249,8 +249,8 @@ export async function readFileContent({
   return ensureRequestContextData('res')
     .header(
       'content-type',
-      // head and filename fallbacks are used for backwards compatibility
-      file.mimeType ?? head.ContentType ?? mime.getType(file.filename) ?? 'application/octet-stream'
+      // derivation is used for backwards compatibility
+      deriveMimeType(file.mimeType ?? head.ContentType, file.filename)
     )
     .send(content);
 }
