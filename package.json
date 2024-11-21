@@ -31,9 +31,10 @@
     "@fastify/swagger-ui": "^3.0.0",
     "@fastify/type-provider-json-schema-to-ts": "^3.0.0",
     "@godaddy/terminus": "^4.12.1",
-    "@grpc/grpc-js": "^1.11.3",
+    "@googleapis/customsearch": "^3.2.0",
+    "@grpc/grpc-js": "^1.12.2",
     "@grpc/proto-loader": "^0.7.13",
-    "@ibm-generative-ai/node-sdk": "^3.2.3",
+    "@ibm-generative-ai/node-sdk": "^3.2.4",
     "@mikro-orm/core": "6.2.9",
     "@mikro-orm/migrations-mongodb": "6.2.9",
     "@mikro-orm/mongodb": "6.2.9",
@@ -47,7 +48,7 @@
     "@zilliz/milvus2-sdk-node": "^2.4.4",
     "ajv": "^8.17.1",
     "axios": "^1.7.7",
-    "bee-agent-framework": "0.0.39",
+    "bee-agent-framework": "0.0.41",
     "bee-observe-connector": "0.0.5",
     "bullmq": "5.8.1",
     "cache-manager": "^5.7.6",
@@ -63,10 +64,10 @@
     "ioredis": "^5.4.1",
     "jose": "^5.6.3",
     "json-schema-to-ts": "^3.1.0",
-    "langchain": "^0.2.16",
     "mime": "^4.0.4",
     "ollama": "^0.5.9",
     "openai": "^4.67.3",
+    "openai-chat-tokens": "^0.2.8",
     "openapi-fetch": "^0.10.2",
     "openid-client": "^5.7.0",
     "p-limit": "^6.1.0",
@@ -123,11 +124,6 @@
       "./mikro-orm.config.ts",
       "./dist/mikro-orm.config.js"
     ]
-  },
-  "pnpm": {
-    "overrides": {
-      "langsmith": "0.1.41"
-    }
   },
   "packageManager": "pnpm@9.0.6+sha1.648f6014eb363abb36618f2ba59282a9eeb3e879"
 }
