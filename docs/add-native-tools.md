@@ -54,6 +54,7 @@ export async function getTools(run: LoadedRun, context: AgentContext): Promise<F
       ...
       // Add the tool in the `switch` statement
       case SystemTools.RIDDLE_TOOL: {
+        // result can be an instance of arbitrary class
         if (!(result instanceof StringToolOutput)) throw new TypeError();
         toolCall.output = result.result;
         break;
