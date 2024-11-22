@@ -20,12 +20,13 @@ import { artifactSharedSchema } from './artifact-shared';
 
 export const artifactSchema = {
   type: 'object',
-  required: [...artifactSharedSchema.required, 'thread_id', 'message_id'],
+  required: [...artifactSharedSchema.required, 'thread_id', 'message_id', 'share_url'],
   properties: {
     ...artifactSharedSchema.properties,
     object: { const: 'artifact' },
-    thread_id: { type: 'string' },
-    message_id: { type: 'string' }
+    thread_id: { type: 'string', nullable: true },
+    message_id: { type: 'string', nullable: true },
+    share_url: { type: 'string', nullable: true }
   }
 } as const satisfies JSONSchema;
 export type Artifact = FromSchema<typeof artifactSchema>;

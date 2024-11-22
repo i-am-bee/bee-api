@@ -49,8 +49,11 @@ export function toDto(artifact: Loaded<Artifact>): ArtifactDto {
   return {
     ...toSharedDto(artifact),
     object: 'artifact',
-    thread_id: artifact.thread.id,
-    message_id: artifact.message.id
+    thread_id: artifact.thread?.id ?? null,
+    message_id: artifact.message?.id ?? null,
+    share_url: artifact.accessSecret
+      ? `/v1/artifacts/${artifact.id}/shared?secret=${artifact.accessSecret}`
+      : null
   };
 }
 
@@ -62,9 +65,6 @@ export function toSharedDto(artifact: Loaded<Artifact>): ArtifactShared {
     metadata: artifact.metadata ?? {},
     created_at: dayjs(artifact.createdAt).unix(),
     source_code: (artifact as AppArtifact).sourceCode,
-    share_url: artifact.accessSecret
-      ? `/v1/artifacts/${artifact.id}/shared?secret=${artifact.accessSecret}`
-      : null,
     name: artifact.name,
     description: artifact.description ?? null
   };
@@ -78,7 +78,7 @@ export function toSharedDto(artifact: Loaded<Artifact>): ArtifactShared {
 }
 
 function getSecret() {
-  return crypto.randomBytes(24).toString('base64url');
+  return `sk-art-${crypto.randomBytes(24).toString('base64url')}`;
 }
 
 export async function createArtifact(body: ArtifactCreateBody): Promise<ArtifactCreateResponse> {
