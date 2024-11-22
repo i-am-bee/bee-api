@@ -239,9 +239,12 @@ export async function getExtractedChunks(file: Loaded<File>) {
       if (!extraction.chunksStorageId) {
         if (!extraction.textStorageId) throw new Error('Extraction missing');
         const text = await getExtractedText(file);
-        const splitter = new RecursiveCharacterTextSplitter({ chunkSize: 400, chunkOverlap: 200 });
-        const documents = await splitter.createDocuments([text], undefined);
-        return documents.map((doc) => doc.pageContent);
+        const splitter = recursiveSplitString(text, {
+          size: 400,
+          overlap: 200,
+          separators: ['\n\n', '\n', ' ', '']
+        });
+        return Array.from(splitter);
       }
       const chunks = JSON.parse(
         await readTextFile(extraction.chunksStorageId)
