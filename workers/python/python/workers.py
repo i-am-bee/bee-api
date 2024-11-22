@@ -16,16 +16,24 @@ import asyncio
 from typing import List
 from bullmq import Worker
 from redis.asyncio import Redis
-from redis.asyncio.connection import parse_url
+from redis.asyncio.retry import Retry
+from redis.exceptions import (TimeoutError, ConnectionError)
+from redis.backoff import ExponentialBackoff
 
 from logger import logger
 from config import config
 
 workers: dict[str, Worker] = dict()
 
+redis_options = {
+    "decode_responses": True,
+    "health_check_interval": 10,
+    "retry": Retry(ExponentialBackoff(cap=10, base=1), 5),
+    "retry_on_error": [ConnectionError, TimeoutError, ConnectionResetError]
+}
 redis_client = Redis.from_url(
-    config.redis_url, decode_responses=True) if config.redis_ca_cert is None else Redis.from_url(
-    config.redis_url, ssl_ca_data=config.redis_ca_cert, decode_responses=True)
+    config.redis_url, **redis_options) if config.redis_ca_cert is None else Redis.from_url(
+    config.redis_url, ssl_ca_data=config.redis_ca_cert, **redis_options)
 
 
 def create_worker(queue_name: str, processor, opts):

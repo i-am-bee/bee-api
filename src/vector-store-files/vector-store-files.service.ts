@@ -15,7 +15,6 @@
  */
 
 import { ref, RequestContext } from '@mikro-orm/core';
-import dayjs from 'dayjs';
 import { Loaded } from '@mikro-orm/mongodb';
 
 import { VectorStoreFile, VectorStoreFileStatus } from './entities/vector-store-file.entity.js';
@@ -51,9 +50,25 @@ import { determineChunkingStrategy } from '@/vector-store-files/utils/determineC
 import { getServiceLogger } from '@/logger.js';
 import { toErrorDto } from '@/errors/plugin.js';
 import { QueueName } from '@/jobs/constants.js';
+import { getProjectPrincipal } from '@/administration/helpers.js';
+import { VECTOR_STORE_FILE_QUOTA_DAILY } from '@/config.js';
+import { dayjs, getLatestDailyFixedTime } from '@/utils/datetime.js';
 
 const getFileLogger = (vectorStoreFileIds?: string[]) =>
   getServiceLogger('vector-store-files').child({ vectorStoreFileIds });
+
+export async function assertVectorStoreFilesQuota(newFilesCount = 1) {
+  const count = await ORM.em.getRepository(VectorStoreFile).count({
+    createdBy: getProjectPrincipal(),
+    createdAt: { $gte: getLatestDailyFixedTime().toDate() }
+  });
+  if (count + newFilesCount > VECTOR_STORE_FILE_QUOTA_DAILY) {
+    throw new APIError({
+      message: 'Your daily vector store file quota has been exceeded',
+      code: APIErrorCode.TOO_MANY_REQUESTS
+    });
+  }
+}
 
 export function toDto(vectorStoreFile: VectorStoreFile): VectorStoreFileDto {
   const { file, status, vectorStore, lastError, usageBytes } = vectorStoreFile;
@@ -102,6 +117,8 @@ export async function createVectorStoreFile({
   if (vectorStore.expired) {
     throw new APIError({ message: 'Vector store is expired', code: APIErrorCode.INVALID_INPUT });
   }
+
+  await assertVectorStoreFilesQuota();
 
   const file = await ORM.em.getRepository(File).findOneOrFail({ id: body.file_id });
 

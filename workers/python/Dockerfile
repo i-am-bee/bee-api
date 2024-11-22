@@ -31,7 +31,7 @@ ENV PYTHONUNBUFFERED=1 \
     PATH="/opt/poetry/bin:/opt/pysetup/.venv/bin:$PATH"
 
 # install runtime dependencies
-RUN apt-get update && apt-get install libmagic-dev libpoppler-cpp-dev libreoffice pandoc tesseract-ocr -y
+RUN apt-get update && apt-get install wget libmagic-dev libpoppler-cpp-dev libreoffice pandoc tesseract-ocr -y
 
 
 # `builder-base` stage is used to build deps + create our virtual environment
@@ -67,10 +67,10 @@ COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 
 WORKDIR /app
 
+# Prepare worker resources.
+COPY workers/python/python/init_resources.py .
+RUN python3.11 init_resources.py    
+
 COPY workers/python/python/ .
 
-# ENV GLOBAL_WORKING_DIR_ENABLED true
-# ENV GLOBAL_WORKING_DIR /tmp/unstructured
-# ENV HUGGINGFACE_HUB_CACHE /tmp/huggingface
-
-CMD [ "python3.11", "main.py"]
+CMD ["python3.11", "main.py"]

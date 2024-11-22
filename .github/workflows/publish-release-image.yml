@@ -56,6 +56,19 @@ jobs:
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
+      - name: Free disk space
+        id: free_disk_space
+        shell: bash
+        # Based on https://github.com/actions/runner-images/issues/2840#issuecomment-790492173
+        # and https://github.com/jlumbroso/free-disk-space
+        run: |
+          sudo rm -rf /usr/share/dotnet || true
+          sudo rm -rf /usr/local/lib/android || true
+          sudo rm -rf /opt/ghc || true
+          sudo rm -rf /usr/local/.ghcup || true
+          sudo rm -rf "/usr/local/share/boost" || true
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY" || true
+
       - name: Build and push bee-api-workers-python image
         uses: docker/build-push-action@v6
         with:
