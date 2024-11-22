@@ -15,9 +15,8 @@
  */
 
 import {
-  AnyTool,
+  AnyTool as FrameworkTool,
   StringToolOutput,
-  Tool as FrameworkTool,
   ToolOutput
 } from 'bee-agent-framework/tools/base';
 import { PythonTool } from 'bee-agent-framework/tools/python/python';
@@ -308,7 +307,7 @@ export async function createToolCall(
     tool,
     input
   }: {
-    tool: AnyTool;
+    tool: FrameworkTool;
     input: unknown;
   },
   { run }: AgentContext

@@ -1,11 +1,8 @@
 lockfileVersion: '9.0'
 
 settings:
-  autoInstallPeers: true
+  autoInstallPeers: false
   excludeLinksFromLockfile: false
-
-overrides:
-  langsmith: 0.1.41
 
 importers:
 
@@ -35,15 +32,18 @@ importers:
       '@godaddy/terminus':
         specifier: ^4.12.1
         version: 4.12.1
+      '@googleapis/customsearch':
+        specifier: ^3.2.0
+        version: 3.2.0
       '@grpc/grpc-js':
-        specifier: ^1.11.3
+        specifier: ^1.12.2
         version: 1.12.2
       '@grpc/proto-loader':
         specifier: ^0.7.13
         version: 0.7.13
       '@ibm-generative-ai/node-sdk':
-        specifier: ^3.2.3
-        version: 3.2.3(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))
+        specifier: ^3.2.4
+        version: 3.2.4
       '@mikro-orm/core':
         specifier: 6.2.9
         version: 6.2.9
@@ -84,11 +84,11 @@ importers:
         specifier: ^1.7.7
         version: 1.7.7
       bee-agent-framework:
-        specifier: 0.0.39
-        version: 0.0.39(@bufbuild/protobuf@1.10.0)(@elastic/elasticsearch@8.15.2)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))))(@langchain/community@0.2.28(@elastic/elasticsearch@8.15.2)(@langchain/langgraph@0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(groq-sdk@0.7.0)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))(sequelize@6.37.3)
+        specifier: 0.0.41
+        version: 0.0.41(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.4)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))
       bee-observe-connector:
         specifier: 0.0.5
-        version: 0.0.5(bee-agent-framework@0.0.39(@bufbuild/protobuf@1.10.0)(@elastic/elasticsearch@8.15.2)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))))(@langchain/community@0.2.28(@elastic/elasticsearch@8.15.2)(@langchain/langgraph@0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(groq-sdk@0.7.0)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))(sequelize@6.37.3))
+        version: 0.0.5(bee-agent-framework@0.0.41(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.4)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8)))
       bullmq:
         specifier: 5.8.1
         version: 5.8.1
@@ -131,9 +131,6 @@ importers:
       json-schema-to-ts:
         specifier: ^3.1.0
         version: 3.1.0
-      langchain:
-        specifier: ^0.2.16
-        version: 0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8))
       mime:
         specifier: ^4.0.4
         version: 4.0.4
@@ -143,6 +140,9 @@ importers:
       openai:
         specifier: ^4.67.3
         version: 4.67.3(zod@3.23.8)
+      openai-chat-tokens:
+        specifier: ^0.2.8
+        version: 0.2.8
       openapi-fetch:
         specifier: ^0.10.2
         version: 0.10.6
@@ -345,14 +345,6 @@ packages:
 
   '@dabh/diagnostics@2.0.3':
     resolution: {integrity: sha512-hrlQOIi7hAfzsMqlGSFyVucrx38O+j6wiGOf//H2ecvIEqYN4ADBSS2iLMh5UFyDunCNniUIPk/q3riFv45xRA==}
-
-  '@elastic/elasticsearch@8.15.2':
-    resolution: {integrity: sha512-DTvjK4bs4WkgdQkXZJx2eVcwKzF1it/PyGT3rl1ReUNIWbkzMEKksiDQK3wY1U3WHT4zTuWQi4GrDOC1w5ej8Q==}
-    engines: {node: '>=18'}
-
-  '@elastic/transport@8.9.1':
-    resolution: {integrity: sha512-jasKNQeOb1vNf9aEYg+8zXmetaFjApDTSCC4QTl6aTixvyiRiSLcCiB8P6Q0lY9JIII/BhqNl8WbpFnsKitntw==}
-    engines: {node: '>=18'}
 
   '@esbuild/aix-ppc64@0.21.5':
     resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
@@ -740,10 +732,13 @@ packages:
   '@iarna/toml@2.2.5':
     resolution: {integrity: sha512-trnsAYxU3xnS1gPHPyU961coFyLkh4gAD/0zQ5mymY4yOZ+CYvsPqUbOFSw0aDM4y0tV7tiFxL/1XfXPNC6IPg==}
 
-  '@ibm-generative-ai/node-sdk@3.2.3':
-    resolution: {integrity: sha512-3RNvxg7655d/zZfjMqrL54QHbVMaEiErJGbO//KWumRDzCWdq0RTus12Ml7QL5c4/XwJsX5yr6ZV8RRHH6OBXg==}
+  '@ibm-generative-ai/node-sdk@3.2.4':
+    resolution: {integrity: sha512-HvJSYql3lOPYZcGb23mBw0kcWLlCX+n7EDRgJQxz7gIzx9WafUuDyl1IlTCXGfxolm0EhNIub79u9v7owtks0w==}
     peerDependencies:
       '@langchain/core': '>=0.1.0'
+    peerDependenciesMeta:
+      '@langchain/core':
+        optional: true
 
   '@inquirer/figures@1.0.7':
     resolution: {integrity: sha512-m+Trk77mp54Zma6xLkLuY+mvanPxlE4A7yNKs2HBiyZ4UkVs28Mv5c/pgWrHeInx+USHeX/WEPzjrWrcJiQgjw==}
@@ -771,393 +766,6 @@ packages:
 
   '@jsdevtools/ono@7.1.3':
     resolution: {integrity: sha512-4JQNk+3mVzK3xh2rqd6RB4J46qUR19azEHBneZyTZM+c456qOrbbM/5xcR8huNCCcbVt7+UmizG6GuUvPvKUYg==}
-
-  '@langchain/community@0.2.28':
-    resolution: {integrity: sha512-O0O52kQ2cVw31XFMU2RcD+PGEhcsUk4KFgCvJTtbU3IFox5Cyc1+I/y8vkmuD+MyI0ES08OQN5ctUdh0kONl0g==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      '@aws-crypto/sha256-js': ^5.0.0
-      '@aws-sdk/client-bedrock-agent-runtime': ^3.583.0
-      '@aws-sdk/client-bedrock-runtime': ^3.422.0
-      '@aws-sdk/client-dynamodb': ^3.310.0
-      '@aws-sdk/client-kendra': ^3.352.0
-      '@aws-sdk/client-lambda': ^3.310.0
-      '@aws-sdk/client-s3': ^3.310.0
-      '@aws-sdk/client-sagemaker-runtime': ^3.310.0
-      '@aws-sdk/client-sfn': ^3.310.0
-      '@aws-sdk/credential-provider-node': ^3.388.0
-      '@azure/search-documents': ^12.0.0
-      '@azure/storage-blob': ^12.15.0
-      '@browserbasehq/sdk': '*'
-      '@clickhouse/client': ^0.2.5
-      '@cloudflare/ai': '*'
-      '@datastax/astra-db-ts': ^1.0.0
-      '@elastic/elasticsearch': ^8.4.0
-      '@getmetal/metal-sdk': '*'
-      '@getzep/zep-cloud': ^1.0.6
-      '@getzep/zep-js': ^0.9.0
-      '@gomomento/sdk': ^1.51.1
-      '@gomomento/sdk-core': ^1.51.1
-      '@google-ai/generativelanguage': '*'
-      '@google-cloud/storage': ^6.10.1 || ^7.7.0
-      '@gradientai/nodejs-sdk': ^1.2.0
-      '@huggingface/inference': ^2.6.4
-      '@langchain/langgraph': ~0.0.26
-      '@layerup/layerup-security': ^1.5.12
-      '@mendable/firecrawl-js': ^0.0.13
-      '@mlc-ai/web-llm': 0.2.46
-      '@mozilla/readability': '*'
-      '@neondatabase/serverless': '*'
-      '@notionhq/client': ^2.2.10
-      '@opensearch-project/opensearch': '*'
-      '@pinecone-database/pinecone': '*'
-      '@planetscale/database': ^1.8.0
-      '@premai/prem-sdk': ^0.3.25
-      '@qdrant/js-client-rest': ^1.8.2
-      '@raycast/api': ^1.55.2
-      '@rockset/client': ^0.9.1
-      '@smithy/eventstream-codec': ^2.0.5
-      '@smithy/protocol-http': ^3.0.6
-      '@smithy/signature-v4': ^2.0.10
-      '@smithy/util-utf8': ^2.0.0
-      '@spider-cloud/spider-client': ^0.0.21
-      '@supabase/supabase-js': ^2.45.0
-      '@tensorflow-models/universal-sentence-encoder': '*'
-      '@tensorflow/tfjs-converter': '*'
-      '@tensorflow/tfjs-core': '*'
-      '@upstash/ratelimit': ^1.1.3
-      '@upstash/redis': ^1.20.6
-      '@upstash/vector': ^1.1.1
-      '@vercel/kv': ^0.2.3
-      '@vercel/postgres': ^0.5.0
-      '@writerai/writer-sdk': ^0.40.2
-      '@xata.io/client': ^0.28.0
-      '@xenova/transformers': ^2.17.2
-      '@zilliz/milvus2-sdk-node': '>=2.3.5'
-      apify-client: ^2.7.1
-      assemblyai: ^4.6.0
-      better-sqlite3: '>=9.4.0 <12.0.0'
-      cassandra-driver: ^4.7.2
-      cborg: ^4.1.1
-      cheerio: ^1.0.0-rc.12
-      chromadb: '*'
-      closevector-common: 0.1.3
-      closevector-node: 0.1.6
-      closevector-web: 0.1.6
-      cohere-ai: '*'
-      convex: ^1.3.1
-      couchbase: ^4.3.0
-      crypto-js: ^4.2.0
-      d3-dsv: ^2.0.0
-      discord.js: ^14.14.1
-      dria: ^0.0.3
-      duck-duck-scrape: ^2.2.5
-      epub2: ^3.0.1
-      faiss-node: ^0.5.1
-      firebase-admin: ^11.9.0 || ^12.0.0
-      google-auth-library: '*'
-      googleapis: '*'
-      hnswlib-node: ^3.0.0
-      html-to-text: ^9.0.5
-      ignore: ^5.2.0
-      interface-datastore: ^8.2.11
-      ioredis: ^5.3.2
-      it-all: ^3.0.4
-      jsdom: '*'
-      jsonwebtoken: ^9.0.2
-      llmonitor: ^0.5.9
-      lodash: ^4.17.21
-      lunary: ^0.7.10
-      mammoth: ^1.6.0
-      mongodb: '>=5.2.0'
-      mysql2: ^3.9.8
-      neo4j-driver: '*'
-      node-llama-cpp: '*'
-      notion-to-md: ^3.1.0
-      officeparser: ^4.0.4
-      pdf-parse: 1.1.1
-      pg: ^8.11.0
-      pg-copy-streams: ^6.0.5
-      pickleparser: ^0.2.1
-      playwright: ^1.32.1
-      portkey-ai: ^0.1.11
-      puppeteer: '*'
-      redis: '*'
-      replicate: ^0.29.4
-      sonix-speech-recognition: ^2.1.1
-      srt-parser-2: ^1.2.3
-      typeorm: ^0.3.20
-      typesense: ^1.5.3
-      usearch: ^1.1.1
-      vectordb: ^0.1.4
-      voy-search: 0.6.2
-      weaviate-ts-client: '*'
-      web-auth-library: ^1.0.3
-      ws: ^8.14.2
-      youtube-transcript: ^1.0.6
-      youtubei.js: ^9.1.0
-    peerDependenciesMeta:
-      '@aws-crypto/sha256-js':
-        optional: true
-      '@aws-sdk/client-bedrock-agent-runtime':
-        optional: true
-      '@aws-sdk/client-bedrock-runtime':
-        optional: true
-      '@aws-sdk/client-dynamodb':
-        optional: true
-      '@aws-sdk/client-kendra':
-        optional: true
-      '@aws-sdk/client-lambda':
-        optional: true
-      '@aws-sdk/client-s3':
-        optional: true
-      '@aws-sdk/client-sagemaker-runtime':
-        optional: true
-      '@aws-sdk/client-sfn':
-        optional: true
-      '@aws-sdk/credential-provider-node':
-        optional: true
-      '@azure/search-documents':
-        optional: true
-      '@azure/storage-blob':
-        optional: true
-      '@browserbasehq/sdk':
-        optional: true
-      '@clickhouse/client':
-        optional: true
-      '@cloudflare/ai':
-        optional: true
-      '@datastax/astra-db-ts':
-        optional: true
-      '@elastic/elasticsearch':
-        optional: true
-      '@getmetal/metal-sdk':
-        optional: true
-      '@getzep/zep-cloud':
-        optional: true
-      '@getzep/zep-js':
-        optional: true
-      '@gomomento/sdk':
-        optional: true
-      '@gomomento/sdk-core':
-        optional: true
-      '@google-ai/generativelanguage':
-        optional: true
-      '@google-cloud/storage':
-        optional: true
-      '@gradientai/nodejs-sdk':
-        optional: true
-      '@huggingface/inference':
-        optional: true
-      '@langchain/langgraph':
-        optional: true
-      '@layerup/layerup-security':
-        optional: true
-      '@mendable/firecrawl-js':
-        optional: true
-      '@mlc-ai/web-llm':
-        optional: true
-      '@mozilla/readability':
-        optional: true
-      '@neondatabase/serverless':
-        optional: true
-      '@notionhq/client':
-        optional: true
-      '@opensearch-project/opensearch':
-        optional: true
-      '@pinecone-database/pinecone':
-        optional: true
-      '@planetscale/database':
-        optional: true
-      '@premai/prem-sdk':
-        optional: true
-      '@qdrant/js-client-rest':
-        optional: true
-      '@raycast/api':
-        optional: true
-      '@rockset/client':
-        optional: true
-      '@smithy/eventstream-codec':
-        optional: true
-      '@smithy/protocol-http':
-        optional: true
-      '@smithy/signature-v4':
-        optional: true
-      '@smithy/util-utf8':
-        optional: true
-      '@spider-cloud/spider-client':
-        optional: true
-      '@supabase/supabase-js':
-        optional: true
-      '@tensorflow-models/universal-sentence-encoder':
-        optional: true
-      '@tensorflow/tfjs-converter':
-        optional: true
-      '@tensorflow/tfjs-core':
-        optional: true
-      '@upstash/ratelimit':
-        optional: true
-      '@upstash/redis':
-        optional: true
-      '@upstash/vector':
-        optional: true
-      '@vercel/kv':
-        optional: true
-      '@vercel/postgres':
-        optional: true
-      '@writerai/writer-sdk':
-        optional: true
-      '@xata.io/client':
-        optional: true
-      '@xenova/transformers':
-        optional: true
-      '@zilliz/milvus2-sdk-node':
-        optional: true
-      apify-client:
-        optional: true
-      assemblyai:
-        optional: true
-      better-sqlite3:
-        optional: true
-      cassandra-driver:
-        optional: true
-      cborg:
-        optional: true
-      cheerio:
-        optional: true
-      chromadb:
-        optional: true
-      closevector-common:
-        optional: true
-      closevector-node:
-        optional: true
-      closevector-web:
-        optional: true
-      cohere-ai:
-        optional: true
-      convex:
-        optional: true
-      couchbase:
-        optional: true
-      crypto-js:
-        optional: true
-      d3-dsv:
-        optional: true
-      discord.js:
-        optional: true
-      dria:
-        optional: true
-      duck-duck-scrape:
-        optional: true
-      epub2:
-        optional: true
-      faiss-node:
-        optional: true
-      firebase-admin:
-        optional: true
-      google-auth-library:
-        optional: true
-      googleapis:
-        optional: true
-      hnswlib-node:
-        optional: true
-      html-to-text:
-        optional: true
-      ignore:
-        optional: true
-      interface-datastore:
-        optional: true
-      ioredis:
-        optional: true
-      it-all:
-        optional: true
-      jsdom:
-        optional: true
-      jsonwebtoken:
-        optional: true
-      llmonitor:
-        optional: true
-      lodash:
-        optional: true
-      lunary:
-        optional: true
-      mammoth:
-        optional: true
-      mongodb:
-        optional: true
-      mysql2:
-        optional: true
-      neo4j-driver:
-        optional: true
-      node-llama-cpp:
-        optional: true
-      notion-to-md:
-        optional: true
-      officeparser:
-        optional: true
-      pdf-parse:
-        optional: true
-      pg:
-        optional: true
-      pg-copy-streams:
-        optional: true
-      pickleparser:
-        optional: true
-      playwright:
-        optional: true
-      portkey-ai:
-        optional: true
-      puppeteer:
-        optional: true
-      redis:
-        optional: true
-      replicate:
-        optional: true
-      sonix-speech-recognition:
-        optional: true
-      srt-parser-2:
-        optional: true
-      typeorm:
-        optional: true
-      typesense:
-        optional: true
-      usearch:
-        optional: true
-      vectordb:
-        optional: true
-      voy-search:
-        optional: true
-      weaviate-ts-client:
-        optional: true
-      web-auth-library:
-        optional: true
-      ws:
-        optional: true
-      youtube-transcript:
-        optional: true
-      youtubei.js:
-        optional: true
-
-  '@langchain/core@0.2.33':
-    resolution: {integrity: sha512-8WMied0Y5c4YDUjvoQqr/M63jAuZ3e+YqCAaszeGeBJbsHFoCdj8Ppr/yP6moAvsLImntxUXC6BxqAIDYkpGkg==}
-    engines: {node: '>=18'}
-
-  '@langchain/langgraph@0.0.34':
-    resolution: {integrity: sha512-cuig46hGmZkf+eXw1Cx2CtkAWgsAbIpa5ABLxn9oe1rbtvHXmfekqHZA6tGE0DipEmsN4H64zFcDEJydll6Sdw==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      better-sqlite3: ^9.5.0
-    peerDependenciesMeta:
-      better-sqlite3:
-        optional: true
-
-  '@langchain/openai@0.2.11':
-    resolution: {integrity: sha512-Pu8+WfJojCgSf0bAsXb4AjqvcDyAWyoEB1AoCRNACgEnBWZuitz3hLwCo9I+6hAbeg3QJ37g82yKcmvKAg1feg==}
-    engines: {node: '>=18'}
-
-  '@langchain/textsplitters@0.0.3':
-    resolution: {integrity: sha512-cXWgKE3sdWLSqAa8ykbCcUsUF1Kyr5J3HOWYGuobhPEycXW4WI++d5DhzdpL238mzoEXTi90VqfSCra37l5YqA==}
-    engines: {node: '>=18'}
 
   '@lukeed/ms@2.0.2':
     resolution: {integrity: sha512-9I2Zn6+NJLfaGoz9jN3lpwDgAYvfGeNYdbAIjJOqzs4Tpc+VU3Jqq4IofSUBKajiDS8k9fZIg18/z13mpk1bsA==}
@@ -2002,9 +1610,6 @@ packages:
   '@types/connect@3.4.36':
     resolution: {integrity: sha512-P63Zd/JUGq+PdrM1lv0Wv5SBYeA2+CORvbrXbngriYY0jzLUWfQMQQxOhjONEz/wlHOAxOdY7CY65rgQdTjq2w==}
 
-  '@types/debug@4.1.12':
-    resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==}
-
   '@types/estree@1.0.5':
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
 
@@ -2025,9 +1630,6 @@ packages:
 
   '@types/memcached@2.2.10':
     resolution: {integrity: sha512-AM9smvZN55Gzs2wRrqeMHVP7KE8KWgCJO/XL5yCly2xF6EKa4YlbpK+cLSAH4NG/Ah64HrlegmGqW8kYws7Vxg==}
-
-  '@types/ms@0.7.34':
-    resolution: {integrity: sha512-nG96G3Wp6acyAgJqGasjODb+acrI7KltPiRxzHPXnP3NgI28bpQDRv53olbqGXbfcgF5aiiHmO3xpwEpS5Ld9g==}
 
   '@types/mysql@2.15.26':
     resolution: {integrity: sha512-DSLCOXhkvfS5WNNPbfn2KdICAmk8lLc+/PNvnPnF7gOdMZCxopXduqv0OQ13y/yA/zXTSikZZqVgybUxOEg6YQ==}
@@ -2050,9 +1652,6 @@ packages:
   '@types/pg@8.6.1':
     resolution: {integrity: sha512-1Kc4oAGzAl7uqUStZCDvaLFqZrW9qWSjXOmBfdgyBP5La7Us6Mg4GBvRlSoaZMhQF/zSj1C8CtKMBkoiT8eL8w==}
 
-  '@types/retry@0.12.0':
-    resolution: {integrity: sha512-wWKOClTTiizcZhXnPY4wikVAwmdYHp8q6DmC+EJUzAMsycb7HB32Kh9RN4+0gExjmPmZSAQjgURXIGATPegAvA==}
-
   '@types/semver@7.5.8':
     resolution: {integrity: sha512-I8EUhyrgfLrcTkzV3TSsGyl1tSuPrEDzr0yd5m90UgNxQkyDXULk3b6MlQqTCpZpNtWe1K0hzclnZkTcLBe2UQ==}
 
@@ -2064,12 +1663,6 @@ packages:
 
   '@types/triple-beam@1.3.5':
     resolution: {integrity: sha512-6WaYesThRMCl19iryMYP7/x2OVgCtbIVflDGFpWnb9irXI3UjYE4AzmYuiUKY1AJstGijoY+MgUszMgRxIYTYw==}
-
-  '@types/uuid@9.0.8':
-    resolution: {integrity: sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA==}
-
-  '@types/validator@13.12.2':
-    resolution: {integrity: sha512-6SlHBzUW8Jhf3liqrGGXyTJSIFe4nqlJ5A5KaMZ2l/vbM3Wh3KSybots/wfWVzNLK4D1NZluDlSQIbIEPx6oyA==}
 
   '@types/webidl-conversions@7.0.3':
     resolution: {integrity: sha512-CiJJvcRtIgzadHCYXw7dqEnMNRjhGZlYK05Mj9OyktqV8uVT8fD2BFOB7S1uwBE3Kj2Z+4UyPmFw/Ixgw/LAlA==}
@@ -2378,21 +1971,49 @@ packages:
     resolution: {integrity: sha512-4Bcg1P8xhUuqcii/S0Z9wiHIrQVPMermM1any+MX5GeGD7faD3/msQUDGLol9wOcz4/jbg/WJnGqoJF6LiBdtg==}
     engines: {node: '>=10.0.0'}
 
-  bee-agent-framework@0.0.39:
-    resolution: {integrity: sha512-C011Ehi16rr2QSteTSVZ+oec555T8J0kwhoibOrpYrrmLmN78IUXZdd90GDYjM1ORRVOnt7JryBAKjvXJQ2tXw==}
+  bee-agent-framework@0.0.41:
+    resolution: {integrity: sha512-fooL1KlyhT06pKo9Cp1Hq4wubbolndqmp/ENLk+bd6vDE1pKylxIo9y6upoT8o+TrkwVRhWVG0zac+ySGTuy5Q==}
     peerDependencies:
+      '@aws-sdk/client-bedrock-runtime': ^3.687.0
       '@elastic/elasticsearch': ^8.0.0
       '@googleapis/customsearch': ^3.2.0
       '@grpc/grpc-js': ^1.11.3
       '@grpc/proto-loader': ^0.7.13
-      '@ibm-generative-ai/node-sdk': ~3.2.3
-      '@langchain/community': ^0.2.28
-      '@langchain/core': ^0.2.27
+      '@ibm-generative-ai/node-sdk': ~3.2.4
+      '@langchain/community': '>=0.2.28'
+      '@langchain/core': '>=0.2.27'
       groq-sdk: ^0.7.0
       ollama: ^0.5.8
       openai: ^4.67.3
       openai-chat-tokens: ^0.2.8
       sequelize: ^6.37.3
+    peerDependenciesMeta:
+      '@aws-sdk/client-bedrock-runtime':
+        optional: true
+      '@elastic/elasticsearch':
+        optional: true
+      '@googleapis/customsearch':
+        optional: true
+      '@grpc/grpc-js':
+        optional: true
+      '@grpc/proto-loader':
+        optional: true
+      '@ibm-generative-ai/node-sdk':
+        optional: true
+      '@langchain/community':
+        optional: true
+      '@langchain/core':
+        optional: true
+      groq-sdk:
+        optional: true
+      ollama:
+        optional: true
+      openai:
+        optional: true
+      openai-chat-tokens:
+        optional: true
+      sequelize:
+        optional: true
 
   bee-observe-connector@0.0.5:
     resolution: {integrity: sha512-veiHn7u4sEPUgMMrNCJ/yuS6hVPE/qSxIJzaGAyolEsF0HXIxP8HdZdGkkZPrq0fUVXXiKBCwIQtt7cAnpYT8g==}
@@ -2407,10 +2028,6 @@ packages:
 
   bignumber.js@9.1.2:
     resolution: {integrity: sha512-2/mKyZH9K85bzOEfhXDBFZTGd1CTs+5IHpeFQo9luiBG7hghdC851Pj2WAhb6E3R6b9tZj/XKhbg4fum+Kepug==}
-
-  binary-extensions@2.3.0:
-    resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
-    engines: {node: '>=8'}
 
   bintrees@1.0.2:
     resolution: {integrity: sha512-VOMgTMwjAaUG580SXn3LacVgjurrbMme7ZZNYGSSV7mmtY6QQRh0Eg3pwIcntQ77DErK1L0NxkbetjcoXzVwKw==}
@@ -2485,10 +2102,6 @@ packages:
   camelcase@4.1.0:
     resolution: {integrity: sha512-FxAv7HpHrXbh3aPo4o2qxHay2lkLY3x5Mw3KeE4KQE8ysVfziWeRZDwcjauvwBSGEC/nXUPzZy8zeh4HokqOnw==}
     engines: {node: '>=4'}
-
-  camelcase@6.3.0:
-    resolution: {integrity: sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==}
-    engines: {node: '>=10'}
 
   camelcase@8.0.0:
     resolution: {integrity: sha512-8WB3Jcas3swSvjIeA2yvCJ+Miyz5l1ZmB6HFb9R1317dt9LCQoswg/BGrmAmkWVEszSrrg4RwmO46qIm2OEnSA==}
@@ -2808,10 +2421,6 @@ packages:
       supports-color:
         optional: true
 
-  decamelize@1.2.0:
-    resolution: {integrity: sha512-z2S+W9X73hAUUki+N+9Za2lBlun89zigOyGrsax+KUQ6wKW4ZoWpEYBkGhQjwAjjDCkWxhY0VKEhk8wzY7F5cA==}
-    engines: {node: '>=0.10.0'}
-
   decimal.js@10.4.3:
     resolution: {integrity: sha512-VBBaLc1MgL5XpzgIP7ny5Z6Nx3UrRkIViUkPUdtl9aya5amy3De1gsUUSB1g3+3sExYNjCAsAznmukyxCb1GRA==}
 
@@ -2903,9 +2512,6 @@ packages:
   dotenv@16.4.5:
     resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
     engines: {node: '>=12'}
-
-  dottie@2.0.6:
-    resolution: {integrity: sha512-iGCHkfUc5kFekGiqhe8B/mdaurD+lakO9txNnTvKtA6PISrw86LgqHvRzWYPyoE2Ph5aMIrCw9/uko6XHTKCwA==}
 
   duck-duck-scrape@2.2.5:
     resolution: {integrity: sha512-RTu/Ag5LhgD/j1l2zVGCwTINBoEYCffl58nMoBjtXWJG8tTex72h3gxpDjAr8jVqFaBvhgASNKTUsE31JeqYgw==}
@@ -3139,9 +2745,6 @@ packages:
     resolution: {integrity: sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==}
     engines: {node: '>=6'}
 
-  eventemitter3@4.0.7:
-    resolution: {integrity: sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==}
-
   eventemitter3@5.0.1:
     resolution: {integrity: sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==}
 
@@ -3160,9 +2763,6 @@ packages:
   execa@8.0.1:
     resolution: {integrity: sha512-VyhnebXciFV2DESc+p6B+y0LjSm0krU4OgJN44qFAhBY0TJ+1V61tYD2+wHusZ6F9n5K+vl8k0sTy7PEfV4qpg==}
     engines: {node: '>=16.17'}
-
-  expr-eval@2.0.2:
-    resolution: {integrity: sha512-4EMSHGOPSwAfBiibw3ndnP0AvjDWLsMvGOvWEZ2F96IGk0bIVdjQisOHxReSkE13mHcfbuCiXw+G4y0zv6N8Eg==}
 
   extend@3.0.2:
     resolution: {integrity: sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==}
@@ -3444,8 +3044,8 @@ packages:
   globrex@0.1.2:
     resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
 
-  google-auth-library@9.14.2:
-    resolution: {integrity: sha512-R+FRIfk1GBo3RdlRYWPdwk8nmtVUOn6+BkDomAC46KoU8kzXzE1HLmOasSCbWUByMMAGkknVF0G5kQ69Vj7dlA==}
+  google-auth-library@9.15.0:
+    resolution: {integrity: sha512-7ccSEJFDFO7exFbO6NRyC+xH8/mZ1GZGG2xxx9iHxZWcjUjJpjWxIMw3cofAKcueZ6DATiukmmprD7yavQHOyQ==}
     engines: {node: '>=14'}
 
   googleapis-common@7.2.0:
@@ -3463,9 +3063,6 @@ packages:
 
   graphemer@1.4.0:
     resolution: {integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==}
-
-  groq-sdk@0.7.0:
-    resolution: {integrity: sha512-OgPqrRtti5MjEVclR8sgBHrhSkTLdFCmi47yrEF29uJZaiCkX3s7bXpnMhq8Lwoe1f4AwgC0qGOeHXpeSgu5lg==}
 
   gtoken@7.1.0:
     resolution: {integrity: sha512-pCcEwRi+TKpMlxAQObHDQ56KawURgyAf6jtIY046fJ5tIv3zDe/LEIubckAO8fj6JnAxLdmWkUfNyulQ2iKdEw==}
@@ -3520,10 +3117,6 @@ packages:
   hosted-git-info@7.0.2:
     resolution: {integrity: sha512-puUZAUKT5m8Zzvs72XWy3HtvVbTWljRE66cP60bxJzAqf2DgICo7lYTY2IHUmLnNpjYvw5bvmoHvPc0QO2a62w==}
     engines: {node: ^16.14.0 || >=18.0.0}
-
-  hpagent@1.2.0:
-    resolution: {integrity: sha512-A91dYTeIB6NoXG+PxTQpCCDDnfHsW9kc06Lvpu1TEe9gnd6ZFeiBoRO9JvzEv6xK7EX97/dUE8g/vBMTqTS3CA==}
-    engines: {node: '>=14'}
 
   html-entities@2.5.2:
     resolution: {integrity: sha512-K//PSRMQk4FZ78Kyau+mZurHn3FH0Vwr+H36eE0rPbeYkRRi9YxceYPhuN60UwWorxyKHhqoAJl2OFKa4BVtaA==}
@@ -3596,10 +3189,6 @@ packages:
   index-to-position@0.1.2:
     resolution: {integrity: sha512-MWDKS3AS1bGCHLBA2VLImJz42f7bJh8wQsTGCzI3j519/CASStoDONUBVz2I/VID0MpiX3SGSnbOD2xUalbE5g==}
     engines: {node: '>=18'}
-
-  inflection@1.13.4:
-    resolution: {integrity: sha512-6I/HUDeYFfuNCVS3td055BaXBwKYuzw7K3ExVMStBowKo9oOAMJIXIHvdyR3iboTCp1b+1i5DSkIZTcwIktuDw==}
-    engines: {'0': node >= 0.4.0}
 
   inflight@1.0.6:
     resolution: {integrity: sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==}
@@ -3920,10 +3509,6 @@ packages:
   jsonfile@6.1.0:
     resolution: {integrity: sha512-5dgndWOriYSm5cnYaJNhalLNDKOqFwyDB/rr1E9ZsGciGvKPs8R2xYGCacuf3z6K1YKDz182fd+fY3cn3pMqXQ==}
 
-  jsonpointer@5.0.1:
-    resolution: {integrity: sha512-p/nXbhSEcu3pZRdkW1OfJhpsVtW1gd4Wa1fnQc9YLiTfAjn0312eMKimbdIQzuZl9aa9xUGaRlP9T/CJE/ditQ==}
-    engines: {node: '>=0.10.0'}
-
   jsonrepair@3.9.0:
     resolution: {integrity: sha512-gC8z8NP6gEh/9DwDFl8G8nr6KSxdUQBhjTyCq+aZy1mT8DxZf9/V1947MztjLDCdnsn8VjoXj0b2R4HGJdEo7A==}
     hasBin: true
@@ -3974,200 +3559,6 @@ packages:
   ky@1.7.2:
     resolution: {integrity: sha512-OzIvbHKKDpi60TnF9t7UUVAF1B4mcqc02z5PIvrm08Wyb+yOcz63GRvEuVxNT18a9E1SrNouhB4W2NNLeD7Ykg==}
     engines: {node: '>=18'}
-
-  langchain@0.2.20:
-    resolution: {integrity: sha512-tbels6Rr524iMM3VOQ4aTGnEOOjAA1BQuBR8u/8gJ2yT48lMtIQRAN32Y4KVjKK+hEWxHHlmLBrtgLpTphFjNA==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      '@aws-sdk/client-s3': '*'
-      '@aws-sdk/client-sagemaker-runtime': '*'
-      '@aws-sdk/client-sfn': '*'
-      '@aws-sdk/credential-provider-node': '*'
-      '@azure/storage-blob': '*'
-      '@browserbasehq/sdk': '*'
-      '@gomomento/sdk': '*'
-      '@gomomento/sdk-core': '*'
-      '@gomomento/sdk-web': ^1.51.1
-      '@langchain/anthropic': '*'
-      '@langchain/aws': '*'
-      '@langchain/cohere': '*'
-      '@langchain/google-genai': '*'
-      '@langchain/google-vertexai': '*'
-      '@langchain/groq': '*'
-      '@langchain/mistralai': '*'
-      '@langchain/ollama': '*'
-      '@mendable/firecrawl-js': '*'
-      '@notionhq/client': '*'
-      '@pinecone-database/pinecone': '*'
-      '@supabase/supabase-js': '*'
-      '@vercel/kv': '*'
-      '@xata.io/client': '*'
-      apify-client: '*'
-      assemblyai: '*'
-      axios: '*'
-      cheerio: '*'
-      chromadb: '*'
-      convex: '*'
-      couchbase: '*'
-      d3-dsv: '*'
-      epub2: '*'
-      faiss-node: '*'
-      fast-xml-parser: '*'
-      handlebars: ^4.7.8
-      html-to-text: '*'
-      ignore: '*'
-      ioredis: '*'
-      jsdom: '*'
-      mammoth: '*'
-      mongodb: '*'
-      node-llama-cpp: '*'
-      notion-to-md: '*'
-      officeparser: '*'
-      pdf-parse: '*'
-      peggy: ^3.0.2
-      playwright: '*'
-      puppeteer: '*'
-      pyodide: '>=0.24.1 <0.27.0'
-      redis: '*'
-      sonix-speech-recognition: '*'
-      srt-parser-2: '*'
-      typeorm: '*'
-      weaviate-ts-client: '*'
-      web-auth-library: '*'
-      ws: '*'
-      youtube-transcript: '*'
-      youtubei.js: '*'
-    peerDependenciesMeta:
-      '@aws-sdk/client-s3':
-        optional: true
-      '@aws-sdk/client-sagemaker-runtime':
-        optional: true
-      '@aws-sdk/client-sfn':
-        optional: true
-      '@aws-sdk/credential-provider-node':
-        optional: true
-      '@azure/storage-blob':
-        optional: true
-      '@browserbasehq/sdk':
-        optional: true
-      '@gomomento/sdk':
-        optional: true
-      '@gomomento/sdk-core':
-        optional: true
-      '@gomomento/sdk-web':
-        optional: true
-      '@langchain/anthropic':
-        optional: true
-      '@langchain/aws':
-        optional: true
-      '@langchain/cohere':
-        optional: true
-      '@langchain/google-genai':
-        optional: true
-      '@langchain/google-vertexai':
-        optional: true
-      '@langchain/groq':
-        optional: true
-      '@langchain/mistralai':
-        optional: true
-      '@langchain/ollama':
-        optional: true
-      '@mendable/firecrawl-js':
-        optional: true
-      '@notionhq/client':
-        optional: true
-      '@pinecone-database/pinecone':
-        optional: true
-      '@supabase/supabase-js':
-        optional: true
-      '@vercel/kv':
-        optional: true
-      '@xata.io/client':
-        optional: true
-      apify-client:
-        optional: true
-      assemblyai:
-        optional: true
-      axios:
-        optional: true
-      cheerio:
-        optional: true
-      chromadb:
-        optional: true
-      convex:
-        optional: true
-      couchbase:
-        optional: true
-      d3-dsv:
-        optional: true
-      epub2:
-        optional: true
-      faiss-node:
-        optional: true
-      fast-xml-parser:
-        optional: true
-      handlebars:
-        optional: true
-      html-to-text:
-        optional: true
-      ignore:
-        optional: true
-      ioredis:
-        optional: true
-      jsdom:
-        optional: true
-      mammoth:
-        optional: true
-      mongodb:
-        optional: true
-      node-llama-cpp:
-        optional: true
-      notion-to-md:
-        optional: true
-      officeparser:
-        optional: true
-      pdf-parse:
-        optional: true
-      peggy:
-        optional: true
-      playwright:
-        optional: true
-      puppeteer:
-        optional: true
-      pyodide:
-        optional: true
-      redis:
-        optional: true
-      sonix-speech-recognition:
-        optional: true
-      srt-parser-2:
-        optional: true
-      typeorm:
-        optional: true
-      weaviate-ts-client:
-        optional: true
-      web-auth-library:
-        optional: true
-      ws:
-        optional: true
-      youtube-transcript:
-        optional: true
-      youtubei.js:
-        optional: true
-
-  langsmith@0.1.41:
-    resolution: {integrity: sha512-8R7s/225Pxmv0ipMfd6sqmWVsfHLQivYlQZ0vx5K+ReoknummTenQlVK8gapk3kqRMnzkrouuRHMhWjMR6RgUA==}
-    peerDependencies:
-      '@langchain/core': '*'
-      langchain: '*'
-      openai: '*'
-    peerDependenciesMeta:
-      '@langchain/core':
-        optional: true
-      langchain:
-        optional: true
-      openai:
-        optional: true
 
   latest-version@9.0.0:
     resolution: {integrity: sha512-7W0vV3rqv5tokqkBAFV1LbR7HPOWzXQDpDgEuib/aJ1jsZZx6x3c2mBI+TJhJzOhkGeaLbCKEHXEXLfirtG2JA==}
@@ -4383,12 +3774,6 @@ packages:
   module-details-from-path@1.0.3:
     resolution: {integrity: sha512-ySViT69/76t8VhE1xXHK6Ch4NcDd26gx0MzKXLO+F7NOtnqH68d9zF94nT8ZWSxXh8ELOERsnJO/sWt1xZYw5A==}
 
-  moment-timezone@0.5.46:
-    resolution: {integrity: sha512-ZXm9b36esbe7OmdABqIWJuBBiLLwAjrN7CE+7sYdCCx82Nabt1wHDj8TVseS59QIlfFPbOoiBPm6ca9BioG4hw==}
-
-  moment@2.30.1:
-    resolution: {integrity: sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==}
-
   mongodb-connection-string-url@3.0.1:
     resolution: {integrity: sha512-XqMGwRX0Lgn05TDB4PyG2h2kKO/FfWJyCzYQbIhXUxz7ETt0I/FqHjUeqj37irJ+Dl1ZtU82uYyj14u2XsZKfg==}
 
@@ -4579,15 +3964,6 @@ packages:
       zod:
         optional: true
 
-  openai@4.68.1:
-    resolution: {integrity: sha512-C9XmYRHgra1U1G4GGFNqRHQEjxhoOWbQYR85IibfJ0jpHUhOm4/lARiKaC/h3zThvikwH9Dx/XOKWPNVygIS3g==}
-    hasBin: true
-    peerDependencies:
-      zod: ^3.23.8
-    peerDependenciesMeta:
-      zod:
-        optional: true
-
   openapi-fetch@0.10.6:
     resolution: {integrity: sha512-6xXfvIEL/POtLGOaFPsp3O+pDe+J3DZYxbD9BrsQHXOTeNK8z/gsWHT6adUy1KcpQOhmkerMzlQrJM6DbN55dQ==}
 
@@ -4642,10 +4018,6 @@ packages:
     resolution: {integrity: sha512-dD4UpyBh/9m4X2NVjA+73/ZPBRF+uF4zIMFvvQsabMiEK8x41L3rQ8EENOi35kyyoaJwNxEeJcP6Fj1H4U409Q==}
     engines: {node: '>=12'}
 
-  p-finally@1.0.0:
-    resolution: {integrity: sha512-LICb2p9CB7FS+0eR1oqWnHhp0FljGLZCWBE9aix0Uye9W8LTQPwMTYVGWQWIw9RdQiDg4+epXQODwIYJtSJaow==}
-    engines: {node: '>=4'}
-
   p-limit@3.1.0:
     resolution: {integrity: sha512-TYOanM3wGwNGsZN2cVTYPArw454xnXj5qmWF1bEoAc4+cU/ol7GVh7odevjp1FNHduHc3KZMcFduxU5Xc6uJRQ==}
     engines: {node: '>=10'}
@@ -4666,17 +4038,9 @@ packages:
     resolution: {integrity: sha512-SdfGSQSJJpD7ZR+dJEjjn9GuuBizHPLW/yarJpXnmrHRruzrq7YM8OqsikSrKeoPv+Pi1YXw9IIBSIg5WveQHA==}
     engines: {node: '>=12'}
 
-  p-queue@6.6.2:
-    resolution: {integrity: sha512-RwFpb72c/BhQLEXIZ5K2e+AhgNVmIejGlTgiB9MzZ0e93GRvqZ7uSi0dvRF7/XIXDeNkra2fNHBxTyPDGySpjQ==}
-    engines: {node: '>=8'}
-
   p-queue@8.0.1:
     resolution: {integrity: sha512-NXzu9aQJTAzbBqOt2hwsR63ea7yvxJc0PwN/zobNAudYfb1B7R08SzB4TsLeSbUCuG467NhnoT0oO6w1qRO+BA==}
     engines: {node: '>=18'}
-
-  p-retry@4.6.2:
-    resolution: {integrity: sha512-312Id396EbJdvRONlngUx0NydfrIQ5lsYu0znKVUzVvArzEIt08V1qhtyESbGVd1FGX7UKtiFp5uwKZdM8wIuQ==}
-    engines: {node: '>=8'}
 
   p-throttle@6.2.0:
     resolution: {integrity: sha512-NCKkOVj6PZa6NiTmfvGilDdf6vO1rFCD3KDnkHko8dTOtkpk4cSR/VTAhhLMG9aiQ7/A9HYgEDNmxzf6hxzR3g==}
@@ -4685,10 +4049,6 @@ packages:
   p-timeout-compat@1.0.4:
     resolution: {integrity: sha512-HEsjA3Df/845IQD0BS2/4691Sh2fnf8lifKHPtHUC6dQJ80NsKRCVVLnB5dApnJOU5JZJDWlE2Z0fd/vrGrUIA==}
     engines: {node: '>=12'}
-
-  p-timeout@3.2.0:
-    resolution: {integrity: sha512-rhIwUycgwwKcP9yTOOFK/AKsAopjjCakVqLHePO3CC6Mir1Z99xT+R63jZxAT5lFZLa2inS5h+ZS2GvR99/FBg==}
-    engines: {node: '>=8'}
 
   p-timeout@6.1.2:
     resolution: {integrity: sha512-UbD77BuZ9Bc9aABo74gfXhNvzC9Tx7SxtHSh1fxvx3jTLLYvmVhiQZZrJzqqU0jKbN32kb5VOKiLEQI/3bIjgQ==}
@@ -4776,9 +4136,6 @@ packages:
 
   pg-connection-string@2.6.2:
     resolution: {integrity: sha512-ch6OwaeaPYcova4kKZ15sbJ2hKb/VP48ZD2gE7i1J+L4MspCtBMAx8nMgz7bksc7IojCIIWuEhHibSMFH8m8oA==}
-
-  pg-connection-string@2.7.0:
-    resolution: {integrity: sha512-PI2W9mv53rXJQEOb8xNR8lH7Hr+EKa6oJa38zsK0S/ky2er16ios1wLKhZyxzD7jUReiWokc9WK5nxSnC7W1TA==}
 
   pg-int8@1.0.1:
     resolution: {integrity: sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==}
@@ -5072,9 +4429,6 @@ packages:
     resolution: {integrity: sha512-0f4Memo5QP7WQyUEAYUO3esD/XjOc3Zjjg5CPsAq1p8sIu0XPeMbHJemKA0BO7tV0X7+A0FoEpbmHXWxPyD3wQ==}
     engines: {node: '>=10'}
 
-  retry-as-promised@7.0.4:
-    resolution: {integrity: sha512-XgmCoxKWkDofwH8WddD0w85ZfqYz+ZHlr5yo+3YUCfycWawU56T5ckWXsScsj5B8tqUcIG67DxXByo3VUgiAdA==}
-
   retry@0.13.1:
     resolution: {integrity: sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg==}
     engines: {node: '>= 4'}
@@ -5153,43 +4507,6 @@ packages:
     resolution: {integrity: sha512-oVekP1cKtI+CTDvHWYFUcMtsK/00wmAEfyqKfNdARm8u1wNVhSgaX7A8d4UuIlUI5e84iEwOhs7ZPYRmzU9U6A==}
     engines: {node: '>=10'}
     hasBin: true
-
-  sequelize-pool@7.1.0:
-    resolution: {integrity: sha512-G9c0qlIWQSK29pR/5U2JF5dDQeqqHRragoyahj/Nx4KOOQ3CPPfzxnfqFPCSB7x5UgjOgnZ61nSxz+fjDpRlJg==}
-    engines: {node: '>= 10.0.0'}
-
-  sequelize@6.37.3:
-    resolution: {integrity: sha512-V2FTqYpdZjPy3VQrZvjTPnOoLm0KudCRXfGWp48QwhyPPp2yW8z0p0sCYZd/em847Tl2dVxJJ1DR+hF+O77T7A==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      ibm_db: '*'
-      mariadb: '*'
-      mysql2: '*'
-      oracledb: '*'
-      pg: '*'
-      pg-hstore: '*'
-      snowflake-sdk: '*'
-      sqlite3: '*'
-      tedious: '*'
-    peerDependenciesMeta:
-      ibm_db:
-        optional: true
-      mariadb:
-        optional: true
-      mysql2:
-        optional: true
-      oracledb:
-        optional: true
-      pg:
-        optional: true
-      pg-hstore:
-        optional: true
-      snowflake-sdk:
-        optional: true
-      sqlite3:
-        optional: true
-      tedious:
-        optional: true
 
   serialize-error@11.0.3:
     resolution: {integrity: sha512-2G2y++21dhj2R7iHAdd0FIzjGwuKZld+7Pl/bTU6YIkrC2ZMbVUjm+luj6A6V34Rv9XfKJDKpTWu9W4Gse1D9g==}
@@ -5513,9 +4830,6 @@ packages:
     resolution: {integrity: sha512-o5sSPKEkg/DIQNmH43V0/uerLrpzVedkUh8tGNvaeXpfpuwjKenlSox/2O/BTlZUtEe+JG7s5YhEz608PlAHRA==}
     engines: {node: '>=0.6'}
 
-  toposort-class@1.0.1:
-    resolution: {integrity: sha512-OsLcGGbYF3rMjPUf8oKktyvCiUxSbqMMS39m33MAjLTC1DVIH6x3WSt63/M77ihI09+Sdfk1AXvfhCEeUmC7mg==}
-
   tr46@0.0.3:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
 
@@ -5662,10 +4976,6 @@ packages:
     resolution: {integrity: sha512-72RFADWFqKmUb2hmmvNODKL3p9hcB6Gt2DOQMis1SEBaV6a4MH8soBvzg+95CYhCKPFedut2JY9bMfrDl9D23g==}
     engines: {node: '>=14.0'}
 
-  undici@6.21.0:
-    resolution: {integrity: sha512-BUgJXc752Kou3oOIuU1i+yZZypyZRqNPW0vqoMPl8VaoalSfeR0D8/t4iAS3yirs79SSMTxTag+ZC86uswv+Cw==}
-    engines: {node: '>=18.17'}
-
   unicorn-magic@0.1.0:
     resolution: {integrity: sha512-lRfVq8fE8gz6QMBuDM6a+LO3IAzTi05H6gCVaUpir2E1Rwpo4ZUog45KpNXKC/Mn3Yb9UDuHumeFTo9iV/D9FQ==}
     engines: {node: '>=18'}
@@ -5713,10 +5023,6 @@ packages:
 
   util@0.12.5:
     resolution: {integrity: sha512-kZf/K6hEIrWHI6XqOFUiiMa+79wE/D8Q+NCNAWclkyg3b4d2k7s0QGepNjiABc+aR3N1PAyHL7p6UcLY6LmrnA==}
-
-  uuid@10.0.0:
-    resolution: {integrity: sha512-8XkAphELsDnEGrDxUOHB3RGvXz6TeuYSGEZBOjtTtPm2lwhGBjLgOzLHB63IUWfBpNucQjND6d3AOudO+H3RWQ==}
-    hasBin: true
 
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
@@ -5896,9 +5202,6 @@ packages:
   winston@3.14.2:
     resolution: {integrity: sha512-CO8cdpBB2yqzEf8v895L+GNKYJiEq8eKlHU38af3snQBQ+sdAIUepjMSguOIJC7ICbzm0ZI+Af2If4vIJrtmOg==}
     engines: {node: '>= 12.0.0'}
-
-  wkx@0.5.0:
-    resolution: {integrity: sha512-Xng/d4Ichh8uN4l0FToV/258EjMGU9MGcA0HV2d9B/ZpZB3lqQm7nkOdZdm5GhKtLLhAE7PiVQwN4eN+2YJJUg==}
 
   word-wrap@1.2.5:
     resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
@@ -6089,25 +5392,6 @@ snapshots:
       colorspace: 1.1.4
       enabled: 2.0.0
       kuler: 2.0.0
-
-  '@elastic/elasticsearch@8.15.2':
-    dependencies:
-      '@elastic/transport': 8.9.1
-      tslib: 2.8.0
-    transitivePeerDependencies:
-      - supports-color
-
-  '@elastic/transport@8.9.1':
-    dependencies:
-      '@opentelemetry/api': 1.9.0
-      debug: 4.3.7(supports-color@9.4.0)
-      hpagent: 1.2.0
-      ms: 2.1.3
-      secure-json-parse: 2.7.0
-      tslib: 2.8.0
-      undici: 6.21.0
-    transitivePeerDependencies:
-      - supports-color
 
   '@esbuild/aix-ppc64@0.21.5':
     optional: true
@@ -6393,10 +5677,9 @@ snapshots:
 
   '@iarna/toml@2.2.5': {}
 
-  '@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))':
+  '@ibm-generative-ai/node-sdk@3.2.4':
     dependencies:
       '@ai-zen/node-fetch-event-source': 2.1.4
-      '@langchain/core': 0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
       fetch-retry: 5.0.6
       http-status-codes: 2.3.0
       openapi-fetch: 0.8.2
@@ -6433,110 +5716,6 @@ snapshots:
   '@js-sdsl/ordered-map@4.4.2': {}
 
   '@jsdevtools/ono@7.1.3': {}
-
-  '@langchain/community@0.2.28(@elastic/elasticsearch@8.15.2)(@langchain/langgraph@0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8))':
-    dependencies:
-      '@langchain/core': 0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
-      '@langchain/openai': 0.2.11(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))
-      binary-extensions: 2.3.0
-      expr-eval: 2.0.2
-      flat: 5.0.2
-      js-yaml: 4.1.0
-      langchain: 0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8))
-      langsmith: 0.1.41(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
-      uuid: 10.0.0
-      zod: 3.23.8
-      zod-to-json-schema: 3.23.3(zod@3.23.8)
-    optionalDependencies:
-      '@elastic/elasticsearch': 8.15.2
-      '@langchain/langgraph': 0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
-      '@zilliz/milvus2-sdk-node': 2.4.4
-      duck-duck-scrape: 2.2.5
-      google-auth-library: 9.14.2
-      ignore: 5.3.2
-      ioredis: 5.4.1
-      lodash: 4.17.21
-      mongodb: 6.7.0(gcp-metadata@6.1.0)(socks@2.8.3)
-    transitivePeerDependencies:
-      - '@gomomento/sdk-web'
-      - '@langchain/anthropic'
-      - '@langchain/aws'
-      - '@langchain/cohere'
-      - '@langchain/google-genai'
-      - '@langchain/google-vertexai'
-      - '@langchain/groq'
-      - '@langchain/mistralai'
-      - '@langchain/ollama'
-      - axios
-      - encoding
-      - fast-xml-parser
-      - handlebars
-      - openai
-      - peggy
-      - pyodide
-
-  '@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))':
-    dependencies:
-      ansi-styles: 5.2.0
-      camelcase: 6.3.0
-      decamelize: 1.2.0
-      js-tiktoken: 1.0.15
-      langsmith: 0.1.41(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
-      mustache: 4.2.0
-      p-queue: 6.6.2
-      p-retry: 4.6.2
-      uuid: 10.0.0
-      zod: 3.23.8
-      zod-to-json-schema: 3.23.3(zod@3.23.8)
-    transitivePeerDependencies:
-      - langchain
-      - openai
-
-  '@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.68.1(zod@3.23.8))':
-    dependencies:
-      ansi-styles: 5.2.0
-      camelcase: 6.3.0
-      decamelize: 1.2.0
-      js-tiktoken: 1.0.15
-      langsmith: 0.1.41(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.68.1(zod@3.23.8)))(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.68.1(zod@3.23.8))
-      mustache: 4.2.0
-      p-queue: 6.6.2
-      p-retry: 4.6.2
-      uuid: 10.0.0
-      zod: 3.23.8
-      zod-to-json-schema: 3.23.3(zod@3.23.8)
-    transitivePeerDependencies:
-      - langchain
-      - openai
-
-  '@langchain/langgraph@0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))':
-    dependencies:
-      '@langchain/core': 0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
-      uuid: 10.0.0
-      zod: 3.23.8
-    transitivePeerDependencies:
-      - langchain
-      - openai
-    optional: true
-
-  '@langchain/openai@0.2.11(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))':
-    dependencies:
-      '@langchain/core': 0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.68.1(zod@3.23.8))
-      js-tiktoken: 1.0.15
-      openai: 4.68.1(zod@3.23.8)
-      zod: 3.23.8
-      zod-to-json-schema: 3.23.3(zod@3.23.8)
-    transitivePeerDependencies:
-      - encoding
-      - langchain
-
-  '@langchain/textsplitters@0.0.3(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))':
-    dependencies:
-      '@langchain/core': 0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
-      js-tiktoken: 1.0.15
-    transitivePeerDependencies:
-      - langchain
-      - openai
 
   '@lukeed/ms@2.0.2': {}
 
@@ -7644,10 +6823,6 @@ snapshots:
     dependencies:
       '@types/node': 20.16.14
 
-  '@types/debug@4.1.12':
-    dependencies:
-      '@types/ms': 0.7.34
-
   '@types/estree@1.0.5': {}
 
   '@types/json-schema@7.0.15': {}
@@ -7667,8 +6842,6 @@ snapshots:
   '@types/memcached@2.2.10':
     dependencies:
       '@types/node': 20.16.14
-
-  '@types/ms@0.7.34': {}
 
   '@types/mysql@2.15.26':
     dependencies:
@@ -7699,8 +6872,6 @@ snapshots:
       pg-protocol: 1.7.0
       pg-types: 2.2.0
 
-  '@types/retry@0.12.0': {}
-
   '@types/semver@7.5.8': {}
 
   '@types/shimmer@1.2.0': {}
@@ -7710,10 +6881,6 @@ snapshots:
       '@types/node': 20.16.14
 
   '@types/triple-beam@1.3.5': {}
-
-  '@types/uuid@9.0.8': {}
-
-  '@types/validator@13.12.2': {}
 
   '@types/webidl-conversions@7.0.3': {}
 
@@ -8093,18 +7260,11 @@ snapshots:
 
   basic-ftp@5.0.5: {}
 
-  ? bee-agent-framework@0.0.39(@bufbuild/protobuf@1.10.0)(@elastic/elasticsearch@8.15.2)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))))(@langchain/community@0.2.28(@elastic/elasticsearch@8.15.2)(@langchain/langgraph@0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(groq-sdk@0.7.0)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))(sequelize@6.37.3)
-  : dependencies:
+  bee-agent-framework@0.0.41(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.4)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8)):
+    dependencies:
       '@ai-zen/node-fetch-event-source': 2.1.4
       '@connectrpc/connect': 1.6.1(@bufbuild/protobuf@1.10.0)
       '@connectrpc/connect-node': 1.6.1(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.6.1(@bufbuild/protobuf@1.10.0))
-      '@elastic/elasticsearch': 8.15.2
-      '@googleapis/customsearch': 3.2.0
-      '@grpc/grpc-js': 1.12.2
-      '@grpc/proto-loader': 0.7.13
-      '@ibm-generative-ai/node-sdk': 3.2.3(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))
-      '@langchain/community': 0.2.28(@elastic/elasticsearch@8.15.2)(@langchain/langgraph@0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8))
-      '@langchain/core': 0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
       '@opentelemetry/api': 1.9.0
       '@streamparser/json': 0.0.21
       ajv: 8.17.1
@@ -8112,7 +7272,6 @@ snapshots:
       bee-proto: 0.0.2
       duck-duck-scrape: 2.2.5
       fast-xml-parser: 4.5.0
-      groq-sdk: 0.7.0
       header-generator: 2.1.56
       joplin-turndown-plugin-gfm: 1.0.12
       js-yaml: 4.1.0
@@ -8121,15 +7280,11 @@ snapshots:
       mathjs: 13.2.0
       mustache: 4.2.0
       object-hash: 3.0.0
-      ollama: 0.5.9
-      openai: 4.67.3(zod@3.23.8)
-      openai-chat-tokens: 0.2.8
       p-queue: 8.0.1
       p-throttle: 6.2.0
       pino: 9.5.0
       promise-based-task: 3.1.1
       remeda: 2.16.0
-      sequelize: 6.37.3
       serialize-error: 11.0.3
       string-comparison: 1.3.0
       string-strip-html: 13.4.8
@@ -8137,14 +7292,22 @@ snapshots:
       wikipedia: 2.1.2
       zod: 3.23.8
       zod-to-json-schema: 3.23.3(zod@3.23.8)
+    optionalDependencies:
+      '@googleapis/customsearch': 3.2.0
+      '@grpc/grpc-js': 1.12.2
+      '@grpc/proto-loader': 0.7.13
+      '@ibm-generative-ai/node-sdk': 3.2.4
+      ollama: 0.5.9
+      openai: 4.67.3(zod@3.23.8)
+      openai-chat-tokens: 0.2.8
     transitivePeerDependencies:
       - '@bufbuild/protobuf'
       - debug
       - encoding
 
-  ? bee-observe-connector@0.0.5(bee-agent-framework@0.0.39(@bufbuild/protobuf@1.10.0)(@elastic/elasticsearch@8.15.2)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))))(@langchain/community@0.2.28(@elastic/elasticsearch@8.15.2)(@langchain/langgraph@0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(groq-sdk@0.7.0)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))(sequelize@6.37.3))
-  : dependencies:
-      bee-agent-framework: 0.0.39(@bufbuild/protobuf@1.10.0)(@elastic/elasticsearch@8.15.2)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.3(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))))(@langchain/community@0.2.28(@elastic/elasticsearch@8.15.2)(@langchain/langgraph@0.0.34(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(@zilliz/milvus2-sdk-node@2.4.4)(axios@1.7.7)(duck-duck-scrape@2.2.5)(fast-xml-parser@4.5.0)(google-auth-library@9.14.2)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(lodash@4.17.21)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(groq-sdk@0.7.0)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))(sequelize@6.37.3)
+  bee-observe-connector@0.0.5(bee-agent-framework@0.0.41(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.4)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))):
+    dependencies:
+      bee-agent-framework: 0.0.41(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0)(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.4)(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(zod@3.23.8))
       openapi-fetch: 0.11.3
       remeda: 2.16.0
 
@@ -8156,8 +7319,6 @@ snapshots:
   before-after-hook@2.2.3: {}
 
   bignumber.js@9.1.2: {}
-
-  binary-extensions@2.3.0: {}
 
   bintrees@1.0.2: {}
 
@@ -8258,8 +7419,6 @@ snapshots:
   callsites@3.1.0: {}
 
   camelcase@4.1.0: {}
-
-  camelcase@6.3.0: {}
 
   camelcase@8.0.0: {}
 
@@ -8577,8 +7736,6 @@ snapshots:
     optionalDependencies:
       supports-color: 9.4.0
 
-  decamelize@1.2.0: {}
-
   decimal.js@10.4.3: {}
 
   deep-eql@4.1.4:
@@ -8658,8 +7815,6 @@ snapshots:
       type-fest: 4.26.1
 
   dotenv@16.4.5: {}
-
-  dottie@2.0.6: {}
 
   duck-duck-scrape@2.2.5:
     dependencies:
@@ -9009,8 +8164,6 @@ snapshots:
 
   event-target-shim@5.0.1: {}
 
-  eventemitter3@4.0.7: {}
-
   eventemitter3@5.0.1: {}
 
   events@3.3.0: {}
@@ -9050,8 +8203,6 @@ snapshots:
       onetime: 6.0.0
       signal-exit: 4.1.0
       strip-final-newline: 3.0.0
-
-  expr-eval@2.0.2: {}
 
   extend@3.0.2: {}
 
@@ -9380,7 +8531,7 @@ snapshots:
 
   globrex@0.1.2: {}
 
-  google-auth-library@9.14.2:
+  google-auth-library@9.15.0:
     dependencies:
       base64-js: 1.5.1
       ecdsa-sig-formatter: 1.0.11
@@ -9396,7 +8547,7 @@ snapshots:
     dependencies:
       extend: 3.0.2
       gaxios: 6.7.1
-      google-auth-library: 9.14.2
+      google-auth-library: 9.15.0
       qs: 6.13.0
       url-template: 2.0.8
       uuid: 9.0.1
@@ -9413,18 +8564,6 @@ snapshots:
   graceful-fs@4.2.11: {}
 
   graphemer@1.4.0: {}
-
-  groq-sdk@0.7.0:
-    dependencies:
-      '@types/node': 18.19.58
-      '@types/node-fetch': 2.6.11
-      abort-controller: 3.0.0
-      agentkeepalive: 4.5.0
-      form-data-encoder: 1.7.2
-      formdata-node: 4.4.1
-      node-fetch: 2.7.0
-    transitivePeerDependencies:
-      - encoding
 
   gtoken@7.1.0:
     dependencies:
@@ -9479,8 +8618,6 @@ snapshots:
   hosted-git-info@7.0.2:
     dependencies:
       lru-cache: 10.4.3
-
-  hpagent@1.2.0: {}
 
   html-entities@2.5.2: {}
 
@@ -9557,8 +8694,6 @@ snapshots:
   imurmurhash@0.1.4: {}
 
   index-to-position@0.1.2: {}
-
-  inflection@1.13.4: {}
 
   inflight@1.0.6:
     dependencies:
@@ -9861,8 +8996,6 @@ snapshots:
     optionalDependencies:
       graceful-fs: 4.2.11
 
-  jsonpointer@5.0.1: {}
-
   jsonrepair@3.9.0: {}
 
   jwa@2.0.0:
@@ -9904,59 +9037,6 @@ snapshots:
   kuler@2.0.0: {}
 
   ky@1.7.2: {}
-
-  langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)):
-    dependencies:
-      '@langchain/core': 0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
-      '@langchain/openai': 0.2.11(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))
-      '@langchain/textsplitters': 0.0.3(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
-      binary-extensions: 2.3.0
-      js-tiktoken: 1.0.15
-      js-yaml: 4.1.0
-      jsonpointer: 5.0.1
-      langsmith: 0.1.41(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
-      openapi-types: 12.1.3
-      p-retry: 4.6.2
-      uuid: 10.0.0
-      yaml: 2.6.0
-      zod: 3.23.8
-      zod-to-json-schema: 3.23.3(zod@3.23.8)
-    optionalDependencies:
-      axios: 1.7.7
-      fast-xml-parser: 4.5.0
-      handlebars: 4.7.8
-      ignore: 5.3.2
-      ioredis: 5.4.1
-      mongodb: 6.7.0(gcp-metadata@6.1.0)(socks@2.8.3)
-    transitivePeerDependencies:
-      - encoding
-      - openai
-
-  langsmith@0.1.41(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)))(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8)):
-    dependencies:
-      '@types/uuid': 9.0.8
-      commander: 10.0.1
-      p-queue: 6.6.2
-      p-retry: 4.6.2
-      semver: 7.6.3
-      uuid: 9.0.1
-    optionalDependencies:
-      '@langchain/core': 0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.67.3(zod@3.23.8))
-      langchain: 0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8))
-      openai: 4.67.3(zod@3.23.8)
-
-  langsmith@0.1.41(@langchain/core@0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.68.1(zod@3.23.8)))(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.68.1(zod@3.23.8)):
-    dependencies:
-      '@types/uuid': 9.0.8
-      commander: 10.0.1
-      p-queue: 6.6.2
-      p-retry: 4.6.2
-      semver: 7.6.3
-      uuid: 9.0.1
-    optionalDependencies:
-      '@langchain/core': 0.2.33(langchain@0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8)))(openai@4.68.1(zod@3.23.8))
-      langchain: 0.2.20(axios@1.7.7)(fast-xml-parser@4.5.0)(handlebars@4.7.8)(ignore@5.3.2)(ioredis@5.4.1)(mongodb@6.7.0(gcp-metadata@6.1.0)(socks@2.8.3))(openai@4.67.3(zod@3.23.8))
-      openai: 4.68.1(zod@3.23.8)
 
   latest-version@9.0.0:
     dependencies:
@@ -10163,12 +9243,6 @@ snapshots:
 
   module-details-from-path@1.0.3: {}
 
-  moment-timezone@0.5.46:
-    dependencies:
-      moment: 2.30.1
-
-  moment@2.30.1: {}
-
   mongodb-connection-string-url@3.0.1:
     dependencies:
       '@types/whatwg-url': 11.0.5
@@ -10342,20 +9416,6 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  openai@4.68.1(zod@3.23.8):
-    dependencies:
-      '@types/node': 18.19.58
-      '@types/node-fetch': 2.6.11
-      abort-controller: 3.0.0
-      agentkeepalive: 4.5.0
-      form-data-encoder: 1.7.2
-      formdata-node: 4.4.1
-      node-fetch: 2.7.0
-    optionalDependencies:
-      zod: 3.23.8
-    transitivePeerDependencies:
-      - encoding
-
   openapi-fetch@0.10.6:
     dependencies:
       openapi-typescript-helpers: 0.0.11
@@ -10443,8 +9503,6 @@ snapshots:
       lodash.isequal: 4.5.0
       vali-date: 1.0.0
 
-  p-finally@1.0.0: {}
-
   p-limit@3.1.0:
     dependencies:
       yocto-queue: 0.1.0
@@ -10466,28 +9524,14 @@ snapshots:
       eventemitter3: 5.0.1
       p-timeout-compat: 1.0.4
 
-  p-queue@6.6.2:
-    dependencies:
-      eventemitter3: 4.0.7
-      p-timeout: 3.2.0
-
   p-queue@8.0.1:
     dependencies:
       eventemitter3: 5.0.1
       p-timeout: 6.1.2
 
-  p-retry@4.6.2:
-    dependencies:
-      '@types/retry': 0.12.0
-      retry: 0.13.1
-
   p-throttle@6.2.0: {}
 
   p-timeout-compat@1.0.4: {}
-
-  p-timeout@3.2.0:
-    dependencies:
-      p-finally: 1.0.0
 
   p-timeout@6.1.2: {}
 
@@ -10573,8 +9617,6 @@ snapshots:
   pend@1.2.0: {}
 
   pg-connection-string@2.6.2: {}
-
-  pg-connection-string@2.7.0: {}
 
   pg-int8@1.0.1: {}
 
@@ -10937,8 +9979,6 @@ snapshots:
 
   ret@0.4.3: {}
 
-  retry-as-promised@7.0.4: {}
-
   retry@0.13.1: {}
 
   reusify@1.0.4: {}
@@ -11019,29 +10059,6 @@ snapshots:
       lru-cache: 6.0.0
 
   semver@7.6.3: {}
-
-  sequelize-pool@7.1.0: {}
-
-  sequelize@6.37.3:
-    dependencies:
-      '@types/debug': 4.1.12
-      '@types/validator': 13.12.2
-      debug: 4.3.7(supports-color@9.4.0)
-      dottie: 2.0.6
-      inflection: 1.13.4
-      lodash: 4.17.21
-      moment: 2.30.1
-      moment-timezone: 0.5.46
-      pg-connection-string: 2.7.0
-      retry-as-promised: 7.0.4
-      semver: 7.6.3
-      sequelize-pool: 7.1.0
-      toposort-class: 1.0.1
-      uuid: 8.3.2
-      validator: 13.12.0
-      wkx: 0.5.0
-    transitivePeerDependencies:
-      - supports-color
 
   serialize-error@11.0.3:
     dependencies:
@@ -11332,8 +10349,6 @@ snapshots:
 
   toidentifier@1.0.1: {}
 
-  toposort-class@1.0.1: {}
-
   tr46@0.0.3: {}
 
   tr46@4.1.1:
@@ -11475,8 +10490,6 @@ snapshots:
     dependencies:
       '@fastify/busboy': 2.1.1
 
-  undici@6.21.0: {}
-
   unicorn-magic@0.1.0: {}
 
   universal-user-agent@6.0.1: {}
@@ -11528,8 +10541,6 @@ snapshots:
       is-generator-function: 1.0.10
       is-typed-array: 1.1.13
       which-typed-array: 1.1.15
-
-  uuid@10.0.0: {}
 
   uuid@8.3.2: {}
 
@@ -11734,10 +10745,6 @@ snapshots:
       stack-trace: 0.0.10
       triple-beam: 1.4.1
       winston-transport: 4.7.1
-
-  wkx@0.5.0:
-    dependencies:
-      '@types/node': 20.16.14
 
   word-wrap@1.2.5: {}
 

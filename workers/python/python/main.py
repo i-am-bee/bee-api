@@ -60,7 +60,7 @@ async def create_web_app(workers: list[Worker]):
     app.add_routes([web.get('/health', healthcheck)])
     runner = web.AppRunner(app)
     await runner.setup()
-    site = web.TCPSite(runner, '0.0.0.0', 8080)
+    site = web.TCPSite(runner, '0.0.0.0', config.port)
     await site.start()
     logger.info("HTTP server started")
 

@@ -20,7 +20,6 @@ import { FilterQuery, Loaded, ref, Ref } from '@mikro-orm/core';
 import ibm from 'ibm-cos-sdk';
 import { MultipartFile } from '@fastify/multipart';
 import dayjs from 'dayjs';
-import mime from 'mime/lite';
 
 import { File } from './entities/file.entity.js';
 import { File as FileDto } from './dtos/file.js';
@@ -30,6 +29,7 @@ import { FileDeleteParams, FileDeleteResponse } from './dtos/file-delete.js';
 import { FilesListQuery, FilesListResponse } from './dtos/files-list.js';
 import { FileContentReadParams, FileContentReadResponse } from './dtos/file-content-read.js';
 import { scheduleExtraction, supportsExtraction } from './extraction/helpers.js';
+import { deriveMimeType } from './utils/mime.js';
 
 import { PassthroughHash } from '@/utils/streams.js';
 import { ORM } from '@/database.js';
@@ -119,6 +119,7 @@ export async function createFile({
     filename,
     bytes: 0,
     contentHash: '',
+    mimeType: deriveMimeType(mimetype, filename),
     dependsOn
   });
 
@@ -129,7 +130,7 @@ export async function createFile({
     Bucket: S3_BUCKET_FILE_STORAGE,
     Key: file.storageId,
     Body: content.compose(passthroughHash),
-    ContentType: mimetype
+    ContentType: file.mimeType
   });
   const unsub = listenToSocketClose(req.socket, () => s3request.abort());
   s3request.on('httpUploadProgress', (progress) => {
@@ -149,7 +150,7 @@ export async function createFile({
     getFilesLogger(file.id).info('File created');
 
     (async () => {
-      if (head.ContentType && supportsExtraction(head.ContentType)) {
+      if (supportsExtraction(file.mimeType)) {
         try {
           await scheduleExtraction(file);
         } catch (err) {
@@ -229,7 +230,8 @@ export async function readFileContent({
   return ensureRequestContextData('res')
     .header(
       'content-type',
-      head.ContentType ?? mime.getType(file.filename) ?? 'application/octet-stream'
+      // derivation is used for backwards compatibility
+      deriveMimeType(file.mimeType ?? head.ContentType, file.filename)
     )
     .send(content);
 }
