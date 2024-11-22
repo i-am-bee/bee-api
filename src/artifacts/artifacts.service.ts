@@ -38,7 +38,6 @@ import {
 import { ArtifactsListQuery, ArtifactsListResponse } from './dtos/artifacts-list.js';
 import { ArtifactShared } from './dtos/artifact-shared.js';
 
-import { Thread } from '@/threads/thread.entity.js';
 import { Message } from '@/messages/message.entity.js';
 import { APIError, APIErrorCode } from '@/errors/error.entity.js';
 import { createDeleteResponse } from '@/utils/delete.js';
@@ -65,9 +64,9 @@ export function toSharedDto(artifact: Loaded<Artifact>): ArtifactShared {
     source_code: (artifact as AppArtifact).sourceCode,
     share_url: artifact.accessSecret
       ? `/v1/artifacts/${artifact.id}/shared?secret=${artifact.accessSecret}`
-      : '',
+      : null,
     name: artifact.name,
-    description: artifact.description ?? ''
+    description: artifact.description ?? null
   };
   switch (artifact.type) {
     case ArtifactType.APP:
@@ -83,27 +82,28 @@ function getSecret() {
 }
 
 export async function createArtifact(body: ArtifactCreateBody): Promise<ArtifactCreateResponse> {
-  const thread = await ORM.em.getRepository(Thread).findOneOrFail({ id: body.thread_id });
   const message = await ORM.em.getRepository(Message).findOneOrFail({ id: body.message_id });
 
-  if (message.thread.id !== thread.id) {
-    throw new APIError({ message: 'Thread message mismatch', code: APIErrorCode.INVALID_INPUT });
+  switch (body.type) {
+    case ArtifactType.APP: {
+      const artifact = new AppArtifact({
+        thread: ref(message.thread),
+        message: ref(message),
+        sourceCode: body.source_code,
+        metadata: body.metadata,
+        accessSecret: body.shared === true ? getSecret() : undefined,
+        name: body.name,
+        description: body.description
+      });
+      await ORM.em.persistAndFlush(artifact);
+      return toDto(artifact);
+    }
+    default:
+      throw new APIError({
+        message: 'Artifact type not supported',
+        code: APIErrorCode.INVALID_INPUT
+      });
   }
-
-  if (body.type === ArtifactType.APP) {
-    const artifact = new AppArtifact({
-      thread: ref(thread),
-      message: ref(message),
-      sourceCode: body.source_code,
-      metadata: body.metadata,
-      accessSecret: body.shared === true ? getSecret() : undefined,
-      name: body.name,
-      description: body.description
-    });
-    await ORM.em.persistAndFlush(artifact);
-    return toDto(artifact);
-  }
-  throw new APIError({ message: 'Artifact type not supported', code: APIErrorCode.INVALID_INPUT });
 }
 
 export async function readArtifact({

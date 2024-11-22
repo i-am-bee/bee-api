@@ -22,8 +22,7 @@ import { artifactSchema } from './artifact.js';
 
 import { metadataSchema } from '@/schema.js';
 
-const commonartifactProperties = {
-  thread_id: { type: 'string' },
+const commonArtifactProperties = {
   message_id: { type: 'string' },
   metadata: metadataSchema,
   shared: { type: 'boolean' },
@@ -35,10 +34,10 @@ export const artifactCreateBodySchema = {
   type: 'object',
   oneOf: [
     {
-      required: ['type', 'thread_id', 'message_id', 'source_code', 'name'],
+      required: ['type', 'message_id', 'source_code', 'name'],
       additionalProperties: false,
       properties: {
-        ...commonartifactProperties,
+        ...commonArtifactProperties,
         type: {
           type: 'string',
           const: ArtifactType.APP

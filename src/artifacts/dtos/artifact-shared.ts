@@ -22,14 +22,15 @@ import { metadataSchema } from '@/schema.js';
 
 export const artifactSharedSchema = {
   type: 'object',
-  required: ['id', 'type', 'created_at', 'object', 'metadata', 'name', 'description'],
+  required: ['id', 'type', 'created_at', 'object', 'metadata', 'name', 'description', 'share_url'],
   properties: {
     id: { type: 'string' },
     object: { const: 'artifact.shared' },
     metadata: metadataSchema,
     created_at: { type: 'number' },
     name: { type: 'string' },
-    description: { type: 'string' }
+    description: { type: 'string', nullable: true },
+    share_url: { type: 'string', nullable: true }
   },
   oneOf: [
     {

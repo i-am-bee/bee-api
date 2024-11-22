@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Entity, Enum, ManyToOne, Property, Ref, Unique } from '@mikro-orm/core';
+import { Entity, Enum, ManyToOne, Property, Ref } from '@mikro-orm/core';
 
 import { Thread } from '@/threads/thread.entity.js';
 import {
@@ -43,7 +43,6 @@ export abstract class Artifact extends PrincipalScopedEntity {
   @ManyToOne()
   message: Ref<Message>;
 
-  @Unique()
   @Property()
   accessSecret?: string;
 
