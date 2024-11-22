@@ -1,0 +1,41 @@
+import { randomUUID } from 'crypto';
+
+import { BaseMessage } from 'bee-agent-framework/llms/primitives/message';
+import { LLMError } from 'bee-agent-framework/llms/base';
+
+import {
+  ChatCompletionCreateBody,
+  ChatCompletionCreateResponse
+} from './dtos/chat-completion-create';
+
+import { createChatLLM, getDefaultModel } from '@/runs/execution/factory';
+import { getLogger } from '@/logger';
+import { APIError, APIErrorCode } from '@/errors/error.entity';
+
+const getChatLogger = () => getLogger();
+
+export async function createChatCompletion({
+  model = getDefaultModel(),
+  messages
+}: ChatCompletionCreateBody): Promise<ChatCompletionCreateResponse> {
+  const llm = createChatLLM({ model });
+  try {
+    const output = await llm.generate(
+      messages.map((message) => new BaseMessage(message.role, message.content))
+    );
+    return {
+      id: randomUUID(),
+      object: 'chat.completion',
+      model,
+      choices: output.messages.map((message) => ({
+        message: { role: message.role, content: message.text }
+      }))
+    };
+  } catch (err) {
+    getChatLogger().error({ err }, 'LLM generation failed');
+    if (err instanceof LLMError) {
+      throw new APIError({ code: APIErrorCode.SERVICE_ERROR, message: err.message });
+    }
+    throw err;
+  }
+}

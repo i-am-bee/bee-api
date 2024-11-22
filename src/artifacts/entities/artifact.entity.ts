@@ -44,8 +44,7 @@ export abstract class Artifact extends PrincipalScopedEntity {
   @ManyToOne()
   message?: Ref<Message>;
 
-  @Index()
-  @Property()
+  @Property({ unique: true })
   accessSecret?: string;
 
   @Property()
@@ -54,12 +53,13 @@ export abstract class Artifact extends PrincipalScopedEntity {
   @Property()
   description?: string;
 
-  constructor({ thread, message, name, description, ...rest }: ArtifactInput) {
+  constructor({ thread, message, name, description, accessSecret, ...rest }: ArtifactInput) {
     super(rest);
     this.thread = thread;
     this.message = message;
     this.name = name;
     this.description = description;
+    this.accessSecret = accessSecret;
   }
 }
 
