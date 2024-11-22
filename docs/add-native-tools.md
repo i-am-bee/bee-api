@@ -102,10 +102,10 @@ function getSystemTools() {
     systemTools.set('riddle_tool', {
     type: ToolType.SYSTEM,
     id: 'riddle_tool',
-    createdAt: new Date(),
+    createdAt: new Date('2024-11-22'),
     ...riddleTool,
     inputSchema: riddleTool.inputSchema.bind(riddleTool),
-    isExternal: false,
+    isExternal: false, // true if it accesses public internet
     metadata: {
       $ui_description_short:
         'It generates a random puzzle to test your knowledge.'
