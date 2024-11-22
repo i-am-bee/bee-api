@@ -130,7 +130,7 @@ function getSystemTools() {
           allSystemTools.get(SystemTools.WEATHER),
           allSystemTools.get(SystemTools.ARXIV),
           allSystemTools.get('read_file'),
-          allSystemTools.get('riddle_tool') // add this line
+          allSystemTools.get(SystemTools.RIDDLE_TOOL) // add this line
         ]
       : [];
   ...
