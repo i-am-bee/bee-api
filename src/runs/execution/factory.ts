@@ -43,6 +43,7 @@ import { BeeAgent } from 'bee-agent-framework/agents/bee/agent';
 import { BeeSystemPrompt } from 'bee-agent-framework/agents/bee/prompts';
 import { ChatLLM, ChatLLMOutput } from 'bee-agent-framework/llms/chat';
 import { BaseMemory } from 'bee-agent-framework/memory/base';
+import { StreamlitAgentSystemPrompt } from 'bee-agent-framework/agents/experimental/streamlit/prompts';
 
 import { Run } from '../entities/run.entity';
 
@@ -269,7 +270,8 @@ export function createAgentRun(
     case Agent.STREAMLIT: {
       const agent = new StreamlitAgent({
         llm,
-        memory
+        memory,
+        templates: { system: getPromptTemplate(run, StreamlitAgentSystemPrompt) }
       });
       return [agent.run(...runArgs).observe(createStreamlitStreamingHandler(ctx)), agent];
     }
