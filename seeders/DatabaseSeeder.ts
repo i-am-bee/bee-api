@@ -90,7 +90,7 @@ export class DatabaseSeeder extends Seeder {
       project: ref(project),
       redactedValue: redactProjectKeyValue(PROJECT_API_KEY)
     });
-    const assistant = new Assistant({
+    const beeAssistant = new Assistant({
       model: getDefaultModel(),
       agent: Agent.BEE,
       tools: [
@@ -119,7 +119,20 @@ export class DatabaseSeeder extends Seeder {
         $ui_icon: 'Bee'
       }
     });
-    em.persist([assistant, projectApiKey]);
+    const streamlitAssistant = new Assistant({
+      model: getDefaultModel(),
+      agent: Agent.STREAMLIT,
+      tools: [],
+      name: 'Builder Assistant',
+      project: ref(project),
+      createdBy: ref(projectUser),
+      description: 'An example streamlit agent, tailored for building Streamlit applications.',
+      metadata: {
+        $ui_color: 'white',
+        $ui_icon: 'Bee'
+      }
+    });
+    em.persist([beeAssistant, streamlitAssistant, projectApiKey]);
     await em.flush();
     process.env.IN_SEEDER = undefined;
   }
