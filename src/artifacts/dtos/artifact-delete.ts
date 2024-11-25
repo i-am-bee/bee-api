@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-export const ExtractionBackend = {
-  DOCLING: 'docling',
-  UNSTRUCTURED_OPENSOURCE: 'unstructured-opensource',
-  UNSTRUCTURED_API: 'unstructured-api',
-  WDU: 'wdu'
-} as const;
-export type ExtractionBackend = (typeof ExtractionBackend)[keyof typeof ExtractionBackend];
+import { FromSchema } from 'json-schema-to-ts';
+
+import { artifactReadParamsSchema } from './artifact-read.js';
+
+import { createDeleteSchema } from '@/schema.js';
+
+export const artifactDeleteParamsSchema = artifactReadParamsSchema;
+export type ArtifactDeleteParams = FromSchema<typeof artifactDeleteParamsSchema>;
+
+export const artifactDeleteResponseSchema = createDeleteSchema('artifact');
+export type ArtifactDeleteResponse = FromSchema<typeof artifactDeleteResponseSchema>;

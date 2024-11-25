@@ -14,10 +14,21 @@
  * limitations under the License.
  */
 
-export const ExtractionBackend = {
-  DOCLING: 'docling',
-  UNSTRUCTURED_OPENSOURCE: 'unstructured-opensource',
-  UNSTRUCTURED_API: 'unstructured-api',
-  WDU: 'wdu'
-} as const;
-export type ExtractionBackend = (typeof ExtractionBackend)[keyof typeof ExtractionBackend];
+import { Entity, Property } from '@mikro-orm/core';
+
+import { Artifact, ArtifactInput, ArtifactType } from './artifact.entity.js';
+
+@Entity({ discriminatorValue: ArtifactType.APP })
+export class AppArtifact extends Artifact {
+  type = ArtifactType.APP;
+
+  @Property()
+  sourceCode: string;
+
+  constructor({ sourceCode, ...rest }: AppArtifactInput) {
+    super(rest);
+    this.sourceCode = sourceCode;
+  }
+}
+
+export type AppArtifactInput = ArtifactInput & Pick<AppArtifact, 'sourceCode'>;

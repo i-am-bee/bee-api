@@ -14,7 +14,19 @@
  * limitations under the License.
  */
 
-export type DoclingChunksExtraction = { text: string }[];
+import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 
-type UnstructuredExtractionElement = { type: string; text: string };
-export type UnstructuredExtractionDocument = UnstructuredExtractionElement[];
+import { artifactSharedSchema } from './artifact-shared';
+
+export const artifactSchema = {
+  type: 'object',
+  required: [...artifactSharedSchema.required, 'thread_id', 'message_id', 'share_url'],
+  properties: {
+    ...artifactSharedSchema.properties,
+    object: { const: 'artifact' },
+    thread_id: { type: 'string', nullable: true },
+    message_id: { type: 'string', nullable: true },
+    share_url: { type: 'string', nullable: true }
+  }
+} as const satisfies JSONSchema;
+export type Artifact = FromSchema<typeof artifactSchema>;

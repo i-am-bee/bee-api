@@ -14,10 +14,17 @@
  * limitations under the License.
  */
 
-export const ExtractionBackend = {
-  DOCLING: 'docling',
-  UNSTRUCTURED_OPENSOURCE: 'unstructured-opensource',
-  UNSTRUCTURED_API: 'unstructured-api',
-  WDU: 'wdu'
-} as const;
-export type ExtractionBackend = (typeof ExtractionBackend)[keyof typeof ExtractionBackend];
+import mime from 'mime';
+
+export const OCTET_STREAM_MIME_TYPE = 'application/octet-stream';
+
+export function deriveMimeType(mimeType?: string, filename?: string) {
+  if (mimeType && mimeType !== OCTET_STREAM_MIME_TYPE) {
+    return mimeType;
+  }
+  if (filename) {
+    const type = mime.getType(filename);
+    if (type) return type;
+  }
+  return OCTET_STREAM_MIME_TYPE;
+}

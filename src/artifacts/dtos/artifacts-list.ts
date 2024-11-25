@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-export const ExtractionBackend = {
-  DOCLING: 'docling',
-  UNSTRUCTURED_OPENSOURCE: 'unstructured-opensource',
-  UNSTRUCTURED_API: 'unstructured-api',
-  WDU: 'wdu'
-} as const;
-export type ExtractionBackend = (typeof ExtractionBackend)[keyof typeof ExtractionBackend];
+import { FromSchema } from 'json-schema-to-ts';
+
+import { artifactSchema } from './artifact.js';
+
+import { createPaginationQuerySchema, withPagination } from '@/schema.js';
+
+export const artifactsListQuerySchema = createPaginationQuerySchema();
+export type ArtifactsListQuery = FromSchema<typeof artifactsListQuerySchema>;
+
+export const artifactsListResponseSchema = withPagination(artifactSchema);
+export type ArtifactsListResponse = FromSchema<typeof artifactsListResponseSchema>;

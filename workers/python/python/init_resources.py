@@ -12,11 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from enum import StrEnum
+from docling.document_converter import DocumentConverter, InputFormat
 
 
-class ExtractionBackend(StrEnum):
-    DOCLING = 'docling'
-    UNSTRUCTURED_OPENSOURCE = 'unstructured-opensource'
-    UNSTRUCTURED_API = 'unstructured-api'
-    WDU = 'wdu'
+def main():
+    """
+    Initialize worker resources prior to running the worker.
+    """
+
+    # Trigger model downloads for docling, for all formats.
+    converter = DocumentConverter()
+    for format in InputFormat:
+        converter.initialize_pipeline(format)
+
+if __name__ == "__main__":
+    main()
