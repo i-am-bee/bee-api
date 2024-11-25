@@ -26,6 +26,8 @@ import {
   StreamlitRunOutput
 } from 'bee-agent-framework/agents/experimental/streamlit/agent';
 
+import { Agent } from '../constants';
+
 import { AgentContext } from '@/runs/execution/execute.js';
 import { getLogger } from '@/logger.js';
 import { createToolCall, finalizeToolCall } from '@/runs/execution/tools/helpers.js';
@@ -56,7 +58,7 @@ const agentToolExecutionTime = new Summary({
 
 export function createBeeStreamingHandler(ctx: AgentContext) {
   return (emitter: Emitter<BeeCallbacks>) => {
-    const logger = getLogger().child({ runId: ctx.run.id });
+    const logger = getLogger().child({ runId: ctx.run.id, agent: Agent.BEE });
 
     let toolExecutionEnd: (() => number) | null = null;
 
@@ -331,6 +333,7 @@ export function createBeeStreamingHandler(ctx: AgentContext) {
 }
 
 export function createStreamlitStreamingHandler(ctx: AgentContext) {
+  const logger = getLogger().child({ runId: ctx.run.id, agent: Agent.STREAMLIT });
   return (emitter: Emitter<StreamlitEvents>) => {
     emitter.on('newToken', async ({ delta }) => {
       if (!ctx.message) {
@@ -343,6 +346,11 @@ export function createStreamlitStreamingHandler(ctx: AgentContext) {
           createdBy: ctx.run.createdBy,
           status: MessageStatus.IN_PROGRESS
         });
+        if (ctx.runStep)
+          logger.warn(
+            { step: ctx.runStep.id },
+            'Message creation has started while previous run step has not finished'
+          );
         ctx.runStep = new RunStep({
           project: ctx.run.project,
           run: ref(ctx.run),
@@ -388,8 +396,14 @@ export function createStreamlitStreamingHandler(ctx: AgentContext) {
       });
     });
     emitter.on('success', async () => {
-      if (!ctx.message) throw new Error('missing message');
-      if (!ctx.runStep) throw new Error('missing runstep');
+      if (!ctx.message) {
+        logger.warn('Agent success with missing message');
+        return;
+      }
+      if (!ctx.runStep) {
+        logger.warn('Agent success with missing run step');
+        return;
+      }
 
       ctx.message.status = MessageStatus.COMPLETED;
       // TODO add artifact to message
