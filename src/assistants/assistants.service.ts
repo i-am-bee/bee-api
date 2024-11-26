@@ -77,7 +77,7 @@ export async function createAssistant({
   system_prompt_overwrite
 }: AssistantCreateBody): Promise<AssistantCreateResponse> {
   if (agent === Agent.STREAMLIT) {
-    if (toolsParam)
+    if (toolsParam.length !== 0)
       throw new APIError({
         code: APIErrorCode.INVALID_INPUT,
         message: 'Tools are currently not supported by Streamlit agent'
@@ -150,7 +150,7 @@ export async function updateAssistant({
   });
 
   if (assistant.agent === Agent.STREAMLIT) {
-    if (tools)
+    if (tools && tools.length !== 0)
       throw new APIError({
         code: APIErrorCode.INVALID_INPUT,
         message: 'Tools are currently not supported by Streamlit agent'
