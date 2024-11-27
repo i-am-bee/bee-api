@@ -45,7 +45,7 @@ export function supportsExtraction(
       return (
         mimeType.startsWith('text/') ||
         mimeType === 'application/json' ||
-        ['docx', 'html', 'jpeg', 'pdf', 'pptx', 'png'].includes(extension)
+        ['docx', 'html', 'md', 'xlsx', 'jpeg', 'pdf', 'pptx', 'png'].includes(extension)
       );
     }
     case ExtractionBackend.WDU:
@@ -101,7 +101,11 @@ export async function scheduleExtraction(
     case ExtractionBackend.DOCLING: {
       file.extraction = new DoclingExtraction({ jobId: file.id });
       await ORM.em.flush();
-      if (file.mimeType?.startsWith('text/') || file.mimeType === 'application/json') {
+      if (
+        (file.mimeType?.startsWith('text/') &&
+          !['text/markdown', 'text/html'].includes(file.mimeType)) ||
+        file.mimeType === 'application/json'
+      ) {
         await nodeQueue.add(
           QueueName.FILES_EXTRACTION_NODE,
           {

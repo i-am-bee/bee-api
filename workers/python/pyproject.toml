@@ -10,7 +10,7 @@ unstructured = {extras = ["all-docs"], version = "^0.16.4"}
 pymongo = "^4.10.1"
 pydantic-settings = "^2.6.1"
 aiohttp = "^3.10.10"
-docling = "^2.5.2"
+docling = "^2.7.1"
 aioboto3 = "^13.2.0"
 
 
