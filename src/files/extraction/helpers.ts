@@ -34,18 +34,48 @@ import { EXTRACTION_BACKEND, S3_BUCKET_FILE_STORAGE } from '@/config';
 import { ORM } from '@/database';
 import { QueueName } from '@/jobs/constants';
 
+function isNativeDoclingFormat(mimeType: string): boolean {
+  const extension = mime.getExtension(mimeType);
+  if (!extension) return false;
+  return [
+    'docx',
+    'dotx',
+    'docm',
+    'dotm',
+    'pptx',
+    'potx',
+    'ppsx',
+    'pptm',
+    'potm',
+    'ppsm',
+    'pdf',
+    'md',
+    'html',
+    'htm',
+    'xhtml',
+    'jpg',
+    'jpeg',
+    'png',
+    'tif',
+    'tiff',
+    'bmp',
+    'adoc',
+    'asciidoc',
+    'asc',
+    'xlsx'
+  ].includes(extension);
+}
+
 export function supportsExtraction(
   mimeType: string = OCTET_STREAM_MIME_TYPE,
   backend: ExtractionBackend = EXTRACTION_BACKEND
 ): boolean {
   switch (backend) {
     case ExtractionBackend.DOCLING: {
-      const extension = mime.getExtension(mimeType);
-      if (!extension) return false;
       return (
         mimeType.startsWith('text/') ||
         mimeType === 'application/json' ||
-        ['docx', 'html', 'jpeg', 'pdf', 'pptx', 'png'].includes(extension)
+        isNativeDoclingFormat(mimeType)
       );
     }
     case ExtractionBackend.WDU:
@@ -99,9 +129,15 @@ export async function scheduleExtraction(
 ) {
   switch (backend) {
     case ExtractionBackend.DOCLING: {
+      const mimeType = file.mimeType;
+      if (!mimeType) throw new Error('Missing mime type');
+
       file.extraction = new DoclingExtraction({ jobId: file.id });
       await ORM.em.flush();
-      if (file.mimeType?.startsWith('text/') || file.mimeType === 'application/json') {
+      if (
+        !isNativeDoclingFormat(mimeType) &&
+        (mimeType.startsWith('text/') || mimeType === 'application/json')
+      ) {
         await nodeQueue.add(
           QueueName.FILES_EXTRACTION_NODE,
           {
