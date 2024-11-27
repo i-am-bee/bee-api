@@ -18,12 +18,14 @@ import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 
 export const chatCompletionSchema = {
   type: 'object',
-  required: ['id', 'object', 'choices'],
+  required: ['id', 'object', 'created', 'model', 'choices'],
   properties: {
     id: {
       type: 'string'
     },
     object: { const: 'chat.completion' },
+    created: { type: 'number' },
+    model: { type: 'string' },
     choices: {
       type: 'array',
       items: {

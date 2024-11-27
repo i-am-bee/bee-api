@@ -1,5 +1,6 @@
 import { BaseMessage } from 'bee-agent-framework/llms/primitives/message';
 import { LLMError } from 'bee-agent-framework/llms/base';
+import dayjs from 'dayjs';
 
 import {
   ChatCompletionCreateBody,
@@ -25,6 +26,7 @@ export async function createChatCompletion({
     return {
       id: generatePrefixedObjectId('chatcmpl'),
       object: 'chat.completion',
+      created: dayjs().unix(),
       model,
       choices: output.messages.map((message) => ({
         message: { role: message.role, content: message.text }

@@ -44,6 +44,7 @@ import { createDeleteResponse } from '@/utils/delete.js';
 import { getUpdatedValue } from '@/utils/update.js';
 import { createPaginatedResponse, getListCursor } from '@/utils/pagination.js';
 import { ORM } from '@/database.js';
+import { ARTIFACT_KEY_PREFIX } from '@/auth/utils.js';
 
 export function toDto(artifact: Loaded<Artifact>): ArtifactDto {
   return {
@@ -78,7 +79,7 @@ export function toSharedDto(artifact: Loaded<Artifact>): ArtifactShared {
 }
 
 function getSecret() {
-  return `sk-art-${crypto.randomBytes(24).toString('base64url')}`;
+  return `${ARTIFACT_KEY_PREFIX}${crypto.randomBytes(24).toString('base64url')}`;
 }
 
 export async function createArtifact(body: ArtifactCreateBody): Promise<ArtifactCreateResponse> {

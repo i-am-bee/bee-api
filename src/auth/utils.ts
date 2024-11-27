@@ -49,7 +49,7 @@ type AuthType = AuthTypeAccessToken | AuthTypeApiKey | AuthTypeArtifactSecret | 
 
 const BEARER_PREFIX = 'Bearer ';
 export const API_KEY_PREFIX = 'sk-proj-';
-const ARTIFACT_KEY_PREFIX = 'sk-art-';
+export const ARTIFACT_KEY_PREFIX = 'sk-art-';
 
 const API_KEY_SIZE = 32;
 
