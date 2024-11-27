@@ -1,5 +1,3 @@
-import { randomUUID } from 'crypto';
-
 import { BaseMessage } from 'bee-agent-framework/llms/primitives/message';
 import { LLMError } from 'bee-agent-framework/llms/base';
 
@@ -11,6 +9,7 @@ import {
 import { createChatLLM, getDefaultModel } from '@/runs/execution/factory';
 import { getLogger } from '@/logger';
 import { APIError, APIErrorCode } from '@/errors/error.entity';
+import { generatePrefixedObjectId } from '@/utils/id';
 
 const getChatLogger = () => getLogger();
 
@@ -24,7 +23,7 @@ export async function createChatCompletion({
       messages.map((message) => new BaseMessage(message.role, message.content))
     );
     return {
-      id: randomUUID(),
+      id: generatePrefixedObjectId('chatcmpl'),
       object: 'chat.completion',
       model,
       choices: output.messages.map((message) => ({
