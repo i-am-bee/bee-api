@@ -41,7 +41,7 @@ export async function getTools(run: LoadedRun, context: AgentContext): Promise<F
   // Add the tool in the `else if` branch
   } else if (tool instanceof RiddleTool) {
     return new SystemCall({
-      toolId: SystemTools.RIDDLE_TOOL,
+      toolId: SystemTools.RIDDLE,
       input: await tool.parse(input)
     });
   }
@@ -53,7 +53,7 @@ export async function getTools(run: LoadedRun, context: AgentContext): Promise<F
 ```typescript
       ...
       // Add the tool in the `switch` statement
-      case SystemTools.RIDDLE_TOOL: {
+      case SystemTools.RIDDLE: {
         // result can be an instance of arbitrary class
         if (!(result instanceof StringToolOutput)) throw new TypeError();
         toolCall.output = result.result;
@@ -71,7 +71,7 @@ export enum SystemTools {
   WEATHER = 'weather',
   ARXIV = 'arxiv',
   READ_FILE = 'read_file',
-  RIDDLE_TOOL = 'riddle_tool', // Add the tool definition
+  RIDDLE = 'riddle', // Add the tool definition
 }
 ```
 
@@ -100,9 +100,9 @@ function getSystemTools() {
 ```typescript
   ...
   // add this block of code
-    systemTools.set('riddle_tool', {
+    systemTools.set('riddle', {
     type: ToolType.SYSTEM,
-    id: 'riddle_tool',
+    id: 'riddle',
     createdAt: new Date('2024-11-22'),
     ...riddleTool,
     inputSchema: riddleTool.inputSchema.bind(riddleTool),
@@ -131,7 +131,7 @@ function getSystemTools() {
           allSystemTools.get(SystemTools.WEATHER),
           allSystemTools.get(SystemTools.ARXIV),
           allSystemTools.get('read_file'),
-          allSystemTools.get(SystemTools.RIDDLE_TOOL) // add this line
+          allSystemTools.get(SystemTools.RIDDLE) // add this line
         ]
       : [];
   ...
@@ -145,7 +145,7 @@ For the tool to be available in the UI, you need to follow these steps:
 1. Add the tool the the schema in *src/app/api/schema.d.ts* file:
 
 ```typescript
-"web_search" | "wikipedia" | "weather" | "arxiv" | "read_file" | "riddle_tool";
+"web_search" | "wikipedia" | "weather" | "arxiv" | "read_file" | "riddle";
 ```
 
 There are several lines like this in the file. I recommend replacing all of them.
@@ -159,7 +159,7 @@ const SYSTEM_TOOL_NAME: Record<SystemToolId, string> = {
   weather: 'OpenMeteo',
   arxiv: 'Arxiv',
   read_file: 'ReadFile',
-  riddle_tool: 'RiddleTool', // Add this line
+  riddle: 'Riddle', // Add this line
 };
 
 const SYSTEM_TOOL_ICONS: Record<SystemToolId, ComponentType> = {
@@ -168,7 +168,7 @@ const SYSTEM_TOOL_ICONS: Record<SystemToolId, ComponentType> = {
   weather: PartlyCloudy,
   arxiv: Arxiv,
   read_file: DocumentView,
-  riddle_tool: Code, // Add this line
+  riddle: Code, // Add this line
 };
 ```
 
