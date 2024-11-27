@@ -16,6 +16,8 @@
 
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 
+import { ChatMessageRole } from '../constants';
+
 export const chatCompletionSchema = {
   type: 'object',
   required: ['id', 'object', 'created', 'model', 'choices'],
@@ -36,7 +38,10 @@ export const chatCompletionSchema = {
           message: {
             type: 'object',
             required: ['role', 'content'],
-            properties: { role: { type: 'string' }, content: { type: 'string' } }
+            properties: {
+              role: { const: ChatMessageRole.ASSISTANT },
+              content: { type: 'string' }
+            }
           }
         }
       }

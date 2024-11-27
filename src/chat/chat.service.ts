@@ -6,6 +6,7 @@ import {
   ChatCompletionCreateBody,
   ChatCompletionCreateResponse
 } from './dtos/chat-completion-create';
+import { ChatMessageRole } from './constants';
 
 import { createChatLLM, getDefaultModel } from '@/runs/execution/factory';
 import { getLogger } from '@/logger';
@@ -28,10 +29,14 @@ export async function createChatCompletion({
       object: 'chat.completion',
       created: dayjs().unix(),
       model,
-      choices: output.messages.map((message, index) => ({
-        index,
-        message: { role: message.role, content: message.text }
-      }))
+      choices: output.messages.map((message, index) => {
+        if (message.role !== ChatMessageRole.ASSISTANT)
+          throw new LLMError(`Unexpected message role ${message.role}`);
+        return {
+          index,
+          message: { role: message.role, content: message.text }
+        };
+      })
     };
   } catch (err) {
     getChatLogger().error({ err }, 'LLM generation failed');

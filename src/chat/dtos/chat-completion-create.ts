@@ -16,6 +16,8 @@
 
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 
+import { ChatMessageRole } from '../constants';
+
 import { chatCompletionSchema } from './chat-completion';
 
 export const chatCompletionCreateBodySchema = {
@@ -25,22 +27,23 @@ export const chatCompletionCreateBodySchema = {
     model: { type: 'string' },
     messages: {
       type: 'array',
+      minItems: 1,
       items: {
         oneOf: [
           {
             type: 'object',
             required: ['role', 'content'],
-            properties: { role: { const: 'system' }, content: { type: 'string' } }
+            properties: { role: { const: ChatMessageRole.SYSTEM }, content: { type: 'string' } }
           },
           {
             type: 'object',
             required: ['role', 'content'],
-            properties: { role: { const: 'user' }, content: { type: 'string' } }
+            properties: { role: { const: ChatMessageRole.USER }, content: { type: 'string' } }
           },
           {
             type: 'object',
             required: ['role', 'content'],
-            properties: { role: { const: 'assistant' }, content: { type: 'string' } }
+            properties: { role: { const: ChatMessageRole.ASSISTANT }, content: { type: 'string' } }
           }
         ]
       }
