@@ -18,15 +18,28 @@ import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 
 import { artifactSharedSchema } from './artifact-shared';
 
-export const artifactSchema = {
+const artifactCommonSchema = {
   type: 'object',
-  required: [...artifactSharedSchema.required, 'thread_id', 'message_id', 'share_url'],
   properties: {
-    ...artifactSharedSchema.properties,
     object: { const: 'artifact' },
     thread_id: { type: 'string', nullable: true },
     message_id: { type: 'string', nullable: true },
     share_url: { type: 'string', nullable: true }
   }
 } as const satisfies JSONSchema;
+
+export const artifactSchema = {
+  ...artifactSharedSchema,
+  // must be repeated for each value from oneOf
+  oneOf: [
+    {
+      required: [...artifactSharedSchema.oneOf[0].required, 'thread_id', 'message_id', 'share_url'],
+      properties: {
+        ...artifactSharedSchema.oneOf[0].properties,
+        ...artifactCommonSchema.properties
+      }
+    }
+  ]
+} as const satisfies JSONSchema;
+
 export type Artifact = FromSchema<typeof artifactSchema>;
