@@ -25,11 +25,18 @@ import { RiddleTool } from "./riddle-tool.js";
 export async function getTools(run: LoadedRun, context: AgentContext): Promise<FrameworkTool[]> {
   const tools: FrameworkTool[] = [];
 
-  tools.push(new RiddleTool()); // Add the tool to the array
-
   const vectorStores = getRunVectorStores(run.assistant.$, run.thread.$);
   for (const vectorStore of vectorStores) {
     vectorStore.lastActiveAt = new Date();
+  }
+
+  // Add the tool
+  const riddleUsage = run.tools.find(
+    (tool): tool is SystemUsage =>
+      tool.type === ToolType.SYSTEM && tool.toolId === SystemTools.RIDDLE
+  );
+  if (riddleUsage) {
+    tools.push(new RiddleTool());
   }
   
   ...
