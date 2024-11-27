@@ -30,8 +30,9 @@ export const chatCompletionSchema = {
       type: 'array',
       items: {
         type: 'object',
-        required: ['message'],
+        required: ['index', 'message'],
         properties: {
+          index: { type: 'number' },
           message: {
             type: 'object',
             required: ['role', 'content'],

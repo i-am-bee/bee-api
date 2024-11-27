@@ -28,7 +28,8 @@ export async function createChatCompletion({
       object: 'chat.completion',
       created: dayjs().unix(),
       model,
-      choices: output.messages.map((message) => ({
+      choices: output.messages.map((message, index) => ({
+        index,
         message: { role: message.role, content: message.text }
       }))
     };
