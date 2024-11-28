@@ -45,7 +45,7 @@ RUN apt-get update \
     build-essential
 
 # install poetry - respects $POETRY_VERSION
-RUN pip3.11 install poetry==${POETRY_VERSION}
+RUN pip install poetry==${POETRY_VERSION}
 
 # copy project requirement files here to ensure they will be cached.
 WORKDIR $PYSETUP_PATH
@@ -53,7 +53,6 @@ COPY workers/python/poetry.lock workers/python/pyproject.toml ./
 
 # install runtime deps - uses $POETRY_VIRTUALENVS_IN_PROJECT internally
 RUN poetry install --with unstructured --no-root
-
 
 FROM python-base as production
 
@@ -69,4 +68,4 @@ WORKDIR /app
 
 COPY workers/python/python/ .
 
-CMD ["python3.11", "main.py"]
+CMD ["python", "main.py"]
