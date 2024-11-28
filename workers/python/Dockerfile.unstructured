@@ -52,7 +52,7 @@ WORKDIR $PYSETUP_PATH
 COPY workers/python/poetry.lock workers/python/pyproject.toml ./
 
 # install runtime deps - uses $POETRY_VIRTUALENVS_IN_PROJECT internally
-RUN poetry install --with unstructured --no-dev --no-root
+RUN poetry install --with unstructured --no-root
 
 
 FROM python-base as production
