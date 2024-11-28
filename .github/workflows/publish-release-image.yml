@@ -69,14 +69,14 @@ jobs:
           sudo rm -rf "/usr/local/share/boost" || true
           sudo rm -rf "$AGENT_TOOLSDIRECTORY" || true
 
-      - name: Build and push bee-api-workers-python image
+      - name: Build and push bee-api-workers-python image with Docling extraction backend
         uses: docker/build-push-action@v6
         with:
-          file: ./workers/python/Dockerfile
+          file: ./workers/python/Dockerfile.docling
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ${{ vars.DOCKER_REGISTRY }}/i-am-bee/bee-api-workers-python:latest
-            ${{ vars.DOCKER_REGISTRY }}/i-am-bee/bee-api-workers-python:${{ steps.get_version.outputs.VERSION }}
-          cache-from: type=registry,ref=${{ vars.DOCKER_REGISTRY }}/i-am-bee/bee-api-workers-python:buildcache
-          cache-to: type=registry,ref=${{ vars.DOCKER_REGISTRY }}/i-am-bee/bee-api-workers-python:buildcache,mode=max
+            ${{ vars.DOCKER_REGISTRY }}/i-am-bee/bee-api-workers-python:latest-docling
+            ${{ vars.DOCKER_REGISTRY }}/i-am-bee/bee-api-workers-python:${{ steps.get_version.outputs.VERSION }}-docling
+          cache-from: type=registry,ref=${{ vars.DOCKER_REGISTRY }}/i-am-bee/bee-api-workers-python:buildcache-docling
+          cache-to: type=registry,ref=${{ vars.DOCKER_REGISTRY }}/i-am-bee/bee-api-workers-python:buildcache-docling,mode=max
