@@ -69,4 +69,4 @@ WORKDIR /app
 
 COPY workers/python/python/ .
 
-CMD ["python3.11", "main.py"]
+CMD ["python", "main.py"]
