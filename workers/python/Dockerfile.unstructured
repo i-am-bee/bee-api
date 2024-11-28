@@ -1,0 +1,75 @@
+# Inspired by "Show and tell discussion" in the official poetry repository:
+# https://github.com/orgs/python-poetry/discussions/1879#discussioncomment-216865
+
+# `python-base` sets up all our shared environment variables
+FROM python:3.11-slim as python-base
+
+# python
+ENV PYTHONUNBUFFERED=1 \
+    # prevents python creating .pyc files
+    PYTHONDONTWRITEBYTECODE=1 \
+    \
+    # pip
+    PIP_NO_CACHE_DIR=off \
+    PIP_DISABLE_PIP_VERSION_CHECK=on \
+    PIP_DEFAULT_TIMEOUT=100 \
+    \
+    # poetry
+    # https://python-poetry.org/docs/configuration/#using-environment-variables
+    POETRY_VERSION=1.8.3 \
+    # make poetry create the virtual environment in the project's root
+    # it gets named `.venv`
+    POETRY_VIRTUALENVS_IN_PROJECT=true \
+    # do not ask any interactive question
+    POETRY_NO_INTERACTION=1 \
+    \
+    # paths
+    # this is where our requirements + virtual environment will live
+    PYSETUP_PATH="/opt/pysetup" \
+    VENV_PATH="/opt/pysetup/.venv" \
+    # prepend poetry and venv to path
+    PATH="/opt/poetry/bin:/opt/pysetup/.venv/bin:$PATH"
+
+# install runtime dependencies
+RUN apt-get update && apt-get install wget libmagic-dev libpoppler-cpp-dev libreoffice pandoc tesseract-ocr -y
+
+
+# `builder-base` stage is used to build deps + create our virtual environment
+FROM python-base as builder-base
+# install build dependencies
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y \
+    # deps for installing poetry
+    curl \
+    # deps for building python deps
+    build-essential
+
+# install poetry - respects $POETRY_VERSION
+RUN pip3.11 install poetry==${POETRY_VERSION}
+
+# copy project requirement files here to ensure they will be cached.
+WORKDIR $PYSETUP_PATH
+COPY workers/python/poetry.lock workers/python/pyproject.toml ./
+
+# install runtime deps - uses $POETRY_VIRTUALENVS_IN_PROJECT internally
+RUN poetry install --with unstructured --no-dev --no-root
+
+
+FROM python-base as production
+
+# Make sure any user gets a directory
+RUN apt-get update && apt-get install --no-install-recommends -y libnss-unknown
+ENV HOME=/home
+RUN chmod a+w /home
+
+# Copy dependencies
+COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
+
+WORKDIR /app
+
+# Prepare worker resources.
+COPY workers/python/python/init_resources.py .  
+
+COPY workers/python/python/ .
+
+CMD ["python3.11", "main.py"]

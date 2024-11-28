@@ -5,14 +5,23 @@ package-mode = false
 python = "~3.11"
 bullmq = "2.9.4"
 redis = "^5.2.0"
-unstructured-ingest = {extras = ["s3"], version = "^0.2.1"}
-unstructured = {extras = ["all-docs"], version = "^0.16.4"}
 pymongo = "^4.10.1"
 pydantic-settings = "^2.6.1"
 aiohttp = "^3.10.10"
-docling = "^2.7.1"
 aioboto3 = "^13.2.0"
 
+[tool.poetry.group.docling]
+optional = true
+
+[tool.poetry.group.docling.dependencies]
+docling = "^2.8.0"
+
+[tool.poetry.group.unstructured]
+optional = true
+
+[tool.poetry.group.unstructured.dependencies]
+unstructured-ingest = {extras = ["s3"], version = "^0.2.1"}
+unstructured = {extras = ["all-docs"], version = "^0.16.4"}
 
 [build-system]
 requires = ["poetry-core"]
