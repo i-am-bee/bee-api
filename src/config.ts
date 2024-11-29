@@ -185,3 +185,5 @@ export const VECTOR_STORE_FILE_QUOTA_DAILY = VECTOR_STORE_FILE_QUOTA_DAILY_RAW
   : Infinity;
 
 export const ARTIFACT_SECRET_RATE_LIMIT = parseInt(getEnv('ARTIFACT_SECRET_RATE_LIMIT', '25'));
+
+export const PACKAGE_DB = getEnv('PACKAGE_DB', './static/package-db.sqlite');

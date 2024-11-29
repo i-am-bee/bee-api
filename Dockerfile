@@ -1,3 +1,16 @@
+ARG ALPINE_VERSION="3.20"
+ARG GO_VERSION="1.23"
+ARG UPM_VERSION="2.5.2"
+
+FROM docker.io/golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS build-upm
+ARG UPM_VERSION
+WORKDIR /workdir
+RUN apk add --no-cache git make gcc g++ musl-dev sqlite && \
+  git clone --depth 1 --branch "v${UPM_VERSION}" https://github.com/replit/upm.git  && \
+  cd ./upm && \
+  export CGO_CFLAGS="-D_LARGEFILE64_SOURCE" && \
+  make internal/backends/python/pypi_map.sqlite
+
 FROM node:22.2-alpine AS base
 
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
@@ -37,6 +50,9 @@ ENV NODE_ENV production
 RUN deluser --remove-home node \
   && addgroup -S node -g 1001 \
   && adduser -S -G node -u 1001 node
+
+# UPM
+COPY --from=build-upm /workdir/upm/internal/backends/python/pypi_map.sqlite ./static/package-db.sqlite
 
 COPY --chown=node:node --from=deps ${APP_DIR}/package.json ./
 COPY --chown=node:node --from=deps ${APP_DIR}/node_modules ./node_modules
