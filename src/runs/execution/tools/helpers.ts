@@ -404,7 +404,7 @@ export async function finalizeToolCall(
     );
   } else if (toolCall instanceof FunctionCall) {
     if (!(result instanceof FunctionToolOutput)) throw new TypeError();
-    toolCall.output = result.output;
+    toolCall.output = result.result;
   } else if (toolCall instanceof FileSearchCall) {
     if (!(result instanceof FileSearchToolOutput)) throw new TypeError();
     toolCall.results = result.results;
