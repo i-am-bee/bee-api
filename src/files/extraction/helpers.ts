@@ -211,7 +211,7 @@ type AvailableKeys<T> = Exclude<T extends T ? keyof T : never, keyof unknown[]>;
 
 const keyByProvider = {
   [ExtractionBackend.DOCLING]: ['documentStorageId', 'chunksStorageId', 'textStorageId'],
-  [ExtractionBackend.WDU]: ['documentStorageId'],
+  [ExtractionBackend.WDU]: ['storageId'],
   [ExtractionBackend.UNSTRUCTURED_OPENSOURCE]: ['storageId'],
   [ExtractionBackend.UNSTRUCTURED_API]: ['storageId']
 } as const satisfies Record<ExtractionBackend, AvailableKeys<typeof File.prototype.extraction>[]>;
@@ -221,9 +221,11 @@ export async function removeExtraction(file: Loaded<File>, signal?: AbortSignal)
   if (!extraction) throw new Error('No extraction to remove');
 
   await Promise.all(
-    keyByProvider[extraction.backend].map((property) => {
+    keyByProvider[extraction.backend].map(async (property) => {
       const Key = extraction[property as keyof typeof extraction];
-      if (Key) withAbort(s3Client.deleteObject({ Bucket: S3_BUCKET_FILE_STORAGE, Key }), signal);
+      if (Key) {
+        await withAbort(s3Client.deleteObject({ Bucket: S3_BUCKET_FILE_STORAGE, Key }), signal);
+      }
     })
   );
 
