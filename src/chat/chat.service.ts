@@ -17,12 +17,18 @@ const getChatLogger = () => getLogger();
 
 export async function createChatCompletion({
   model = getDefaultModel(),
-  messages
+  messages,
+  response_format
 }: ChatCompletionCreateBody): Promise<ChatCompletionCreateResponse> {
   const llm = createChatLLM({ model });
   try {
     const output = await llm.generate(
-      messages.map(({ role, content }) => BaseMessage.of({ role, text: content }))
+      messages.map(({ role, content }) => BaseMessage.of({ role, text: content })),
+      {
+        guided: {
+          json: response_format?.json_schema.schema
+        }
+      }
     );
     return {
       id: generatePrefixedObjectId('chatcmpl'),
