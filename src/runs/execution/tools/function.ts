@@ -17,12 +17,13 @@
 import {
   BaseToolOptions,
   BaseToolRunOptions,
+  StringToolOutput,
   Tool,
-  ToolInput,
-  ToolOutput
+  ToolInput
 } from 'bee-agent-framework/tools/base';
 import { SchemaObject } from 'ajv';
 import { Loaded } from '@mikro-orm/core';
+import { GetRunContext } from 'bee-agent-framework/context';
 
 import { AgentContext } from '../execute.js';
 
@@ -41,26 +42,7 @@ export interface FunctionToolOptions extends BaseToolOptions {
   context: AgentContext;
 }
 
-export class FunctionToolOutput extends ToolOutput {
-  constructor(public readonly output: string) {
-    super();
-  }
-
-  getTextContent(): string {
-    return this.output;
-  }
-  isEmpty(): boolean {
-    return false;
-  }
-  createSnapshot(): unknown {
-    return {
-      output: this.output
-    };
-  }
-  loadSnapshot(_snapshot: unknown): void {
-    throw new Error('Method not implemented.');
-  }
-}
+export class FunctionToolOutput extends StringToolOutput {}
 
 export class FunctionTool extends Tool<FunctionToolOutput, FunctionToolOptions> {
   name: string;
@@ -80,7 +62,11 @@ export class FunctionTool extends Tool<FunctionToolOutput, FunctionToolOptions> 
     return `run:${run.id}:call:${toolCallId}:output`;
   }
 
-  protected async _run(_: ToolInput<this>, options: BaseToolRunOptions) {
+  protected async _run(
+    _: ToolInput<this>,
+    __: BaseToolRunOptions | undefined,
+    run: GetRunContext<typeof this>
+  ) {
     const toolCall = this.options.context.toolCall;
     if (!(toolCall instanceof FunctionCall)) throw new Error('Invalid tool call');
 
@@ -114,8 +100,8 @@ export class FunctionTool extends Tool<FunctionToolOutput, FunctionToolOptions> 
         await ORM.em.flush();
         resolve(new FunctionToolOutput(output));
       });
-      options.signal?.addEventListener('abort', () => {
-        reject(options.signal?.reason);
+      run.signal.addEventListener('abort', () => {
+        reject(run.signal.reason);
       });
     });
   }
