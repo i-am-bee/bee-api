@@ -22,7 +22,7 @@ export async function createChatCompletion({
   const llm = createChatLLM({ model });
   try {
     const output = await llm.generate(
-      messages.map((message) => new BaseMessage(message.role, message.content))
+      messages.map(({ role, content }) => BaseMessage.of({ role, text: content }))
     );
     return {
       id: generatePrefixedObjectId('chatcmpl'),
