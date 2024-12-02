@@ -16,6 +16,7 @@ from enum import StrEnum
 
 
 class ExtractionBackend(StrEnum):
+    DOCLING = 'docling'
     UNSTRUCTURED_OPENSOURCE = 'unstructured-opensource'
     UNSTRUCTURED_API = 'unstructured-api'
     WDU = 'wdu'

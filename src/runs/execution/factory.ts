@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { Loaded } from '@mikro-orm/core';
 import { Ollama } from 'ollama';
 import { OpenAI } from 'openai';
 import { Client as BAMClient } from '@ibm-generative-ai/node-sdk';
@@ -33,10 +32,26 @@ import { WatsonXChatLLMPresetModel } from 'bee-agent-framework/adapters/watsonx/
 import { BAMLLM } from 'bee-agent-framework/adapters/bam/llm';
 import { IBMvLLM } from 'bee-agent-framework/adapters/ibm-vllm/llm';
 import { WatsonXLLM } from 'bee-agent-framework/adapters/watsonx/llm';
+import { ZodType } from 'zod';
+import { PromptTemplate } from 'bee-agent-framework';
+import { AnyTool } from 'bee-agent-framework/tools/base';
+import { StreamlitAgent } from 'bee-agent-framework/agents/experimental/streamlit/agent';
+import { BeeAgent } from 'bee-agent-framework/agents/bee/agent';
+import { BeeSystemPrompt } from 'bee-agent-framework/agents/bee/prompts';
+import { ChatLLM, ChatLLMOutput } from 'bee-agent-framework/llms/chat';
+import { BaseMemory } from 'bee-agent-framework/memory/base';
+import { StreamlitAgentSystemPrompt } from 'bee-agent-framework/agents/experimental/streamlit/prompts';
+import { GraniteBeeSystemPrompt } from 'bee-agent-framework/agents/bee/runners/granite/prompts';
+import { Loaded } from '@mikro-orm/core';
 
 import { Run } from '../entities/run.entity';
 
-import { LLMBackend } from './constants';
+import { Agent, LLMBackend } from './constants';
+import {
+  createBeeStreamingHandler,
+  createStreamlitStreamingHandler
+} from './event-handlers/streaming';
+import { AgentContext } from './execute';
 
 import {
   BAM_API_KEY,
@@ -75,7 +90,10 @@ let ollamaClient: Ollama | null;
 let openAIClient: OpenAI | null;
 let bamClient: BAMClient | null;
 
-export function createChatLLM(run: Loaded<Run>, backend: LLMBackend = LLM_BACKEND) {
+export function createChatLLM(
+  params: { model: string; topP?: number; temperature?: number },
+  backend: LLMBackend = LLM_BACKEND
+) {
   switch (backend) {
     case LLMBackend.IBM_VLLM: {
       vllmClient ??= new IBMvLLLClient({
@@ -89,14 +107,14 @@ export function createChatLLM(run: Loaded<Run>, backend: LLMBackend = LLM_BACKEN
               }
             : undefined
       });
-      return IBMVllmChatLLM.fromPreset(run.model as IBMVllmChatLLMPresetModel, {
+      return IBMVllmChatLLM.fromPreset(params.model as IBMVllmChatLLMPresetModel, {
         client: vllmClient,
         parameters: (parameters) => ({
           ...parameters,
           sampling: {
             ...parameters.sampling,
-            top_p: run.topP ?? parameters.sampling?.top_p,
-            temperature: run.temperature ?? parameters.sampling?.temperature
+            top_p: params.topP ?? parameters.sampling?.top_p,
+            temperature: params.temperature ?? parameters.sampling?.temperature
           },
           stopping: {
             ...parameters.stopping,
@@ -109,10 +127,10 @@ export function createChatLLM(run: Loaded<Run>, backend: LLMBackend = LLM_BACKEN
       ollamaClient ??= new Ollama({ host: OLLAMA_URL ?? undefined });
       return new OllamaChatLLM({
         client: ollamaClient,
-        modelId: run.model,
+        modelId: params.model,
         parameters: {
-          top_p: run.topP,
-          temperature: run.temperature,
+          top_p: params.topP,
+          temperature: params.temperature,
           num_predict: MAX_NEW_TOKENS
         }
       });
@@ -121,22 +139,22 @@ export function createChatLLM(run: Loaded<Run>, backend: LLMBackend = LLM_BACKEN
       openAIClient ??= new OpenAI({ apiKey: OPENAI_API_KEY ?? undefined });
       return new OpenAIChatLLM({
         client: openAIClient,
-        modelId: run.model as OpenAI.ChatModel,
+        modelId: params.model as OpenAI.ChatModel,
         parameters: {
-          top_p: run.topP,
-          temperature: run.temperature,
+          top_p: params.topP,
+          temperature: params.temperature,
           max_completion_tokens: MAX_NEW_TOKENS
         }
       });
     }
     case LLMBackend.BAM: {
       bamClient ??= new BAMClient({ apiKey: BAM_API_KEY ?? undefined });
-      return BAMChatLLM.fromPreset(run.model as BAMChatLLMPresetModel, {
+      return BAMChatLLM.fromPreset(params.model as BAMChatLLMPresetModel, {
         client: bamClient,
         parameters: (parameters) => ({
           ...parameters,
-          top_p: run.topP ?? parameters.top_p,
-          temperature: run.temperature ?? parameters.temperature,
+          top_p: params.topP ?? parameters.top_p,
+          temperature: params.temperature ?? parameters.temperature,
           max_new_tokens: MAX_NEW_TOKENS
         })
       });
@@ -144,14 +162,14 @@ export function createChatLLM(run: Loaded<Run>, backend: LLMBackend = LLM_BACKEN
     case LLMBackend.WATSONX: {
       if (!WATSONX_API_KEY) throw new Error('Missing WATSONX_API_KEY');
       if (!WATSONX_PROJECT_ID) throw new Error('Missing WATSONX_PROJECT_ID');
-      return WatsonXChatLLM.fromPreset(run.model as WatsonXChatLLMPresetModel, {
+      return WatsonXChatLLM.fromPreset(params.model as WatsonXChatLLMPresetModel, {
         apiKey: WATSONX_API_KEY,
         projectId: WATSONX_PROJECT_ID,
         region: WATSONX_REGION ?? undefined,
         parameters: (parameters) => ({
           ...parameters,
-          top_p: run.topP ?? parameters.top_p,
-          temperature: run.temperature ?? parameters.temperature,
+          top_p: params.topP ?? parameters.top_p,
+          temperature: params.temperature ?? parameters.temperature,
           max_new_tokens: MAX_NEW_TOKENS
         })
       });
@@ -214,4 +232,67 @@ export function createCodeLLM(backend: LLMBackend = LLM_BACKEND) {
     default:
       return undefined;
   }
+}
+
+export function createAgentRun(
+  run: Loaded<Run, 'assistant'>,
+  { llm, tools, memory }: { llm: ChatLLM<ChatLLMOutput>; tools: AnyTool[]; memory: BaseMemory },
+  { signal, ctx }: { signal: AbortSignal; ctx: AgentContext }
+) {
+  const runArgs = [
+    { prompt: null }, // messages have been loaded to agent's memory
+    {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      signal,
+      execution: {
+        totalMaxRetries: 10,
+        maxRetriesPerStep: 3,
+        maxIterations: 10
+      }
+    }
+  ] as const;
+  switch (run.assistant.$.agent) {
+    case Agent.BEE: {
+      const agent = new BeeAgent({
+        llm,
+        memory,
+        tools,
+        templates: {
+          system: getPromptTemplate(
+            run,
+            run.model.includes('granite') ? GraniteBeeSystemPrompt : BeeSystemPrompt
+          )
+        }
+      });
+      return [agent.run(...runArgs).observe(createBeeStreamingHandler(ctx)), agent];
+    }
+    case Agent.STREAMLIT: {
+      const agent = new StreamlitAgent({
+        llm,
+        memory,
+        templates: { system: getPromptTemplate(run, StreamlitAgentSystemPrompt) }
+      });
+      return [agent.run(...runArgs).observe(createStreamlitStreamingHandler(ctx)), agent];
+    }
+  }
+}
+
+function getPromptTemplate<T extends ZodType>(
+  run: Loaded<Run, 'assistant'>,
+  promptTemplate: PromptTemplate<T>
+): PromptTemplate<T> {
+  const instructions = run.additionalInstructions
+    ? `${run.instructions} ${run.additionalInstructions}`
+    : run.instructions;
+  return promptTemplate.fork((input) => ({
+    ...input,
+    ...(run.assistant.$.systemPromptOverwrite
+      ? { template: run.assistant.$.systemPromptOverwrite }
+      : {}),
+    defaults: {
+      ...input.defaults,
+      ...(instructions ? { instructions } : {})
+    }
+  }));
 }

@@ -1,5 +1,45 @@
 # Changelog
 
+## [0.0.13](https://github.com/i-am-bee/bee-api/compare/v0.0.12...v0.0.13) (2024-11-25)
+
+### Features
+
+* **agents:** add streamlit agent ([#87](https://github.com/i-am-bee/bee-api/issues/87)) ([cc3445c](https://github.com/i-am-bee/bee-api/commit/cc3445c1a85363c03a57597a9417e66fbbd584ee))
+* **artifact:** add artifacts CRUDL ([#82](https://github.com/i-am-bee/bee-api/issues/82)) ([6b8b684](https://github.com/i-am-bee/bee-api/commit/6b8b6841ad692d00dc6e9a8879fa3fa36072d821)), closes [i-am-bee/internal#18](https://github.com/i-am-bee/internal/issues/18)
+* **deps:** remove langchain dependency ([#80](https://github.com/i-am-bee/bee-api/issues/80)) ([1255cab](https://github.com/i-am-bee/bee-api/commit/1255cabfdde7a2f4e590ce126ee8fba657f2e9d7))
+* integrate docling extraction ([#74](https://github.com/i-am-bee/bee-api/issues/74)) ([f649be3](https://github.com/i-am-bee/bee-api/commit/f649be3d6314f63b2532cf606dd862571b63f53d))
+* **limits:** add quotas for runs and vector store files ([#78](https://github.com/i-am-bee/bee-api/issues/78)) ([a8d3d33](https://github.com/i-am-bee/bee-api/commit/a8d3d3357022dc1197c816d35abb6e4fdb21c742))
+* use granite agent for granite model ([#75](https://github.com/i-am-bee/bee-api/issues/75)) ([b15da33](https://github.com/i-am-bee/bee-api/commit/b15da3302f8ccb64ec7ba8269320532362b88dac))
+
+### Bug Fixes
+
+* dayjs import ([#93](https://github.com/i-am-bee/bee-api/issues/93)) ([933110f](https://github.com/i-am-bee/bee-api/commit/933110fb18ca1253c327969a8378090636b19499))
+* **docker:** copy .npmrc before installing deps ([#86](https://github.com/i-am-bee/bee-api/issues/86)) ([92f3ce3](https://github.com/i-am-bee/bee-api/commit/92f3ce3426ed1aea8dd4fd2c373a503d418a24f7))
+* free disk space for github build and publish action ([#88](https://github.com/i-am-bee/bee-api/issues/88)) ([94cb0ad](https://github.com/i-am-bee/bee-api/commit/94cb0adda404a5de1839e4502f9ad5487fbc604c))
+* **redis:** add healthcheck and more retries to python redis client ([#81](https://github.com/i-am-bee/bee-api/issues/81)) ([c9d8950](https://github.com/i-am-bee/bee-api/commit/c9d8950516e6a84ea8a2854e446954f0e88f87e8))
+
+## [0.0.12](https://github.com/i-am-bee/bee-api/compare/v0.0.11...v0.0.12) (2024-11-15)
+
+### Bug Fixes
+
+* **build:** support execution under any user ([e1d32be](https://github.com/i-am-bee/bee-api/commit/e1d32be315abd36933059e554cff1a9c5cd2d342))
+
+## [0.0.11](https://github.com/i-am-bee/bee-api/compare/v0.0.10...v0.0.11) (2024-11-14)
+
+## [0.0.10](https://github.com/i-am-bee/bee-api/compare/v0.0.9...v0.0.10) (2024-11-14)
+
+## [0.0.9](https://github.com/i-am-bee/bee-api/compare/v0.0.8...v0.0.9) (2024-11-13)
+
+### Features
+
+* **extraction:** use Unstructured Opensource ([#29](https://github.com/i-am-bee/bee-api/issues/29)) ([549f924](https://github.com/i-am-bee/bee-api/commit/549f924e6203557dfac4a392a0907f35f9ed5540))
+
+### Bug Fixes
+
+* **extraction:** eliminate race condition and other errors ([#61](https://github.com/i-am-bee/bee-api/issues/61)) ([1a821cd](https://github.com/i-am-bee/bee-api/commit/1a821cdce8f2b5f6594e4843358d6662053de725))
+* **misc:** migration, redis and mongo SSL connections ([#59](https://github.com/i-am-bee/bee-api/issues/59)) ([3ebd1b1](https://github.com/i-am-bee/bee-api/commit/3ebd1b1a7a2a562f6969ae97eb015655ece2056d))
+* **run:** avoid unhandled promises during execution ([#64](https://github.com/i-am-bee/bee-api/issues/64)) ([db5a64f](https://github.com/i-am-bee/bee-api/commit/db5a64f230099900972a55ce1e3b2b3887aeb988))
+
 ## [0.0.8](https://github.com/i-am-bee/bee-api/compare/v0.0.7...v0.0.8) (2024-11-08)
 
 ### Features

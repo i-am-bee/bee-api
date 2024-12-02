@@ -24,6 +24,7 @@ import {
 import { z } from 'zod';
 import { isTruthy } from 'remeda';
 import { Loaded } from '@mikro-orm/core';
+import { GetRunContext } from 'bee-agent-framework/context';
 
 import { getVectorStoreClient } from '@/vector-store-files/execution/client.js';
 import { VectorStore } from '@/vector-stores/entities/vector-store.entity.js';
@@ -81,13 +82,14 @@ export class FileSearchTool extends Tool<FileSearchToolOutput, FileSearchToolOpt
 
   async _run(
     { query }: ToolInput<FileSearchTool>,
-    options: BaseToolRunOptions
+    _options: BaseToolRunOptions | undefined,
+    run: GetRunContext<typeof this>
   ): Promise<FileSearchToolOutput> {
     const vectorStoreClient = getVectorStoreClient();
 
     const embeddingAdapter = await createEmbeddingAdapter();
 
-    const embedding = await embeddingAdapter.embed(query, { signal: options.signal });
+    const embedding = await embeddingAdapter.embed(query, { signal: run.signal });
     if (!embedding) throw new Error('Missing embedding data in embedding response');
 
     if (this.vectorStores.some((vectorStore) => vectorStore.expired)) {

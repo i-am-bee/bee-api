@@ -15,7 +15,6 @@
  */
 
 import { FilterQuery, Loaded, QueryOrder, ref } from '@mikro-orm/core';
-import dayjs from 'dayjs';
 
 import { RunCreateBody, RunCreateParams, RunCreateResponse } from './dtos/run-create.js';
 import { Run, RunStatus } from './entities/run.entity.js';
@@ -66,6 +65,22 @@ import { createClient } from '@/redis.js';
 import { ToolCall } from '@/tools/entities/tool-calls/tool-call.entity.js';
 import { SystemTools } from '@/tools/entities/tool-calls/system-call.entity.js';
 import { ensureRequestContextData } from '@/context.js';
+import { getProjectPrincipal } from '@/administration/helpers.js';
+import { RUNS_QUOTA_DAILY } from '@/config.js';
+import { dayjs, getLatestDailyFixedTime } from '@/utils/datetime.js';
+
+export async function assertRunsQuota(newRuns = 1) {
+  const count = await ORM.em.getRepository(Run).count({
+    createdBy: getProjectPrincipal(),
+    createdAt: { $gte: getLatestDailyFixedTime().toDate() }
+  });
+  if (count + newRuns > RUNS_QUOTA_DAILY) {
+    throw new APIError({
+      message: 'Your daily runs quota has been exceeded',
+      code: APIErrorCode.TOO_MANY_REQUESTS
+    });
+  }
+}
 
 const getRunsLogger = (runId?: string) => getServiceLogger('runs').child({ runId });
 
@@ -184,6 +199,8 @@ export async function createRun({
       });
     }
   }
+
+  await assertRunsQuota();
 
   const run = new Run({
     thread: ref(thread),

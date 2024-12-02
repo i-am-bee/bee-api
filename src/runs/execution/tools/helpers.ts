@@ -15,9 +15,8 @@
  */
 
 import {
-  AnyTool,
+  AnyTool as FrameworkTool,
   StringToolOutput,
-  Tool as FrameworkTool,
   ToolOutput
 } from 'bee-agent-framework/tools/base';
 import { PythonTool } from 'bee-agent-framework/tools/python/python';
@@ -308,7 +307,7 @@ export async function createToolCall(
     tool,
     input
   }: {
-    tool: AnyTool;
+    tool: FrameworkTool;
     input: unknown;
   },
   { run }: AgentContext
@@ -405,7 +404,7 @@ export async function finalizeToolCall(
     );
   } else if (toolCall instanceof FunctionCall) {
     if (!(result instanceof FunctionToolOutput)) throw new TypeError();
-    toolCall.output = result.output;
+    toolCall.output = result.result;
   } else if (toolCall instanceof FileSearchCall) {
     if (!(result instanceof FileSearchToolOutput)) throw new TypeError();
     toolCall.results = result.results;

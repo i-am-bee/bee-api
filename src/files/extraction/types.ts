@@ -14,5 +14,7 @@
  * limitations under the License.
  */
 
+export type DoclingChunksExtraction = { text: string }[];
+
 type UnstructuredExtractionElement = { type: string; text: string };
 export type UnstructuredExtractionDocument = UnstructuredExtractionElement[];

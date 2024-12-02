@@ -21,6 +21,7 @@ import { FastifyRequest } from 'fastify';
 export const AuthSecret = {
   ACCESS_TOKEN: 'access_token',
   API_KEY: 'key',
+  ARTIFACT_SECRET: 'artifact_secret',
   UNKNOWN: 'unknown'
 } as const;
 export type AuthSecret = (typeof AuthSecret)[keyof typeof AuthSecret];
@@ -35,14 +36,20 @@ interface AuthTypeApiKey {
   value: string;
 }
 
+interface AuthTypeArtifactSecret {
+  type: typeof AuthSecret.ARTIFACT_SECRET;
+  value: string;
+}
+
 interface AuthTypeUnknown {
   type: typeof AuthSecret.UNKNOWN;
 }
 
-type AuthType = AuthTypeAccessToken | AuthTypeApiKey | AuthTypeUnknown;
+type AuthType = AuthTypeAccessToken | AuthTypeApiKey | AuthTypeArtifactSecret | AuthTypeUnknown;
 
 const BEARER_PREFIX = 'Bearer ';
 export const API_KEY_PREFIX = 'sk-proj-';
+export const ARTIFACT_KEY_PREFIX = 'sk-art-';
 
 const API_KEY_SIZE = 32;
 
@@ -55,6 +62,14 @@ export const determineAuthType = (req: FastifyRequest): AuthType => {
         return {
           value: secondPart,
           type: AuthSecret.API_KEY
+        };
+      } else if (
+        secondPart.startsWith(ARTIFACT_KEY_PREFIX) &&
+        secondPart.length > ARTIFACT_KEY_PREFIX.length
+      ) {
+        return {
+          value: secondPart,
+          type: AuthSecret.ARTIFACT_SECRET
         };
       } else {
         return {
@@ -69,9 +84,9 @@ export const determineAuthType = (req: FastifyRequest): AuthType => {
   };
 };
 
-export function scryptApiKey(apiKey: string) {
-  // We expect the key to be random and high entropy, therefore constant salt is not an issue
-  return crypto.scryptSync(apiKey, 'salt', 64).toString('hex');
+export function scryptSecret(secret: string) {
+  // We expect the secret to be random and high entropy, therefore constant salt is not an issue
+  return crypto.scryptSync(secret, 'salt', 64).toString('hex');
 }
 
 export function generateApiKey() {

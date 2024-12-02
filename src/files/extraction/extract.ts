@@ -22,6 +22,7 @@ import yauzl, { Options, ZipFile } from 'yauzl';
 import { File } from '../entities/file.entity';
 import { s3Client } from '../files.service';
 import { WDUExtraction } from '../entities/extractions/wdu-extraction.entity';
+import { DoclingExtraction } from '../entities/extractions/docling-extraction.entity';
 
 import { ExtractionBackend } from './constants';
 
@@ -30,14 +31,7 @@ import { toBuffer } from '@/utils/streams.js';
 import { ORM } from '@/database';
 
 async function wduExtract(file: Loaded<File>) {
-  const head = await s3Client
-    .headObject({
-      Bucket: S3_BUCKET_FILE_STORAGE,
-      Key: file.storageId
-    })
-    .promise();
-
-  if (head.ContentType?.startsWith('text/') || head.ContentType === 'application/json') {
+  if (file.mimeType?.startsWith('text/') || file.mimeType === 'application/json') {
     file.extraction = new WDUExtraction({ storageId: file.storageId });
     await ORM.em.flush();
     return;
@@ -105,12 +99,25 @@ async function wduExtract(file: Loaded<File>) {
   return (await dataBufferPromise).toString('utf8');
 }
 
+async function doclingExtract(file: Loaded<File>) {
+  if (file.mimeType?.startsWith('text/') || file.mimeType === 'application/json') {
+    file.extraction = new DoclingExtraction({ textStorageId: file.storageId });
+    await ORM.em.flush();
+    return;
+  }
+
+  throw new Error('Non-text formats must be handled by python workers');
+}
+
 export async function extract(file: Loaded<File>) {
   const extraction = file.extraction;
   if (!extraction) throw new Error('No extraction data');
   switch (extraction.backend) {
     case ExtractionBackend.WDU:
       await wduExtract(file);
+      return;
+    case ExtractionBackend.DOCLING:
+      await doclingExtract(file);
       return;
     default:
       throw new Error(`Backend ${extraction.backend} is not supported`);

@@ -24,6 +24,8 @@ class Config(BaseSettings):
     model_config = SettingsConfigDict(
         env_file='../../.env', env_file_encoding='utf-8', env_ignore_empty=True, extra='ignore')
 
+    port: int = 8080
+
     log_level: str = 'info'
 
     run_bullmq_workers_raw: str = Field(alias='run_bullmq_workers')

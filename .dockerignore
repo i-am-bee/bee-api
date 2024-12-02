@@ -1,1 +1,4 @@
 node_modules
+
+# Package DB is created during docker build
+static/package-db.sqlite

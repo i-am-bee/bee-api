@@ -33,7 +33,9 @@ S3_URL = f"s3://{config.s3_bucket_file_storage}"
 
 
 async def unstructuredExtraction(file):
-    storage_id = file["storageId"]
+    storage_id = file.get("storageId")
+    if storage_id is None:
+        raise RuntimeError("storageId not found")
 
     s3_connection_config = S3ConnectionConfig(
         endpoint_url=config.s3_endpoint,

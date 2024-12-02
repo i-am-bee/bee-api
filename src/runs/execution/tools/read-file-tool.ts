@@ -19,10 +19,12 @@ import {
   ToolInput,
   StringToolOutput,
   Tool,
-  ToolError
+  ToolError,
+  BaseToolRunOptions
 } from 'bee-agent-framework/tools/base';
 import { z } from 'zod';
 import { hasAtLeast } from 'remeda';
+import { GetRunContext } from 'bee-agent-framework/context';
 
 import { File } from '@/files/entities/file.entity.js';
 import { getExtractedText } from '@/files/extraction/helpers';
@@ -47,13 +49,17 @@ export class ReadFileTool extends Tool<StringToolOutput, ReadFileToolOptions> {
     });
   }
 
-  protected async _run({ filename }: ToolInput<ReadFileTool>): Promise<StringToolOutput> {
+  protected async _run(
+    { filename }: ToolInput<ReadFileTool>,
+    _: BaseToolRunOptions,
+    run: GetRunContext<typeof this>
+  ): Promise<StringToolOutput> {
     const file = this.options.files.find((file) => file.filename === filename);
     if (!file) {
       throw new ToolError(`File ${filename} not found.`);
     }
     try {
-      const text = await getExtractedText(file);
+      const text = await getExtractedText(file, run.signal);
       if (text.length > this.options.fileSize) {
         throw new ToolError(
           `The text is too big (${text.length} characters). Maximum allowed size is ${this.options.fileSize} characters`,

@@ -37,9 +37,6 @@ yarn-error.log*
 # mikro-orm ts metadata cache
 /temp
 
-# npm
-.npmrc
-
 # other
 /tmp
 

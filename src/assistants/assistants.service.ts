@@ -42,6 +42,7 @@ import { Tool, ToolType } from '@/tools/entities/tool/tool.entity.js';
 import { getUpdatedValue } from '@/utils/update.js';
 import { createDeleteResponse } from '@/utils/delete.js';
 import { getDefaultModel } from '@/runs/execution/factory';
+import { Agent } from '@/runs/execution/constants.js';
 
 export function toDto(assistant: Loaded<Assistant>): AssistantDto {
   return {
@@ -55,6 +56,7 @@ export function toDto(assistant: Loaded<Assistant>): AssistantDto {
     metadata: assistant.metadata ?? {},
     created_at: dayjs(assistant.createdAt).unix(),
     model: assistant.model,
+    agent: assistant.agent,
     top_p: assistant.topP,
     temperature: assistant.temperature,
     system_prompt: assistant.systemPromptOverwrite
@@ -70,9 +72,23 @@ export async function createAssistant({
   metadata,
   top_p,
   model,
+  agent,
   temperature,
   system_prompt_overwrite
 }: AssistantCreateBody): Promise<AssistantCreateResponse> {
+  if (agent === Agent.STREAMLIT) {
+    if (toolsParam.length !== 0)
+      throw new APIError({
+        code: APIErrorCode.INVALID_INPUT,
+        message: 'Tools are currently not supported by Streamlit agent'
+      });
+    if (tool_resources)
+      throw new APIError({
+        code: APIErrorCode.INVALID_INPUT,
+        message: 'Tool resouces are currently not supported by Streamlit agent'
+      });
+  }
+
   const customToolIds = toolsParam.flatMap((toolUsage) =>
     toolUsage.type === ToolType.USER ? toolUsage.user.tool.id : []
   );
@@ -99,6 +115,7 @@ export async function createAssistant({
     metadata,
     topP: top_p ?? undefined,
     model: model ?? getDefaultModel(),
+    agent,
     temperature: temperature ?? undefined,
     systemPromptOverwrite: system_prompt_overwrite ?? undefined
   });
@@ -131,6 +148,20 @@ export async function updateAssistant({
   const assistant = await ORM.em.getRepository(Assistant).findOneOrFail({
     id: assistant_id
   });
+
+  if (assistant.agent === Agent.STREAMLIT) {
+    if (tools && tools.length !== 0)
+      throw new APIError({
+        code: APIErrorCode.INVALID_INPUT,
+        message: 'Tools are currently not supported by Streamlit agent'
+      });
+    if (tool_resources)
+      throw new APIError({
+        code: APIErrorCode.INVALID_INPUT,
+        message: 'Tool resouces are currently not supported by Streamlit agent'
+      });
+  }
+
   assistant.name = getUpdatedValue(name, assistant.name);
   assistant.description = getUpdatedValue(description, assistant.description);
   assistant.instructions = getUpdatedValue(instructions, assistant.instructions);
@@ -157,9 +188,14 @@ export async function listAssistants({
   before,
   order,
   order_by,
+  agent,
   search
 }: AssistantsListQuery): Promise<AssistantsListResponse> {
   const where: FilterQuery<Assistant> = {};
+
+  if (agent) {
+    where.agent = agent;
+  }
 
   if (search) {
     const regexp = new RegExp(search, 'i');

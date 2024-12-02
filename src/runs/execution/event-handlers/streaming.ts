@@ -15,12 +15,18 @@
  */
 
 import { FrameworkError, Version } from 'bee-agent-framework';
-import { EventMeta, Emitter } from 'bee-agent-framework/emitter/emitter';
+import { EventMeta, Emitter, Callback } from 'bee-agent-framework/emitter/emitter';
 import { ref } from '@mikro-orm/core';
 import { Role } from 'bee-agent-framework/llms/primitives/message';
 import { BeeCallbacks } from 'bee-agent-framework/agents/bee/types';
 import { Summary } from 'prom-client';
 import { ToolError } from 'bee-agent-framework/tools/base';
+import {
+  StreamlitEvents as StreamlitEventsFramework,
+  StreamlitRunOutput
+} from 'bee-agent-framework/agents/experimental/streamlit/agent';
+
+import { Agent } from '../constants';
 
 import { AgentContext } from '@/runs/execution/execute.js';
 import { getLogger } from '@/logger.js';
@@ -50,9 +56,9 @@ const agentToolExecutionTime = new Summary({
   registers: [jobRegistry]
 });
 
-export function createStreamingHandler(ctx: AgentContext) {
+export function createBeeStreamingHandler(ctx: AgentContext) {
   return (emitter: Emitter<BeeCallbacks>) => {
-    const logger = getLogger().child({ runId: ctx.run.id });
+    const logger = getLogger().child({ runId: ctx.run.id, agent: Agent.BEE });
 
     let toolExecutionEnd: (() => number) | null = null;
 
@@ -108,37 +114,45 @@ export function createStreamingHandler(ctx: AgentContext) {
           const client = createClient();
           await new Promise((resolve, reject) => {
             client.subscribe(createApproveChannel(ctx.run, toolCall), async (err) => {
-              if (err) {
+              try {
+                if (err) {
+                  reject(err);
+                } else {
+                  ctx.run.requireAction(
+                    new RequiredToolApprove({
+                      toolCalls: [...(ctx.run.requiredAction?.toolCalls ?? []), toolCall]
+                    })
+                  );
+                  await ORM.em.flush();
+                  await ctx.publish({
+                    event: 'thread.run.requires_action',
+                    data: toRunDto(ctx.run)
+                  });
+                  await ctx.publish({
+                    event: 'done',
+                    data: '[DONE]'
+                  });
+                }
+              } catch (err) {
                 reject(err);
-              } else {
-                ctx.run.requireAction(
-                  new RequiredToolApprove({
-                    toolCalls: [...(ctx.run.requiredAction?.toolCalls ?? []), toolCall]
-                  })
-                );
-                await ORM.em.flush();
-                await ctx.publish({
-                  event: 'thread.run.requires_action',
-                  data: toRunDto(ctx.run)
-                });
-                await ctx.publish({
-                  event: 'done',
-                  data: '[DONE]'
-                });
               }
             });
             client.on('message', async (_, approval) => {
-              ctx.run.submitAction();
-              await ORM.em.flush();
-              if (approval !== 'true') {
-                reject(
-                  new ToolError('User has not approved this tool to run.', [], {
-                    isFatal: false,
-                    isRetryable: false
-                  })
-                );
+              try {
+                ctx.run.submitAction();
+                await ORM.em.flush();
+                if (approval !== 'true') {
+                  reject(
+                    new ToolError('User has not approved this tool to run.', [], {
+                      isFatal: false,
+                      isRetryable: false
+                    })
+                  );
+                }
+                resolve(true);
+              } catch (err) {
+                reject(err);
               }
-              resolve(true);
             });
           });
         }
@@ -177,7 +191,10 @@ export function createStreamingHandler(ctx: AgentContext) {
         ctx.message.content = data.final_answer ?? ctx.message.content;
         ctx.message.status = MessageStatus.COMPLETED;
         await ORM.em.flush();
-        await ctx.publish({ event: 'thread.message.completed', data: toMessageDto(ctx.message) });
+        await ctx.publish({
+          event: 'thread.message.completed',
+          data: toMessageDto(ctx.message)
+        });
         ctx.message = undefined;
       }
       if (
@@ -202,7 +219,10 @@ export function createStreamingHandler(ctx: AgentContext) {
         } else {
           ctx.runStep.status = RunStepStatus.FAILED;
           await ORM.em.flush();
-          await ctx.publish({ event: 'thread.run.step.failed', data: toRunStepDto(ctx.runStep) });
+          await ctx.publish({
+            event: 'thread.run.step.failed',
+            data: toRunStepDto(ctx.runStep)
+          });
         }
         ctx.runStep = undefined;
         ctx.toolCall = undefined;
@@ -244,7 +264,10 @@ export function createStreamingHandler(ctx: AgentContext) {
             event: 'thread.run.step.in_progress',
             data: toRunStepDto(ctx.runStep)
           });
-          await ctx.publish({ event: 'thread.message.created', data: toMessageDto(ctx.message) });
+          await ctx.publish({
+            event: 'thread.message.created',
+            data: toMessageDto(ctx.message)
+          });
           await ctx.publish({
             event: 'thread.message.in_progress',
             data: toMessageDto(ctx.message)
@@ -309,6 +332,98 @@ export function createStreamingHandler(ctx: AgentContext) {
   };
 }
 
+export function createStreamlitStreamingHandler(ctx: AgentContext) {
+  const logger = getLogger().child({ runId: ctx.run.id, agent: Agent.STREAMLIT });
+  return (emitter: Emitter<StreamlitEvents>) => {
+    emitter.on('newToken', async ({ delta }) => {
+      if (!ctx.message) {
+        ctx.message = new Message({
+          project: ctx.run.project,
+          role: Role.ASSISTANT,
+          content: '',
+          thread: ctx.run.thread,
+          run: ref(ctx.run),
+          createdBy: ctx.run.createdBy,
+          status: MessageStatus.IN_PROGRESS
+        });
+        if (ctx.runStep)
+          logger.warn(
+            { step: ctx.runStep.id },
+            'Message creation has started while previous run step has not finished'
+          );
+        ctx.runStep = new RunStep({
+          project: ctx.run.project,
+          run: ref(ctx.run),
+          thread: ctx.run.thread,
+          assistant: ctx.run.assistant,
+          createdBy: ctx.run.createdBy,
+          details: new RunStepMessageCreation({ message: ref(ctx.message) })
+        });
+        await ORM.em.persistAndFlush([ctx.message, ctx.runStep]);
+        await ctx.publish({
+          event: 'thread.run.step.created',
+          data: toRunStepDto(ctx.runStep)
+        });
+        await ctx.publish({
+          event: 'thread.run.step.in_progress',
+          data: toRunStepDto(ctx.runStep)
+        });
+        await ctx.publish({ event: 'thread.message.created', data: toMessageDto(ctx.message) });
+        await ctx.publish({
+          event: 'thread.message.in_progress',
+          data: toMessageDto(ctx.message)
+        });
+      }
+      ctx.message.content += delta;
+      await ctx.publish({
+        event: 'thread.message.delta',
+        data: {
+          id: ctx.message.id,
+          object: 'thread.message.delta',
+          delta: {
+            role: Role.ASSISTANT,
+            content: [
+              {
+                index: 0,
+                type: 'text',
+                text: {
+                  value: delta
+                }
+              }
+            ]
+          }
+        }
+      });
+    });
+    emitter.on('success', async () => {
+      if (!ctx.message) {
+        logger.warn('Agent success with missing message');
+        return;
+      }
+      if (!ctx.runStep) {
+        logger.warn('Agent success with missing run step');
+        return;
+      }
+
+      ctx.message.status = MessageStatus.COMPLETED;
+      // TODO add artifact to message
+      await ORM.em.flush();
+      await ctx.publish({
+        event: 'thread.message.completed',
+        data: toMessageDto(ctx.message)
+      });
+
+      ctx.runStep.status = RunStepStatus.COMPLETED;
+      await ORM.em.flush();
+      await ctx.publish({
+        event: 'thread.run.step.completed',
+        data: toRunStepDto(ctx.runStep)
+      });
+    });
+    emitter.on('error', ({ error }) => onError(ctx)(error));
+  };
+}
+
 const onError = (ctx: AgentContext) => async (error: Error) => {
   if (ctx.message) {
     ctx.message.status = MessageStatus.INCOMPLETE;
@@ -349,4 +464,11 @@ const createEventFromMeta = (meta: EventMeta) => {
         parentRunId: meta.trace?.parentRunId
       })
     : undefined;
+};
+
+type StreamlitEvents = StreamlitEventsFramework & {
+  error?: Callback<{
+    error: Error;
+  }>;
+  success?: Callback<StreamlitRunOutput>;
 };

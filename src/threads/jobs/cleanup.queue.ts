@@ -30,6 +30,7 @@ import { File } from '@/files/entities/file.entity';
 import { VectorStore } from '@/vector-stores/entities/vector-store.entity';
 import { getJobLogger } from '@/logger';
 import { deleteVectorStoreFiles } from '@/vector-store-files/vector-store-files.service';
+import { Artifact } from '@/artifacts/entities/artifact.entity';
 
 async function jobHandler() {
   return RequestContext.create(ORM.em, async () => {
@@ -67,6 +68,13 @@ async function jobHandler() {
             await ORM.em
               .getRepository(Message)
               .nativeDelete({ thread: threadId }, { filters: { deleted: false } });
+            await ORM.em
+              .getRepository(Artifact)
+              .nativeUpdate(
+                { thread: threadId },
+                { thread: null, message: null },
+                { filters: { deleted: false } }
+              );
             await ORM.em
               .getRepository(RunStep)
               .nativeDelete({ thread: threadId }, { filters: { deleted: false } });

@@ -17,23 +17,39 @@ from bullmq import Job
 from workers import create_worker
 from enums import ExtractionBackend
 from database import database
-from extraction.unstructured import unstructuredExtraction
+from logger import logger
 
 EXTRACTION_QUEUE_NAME = "files:extraction:python"
 
 
 async def processExtraction(job: Job, job_token):
     data = job.data
-    file_id = data['fileId']
+    file_id = data.get('fileId')
+    if file_id is None:
+        raise RuntimeError("fileId not found")
 
     file = await database.get_collection('file').find_one({"_id": file_id})
     if file is None:
         raise RuntimeError("File not found")
-    extraction = file["extraction"]
-    backend = extraction["backend"]
+    extraction = file.get("extraction")
+    if extraction is None:
+        raise RuntimeError("Extraction not found")
+    backend = extraction.get("backend")
 
     if backend == ExtractionBackend.UNSTRUCTURED_OPENSOURCE or backend == ExtractionBackend.UNSTRUCTURED_API:
-        await unstructuredExtraction(file)
+        try:
+            from extraction.unstructured import unstructuredExtraction
+            await unstructuredExtraction(file)
+        except ImportError:
+            logger.exception(
+                f"Unable to import unstructured, throwing away job {job.id}")
+    elif backend == ExtractionBackend.DOCLING:
+        try:
+            from extraction.docling import docling_extraction
+            await docling_extraction(file)
+        except ImportError:
+            logger.exception(
+                f"Unable to import docling, throwing away job {job.id}")
     else:
         raise RuntimeError("Unsupported backend")
 

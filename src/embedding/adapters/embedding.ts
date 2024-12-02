@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { cosineSimilarity } from 'langchain/util/math';
+import { cosineSimilarityMatrix } from '@/embedding/utilts';
 
 export type EmbeddingOptions = {
   signal?: AbortSignal;
@@ -37,7 +36,7 @@ export abstract class Embedding {
     options?: EmbeddingOptions
   ): Promise<{ score: number }[]> {
     const [sourceEmbedding, ...textEmbeddings] = await this.embedMany([query, ...texts], options);
-    const matrix = cosineSimilarity([sourceEmbedding], textEmbeddings);
+    const matrix = cosineSimilarityMatrix([sourceEmbedding], textEmbeddings);
     const similarities = matrix.at(0);
     if (!similarities) throw new Error('Missing similarities');
     return similarities.map((score) => ({ score }));
