@@ -78,7 +78,7 @@ The easiest way to run all the dependencies for the bee-api is to:
 pnpm install
 ```
 
-- Run the database seeder:
+- When running for the first time seed the database:
 
 ```
 pnpm mikro-orm seeder:run
@@ -90,7 +90,7 @@ pnpm mikro-orm seeder:run
 cp .env.example .env
 ```
 
-- Add values the env vars: CRYPTO_CIPHER_KEY, LLM_BACKEND, EMBEDDING_BACKEND.
+- Add values the env vars: CRYPTO_CIPHER_KEY, LLM_BACKEND, EMBEDDING_BACKEND and API key for which ever provider you have chosen.
 
 - Run the bee-api:
 
