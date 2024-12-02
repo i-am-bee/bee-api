@@ -57,7 +57,7 @@ export const chatCompletionCreateBodySchema = {
           type: 'object',
           required: ['schema'],
           properties: {
-            schema: { type: 'string' }
+            schema: { type: 'object', additionalProperties: true }
           }
         }
       }
