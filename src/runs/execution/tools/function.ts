@@ -17,6 +17,7 @@
 import {
   BaseToolOptions,
   BaseToolRunOptions,
+  CustomToolEmitter,
   StringToolOutput,
   Tool,
   ToolInput
@@ -24,6 +25,7 @@ import {
 import { SchemaObject } from 'ajv';
 import { Loaded } from '@mikro-orm/core';
 import { GetRunContext } from 'bee-agent-framework/context';
+import { Emitter } from 'bee-agent-framework/emitter/emitter';
 
 import { AgentContext } from '../execute.js';
 
@@ -48,6 +50,15 @@ export class FunctionTool extends Tool<FunctionToolOutput, FunctionToolOptions> 
   name: string;
   description: string;
 
+  static {
+    this.register();
+  }
+
+  readonly emitter: CustomToolEmitter<Record<string, any>, StringToolOutput> = Emitter.root.child({
+    namespace: ['tool', 'function'],
+    creator: this
+  });
+
   inputSchema() {
     return this.options.parameters ?? {};
   }
@@ -64,7 +75,7 @@ export class FunctionTool extends Tool<FunctionToolOutput, FunctionToolOptions> 
 
   protected async _run(
     _: ToolInput<this>,
-    __: BaseToolRunOptions | undefined,
+    __: Partial<BaseToolRunOptions>,
     run: GetRunContext<typeof this>
   ) {
     const toolCall = this.options.context.toolCall;
