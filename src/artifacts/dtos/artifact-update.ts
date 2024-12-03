@@ -24,15 +24,25 @@ import { metadataSchema } from '@/schema.js';
 export const artifactUpdateParamsSchema = artifactReadParamsSchema;
 export type ArtifactUpdateParams = FromSchema<typeof artifactUpdateParamsSchema>;
 
+const commonArtifactUpdateProperties = {
+  metadata: metadataSchema,
+  shared: { type: 'boolean' },
+  name: { type: 'string' },
+  description: { type: 'string' },
+  message_id: { type: 'string' }
+} as const;
+
 export const artifactUpdateBodySchema = {
   type: 'object',
-  additionalProperties: false,
-  properties: {
-    metadata: metadataSchema,
-    shared: { type: 'boolean' },
-    name: { type: 'string' },
-    description: { type: 'string' }
-  }
+  oneOf: [
+    {
+      additionalProperties: false,
+      properties: {
+        ...commonArtifactUpdateProperties,
+        source_code: { type: 'string' }
+      }
+    }
+  ]
 } as const satisfies JSONSchema;
 export type ArtifactUpdateBody = FromSchema<typeof artifactUpdateBodySchema>;
 
