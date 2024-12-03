@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.0.14](https://github.com/i-am-bee/bee-api/compare/v0.0.13...v0.0.14) (2024-12-03)
+
+### Features
+
+* chat completion endpoint for authorized and artifact users ([#92](https://github.com/i-am-bee/bee-api/issues/92)) ([b40c204](https://github.com/i-am-bee/bee-api/commit/b40c20413191a054ea38a5bbe2d47df620180970))
+* **deps:** upgrade bee-agent-framework and refactor ([#102](https://github.com/i-am-bee/bee-api/issues/102)) ([fc014df](https://github.com/i-am-bee/bee-api/commit/fc014df8d756042e5490028ad03d7b0d0b24a743))
+* **ui:** modules_to_packages endpoint ([#101](https://github.com/i-am-bee/bee-api/issues/101)) ([6c203cc](https://github.com/i-am-bee/bee-api/commit/6c203cc28a8423151e2fcb398c4c8da9bfcccf39))
+
+### Bug Fixes
+
+* **artifact:** fix schema and type ([#97](https://github.com/i-am-bee/bee-api/issues/97)) ([7a585cd](https://github.com/i-am-bee/bee-api/commit/7a585cd80930973107b40f3a0e4e6cbfd6dbd664))
+* **assistant:** tools check for streamlit agent ([#94](https://github.com/i-am-bee/bee-api/issues/94)) ([0d4ff85](https://github.com/i-am-bee/bee-api/commit/0d4ff854a48a1d0b386bf9a5cc3453b6c60b5c5d))
+
 ## [0.0.13](https://github.com/i-am-bee/bee-api/compare/v0.0.12...v0.0.13) (2024-11-25)
 
 ### Features
