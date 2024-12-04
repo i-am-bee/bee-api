@@ -19,6 +19,7 @@ import { join } from 'path';
 import {
   BaseToolOptions,
   BaseToolRunOptions,
+  CustomToolEmitter,
   StringToolOutput,
   Tool,
   ToolError
@@ -30,6 +31,7 @@ import axios from 'axios';
 import { HttpProxyAgent } from 'http-proxy-agent';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { GetRunContext } from 'bee-agent-framework/context';
+import { Emitter } from 'bee-agent-framework/emitter/emitter';
 
 import { AgentContext } from '../execute.js';
 
@@ -52,6 +54,11 @@ export class ApiCallTool extends Tool<StringToolOutput, ApiCallToolOptions> {
   description: string;
   openApiSchema: any;
   apiKey?: string;
+
+  readonly emitter: CustomToolEmitter<Record<string, any>, StringToolOutput> = Emitter.root.child({
+    namespace: ['tool', 'api'],
+    creator: this
+  });
 
   inputSchema() {
     return {
@@ -96,6 +103,10 @@ export class ApiCallTool extends Tool<StringToolOutput, ApiCallToolOptions> {
     } as const satisfies SchemaObject;
   }
 
+  static {
+    this.register();
+  }
+
   public constructor({ name, description, openApiSchema, apiKey, ...rest }: ApiCallToolOptions) {
     super({ name, description, ...rest });
     this.name = name;
@@ -112,7 +123,7 @@ export class ApiCallTool extends Tool<StringToolOutput, ApiCallToolOptions> {
 
   protected async _run(
     input: any,
-    _options: BaseToolRunOptions | undefined,
+    _options: Partial<BaseToolRunOptions>,
     run: GetRunContext<typeof this>
   ) {
     let path: string = input.path || '';

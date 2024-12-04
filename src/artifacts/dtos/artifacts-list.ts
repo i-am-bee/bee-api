@@ -16,11 +16,30 @@
 
 import { FromSchema } from 'json-schema-to-ts';
 
+import { ArtifactType } from '../entities/artifact.entity.js';
+
 import { artifactSchema } from './artifact.js';
 
 import { createPaginationQuerySchema, withPagination } from '@/schema.js';
+import { JSONSchema } from '@/ajv.js';
 
-export const artifactsListQuerySchema = createPaginationQuerySchema();
+export const artifactsListQuerySchema = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    ...createPaginationQuerySchema(['type', 'name'] as const).properties,
+    type: {
+      type: 'array',
+      uniqueItems: true,
+      items: { type: 'string', enum: Object.values(ArtifactType) }
+    },
+    search: {
+      type: 'string',
+      minLength: 1,
+      nullable: true
+    }
+  }
+} as const satisfies JSONSchema;
 export type ArtifactsListQuery = FromSchema<typeof artifactsListQuerySchema>;
 
 export const artifactsListResponseSchema = withPagination(artifactSchema);

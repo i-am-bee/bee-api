@@ -20,11 +20,13 @@ import {
   StringToolOutput,
   Tool,
   ToolError,
-  BaseToolRunOptions
+  BaseToolRunOptions,
+  CustomToolEmitter
 } from 'bee-agent-framework/tools/base';
 import { z } from 'zod';
 import { hasAtLeast } from 'remeda';
 import { GetRunContext } from 'bee-agent-framework/context';
+import { Emitter } from 'bee-agent-framework/emitter/emitter';
 
 import { File } from '@/files/entities/file.entity.js';
 import { getExtractedText } from '@/files/extraction/helpers';
@@ -49,9 +51,14 @@ export class ReadFileTool extends Tool<StringToolOutput, ReadFileToolOptions> {
     });
   }
 
+  readonly emitter: CustomToolEmitter<ToolInput<this>, StringToolOutput> = Emitter.root.child({
+    namespace: ['tool', 'file', 'read'],
+    creator: this
+  });
+
   protected async _run(
     { filename }: ToolInput<ReadFileTool>,
-    _: BaseToolRunOptions,
+    _: Partial<BaseToolRunOptions>,
     run: GetRunContext<typeof this>
   ): Promise<StringToolOutput> {
     const file = this.options.files.find((file) => file.filename === filename);

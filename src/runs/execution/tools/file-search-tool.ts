@@ -17,6 +17,7 @@
 import {
   BaseToolOptions,
   BaseToolRunOptions,
+  CustomToolEmitter,
   Tool,
   ToolInput,
   ToolOutput
@@ -25,6 +26,7 @@ import { z } from 'zod';
 import { isTruthy } from 'remeda';
 import { Loaded } from '@mikro-orm/core';
 import { GetRunContext } from 'bee-agent-framework/context';
+import { Emitter } from 'bee-agent-framework/emitter/emitter';
 
 import { getVectorStoreClient } from '@/vector-store-files/execution/client.js';
 import { VectorStore } from '@/vector-stores/entities/vector-store.entity.js';
@@ -80,9 +82,14 @@ export class FileSearchTool extends Tool<FileSearchToolOutput, FileSearchToolOpt
   }
   vectorStores: Loaded<VectorStore>[];
 
+  readonly emitter: CustomToolEmitter<ToolInput<this>, FileSearchToolOutput> = Emitter.root.child({
+    namespace: ['tool', 'file', 'search'],
+    creator: this
+  });
+
   async _run(
     { query }: ToolInput<FileSearchTool>,
-    _options: BaseToolRunOptions | undefined,
+    _options: Partial<BaseToolRunOptions>,
     run: GetRunContext<typeof this>
   ): Promise<FileSearchToolOutput> {
     const vectorStoreClient = getVectorStoreClient();
