@@ -50,7 +50,7 @@ export const usersModule: FastifyPluginAsyncJsonSchemaToTs = async (app) => {
         ...req.body,
         externalId: identity.sub,
         email: identity.email,
-        name: identity.preferred_username
+        name: req.body.name
       });
     }
   );
