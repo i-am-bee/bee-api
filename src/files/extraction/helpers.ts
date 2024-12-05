@@ -17,6 +17,7 @@
 import { Loaded } from '@mikro-orm/core';
 import mime from 'mime';
 import { recursiveSplitString } from 'bee-agent-framework/internals/helpers/string';
+import ibm from 'ibm-cos-sdk';
 
 import { s3Client } from '../files.service';
 import { DoclingExtraction } from '../entities/extractions/docling-extraction.entity';
@@ -34,18 +35,54 @@ import { EXTRACTION_BACKEND, S3_BUCKET_FILE_STORAGE } from '@/config';
 import { ORM } from '@/database';
 import { QueueName } from '@/jobs/constants';
 
+export const withAbort = <A, B>(value: ibm.Request<A, B>, signal?: AbortSignal) => {
+  const handler = () => value.abort();
+  signal?.addEventListener('abort', handler);
+  return value.promise().finally(() => signal?.removeEventListener('abort', handler));
+};
+
+function isNativeDoclingFormat(mimeType: string): boolean {
+  const extension = mime.getExtension(mimeType);
+  if (!extension) return false;
+  return [
+    'docx',
+    'dotx',
+    'docm',
+    'dotm',
+    'pptx',
+    'potx',
+    'ppsx',
+    'pptm',
+    'potm',
+    'ppsm',
+    'pdf',
+    'md',
+    'html',
+    'htm',
+    'xhtml',
+    'jpg',
+    'jpeg',
+    'png',
+    'tif',
+    'tiff',
+    'bmp',
+    'adoc',
+    'asciidoc',
+    'asc',
+    'xlsx'
+  ].includes(extension);
+}
+
 export function supportsExtraction(
   mimeType: string = OCTET_STREAM_MIME_TYPE,
   backend: ExtractionBackend = EXTRACTION_BACKEND
 ): boolean {
   switch (backend) {
     case ExtractionBackend.DOCLING: {
-      const extension = mime.getExtension(mimeType);
-      if (!extension) return false;
       return (
         mimeType.startsWith('text/') ||
         mimeType === 'application/json' ||
-        ['docx', 'html', 'jpeg', 'pdf', 'pptx', 'png'].includes(extension)
+        isNativeDoclingFormat(mimeType)
       );
     }
     case ExtractionBackend.WDU:
@@ -99,9 +136,15 @@ export async function scheduleExtraction(
 ) {
   switch (backend) {
     case ExtractionBackend.DOCLING: {
+      const mimeType = file.mimeType;
+      if (!mimeType) throw new Error('Missing mime type');
+
       file.extraction = new DoclingExtraction({ jobId: file.id });
       await ORM.em.flush();
-      if (file.mimeType?.startsWith('text/') || file.mimeType === 'application/json') {
+      if (
+        !isNativeDoclingFormat(mimeType) &&
+        (mimeType.startsWith('text/') || mimeType === 'application/json')
+      ) {
         await nodeQueue.add(
           QueueName.FILES_EXTRACTION_NODE,
           {
@@ -164,81 +207,72 @@ export async function scheduleExtraction(
   }
 }
 
-export async function removeExtraction(file: Loaded<File>) {
+type AvailableKeys<T> = Exclude<T extends T ? keyof T : never, keyof unknown[]>;
+
+const keyByProvider = {
+  [ExtractionBackend.DOCLING]: ['documentStorageId', 'chunksStorageId', 'textStorageId'],
+  [ExtractionBackend.WDU]: ['storageId'],
+  [ExtractionBackend.UNSTRUCTURED_OPENSOURCE]: ['storageId'],
+  [ExtractionBackend.UNSTRUCTURED_API]: ['storageId']
+} as const satisfies Record<ExtractionBackend, AvailableKeys<typeof File.prototype.extraction>[]>;
+
+export async function removeExtraction(file: Loaded<File>, signal?: AbortSignal) {
   const extraction = file.extraction;
   if (!extraction) throw new Error('No extraction to remove');
-  switch (extraction.backend) {
-    case ExtractionBackend.DOCLING:
-      if (extraction.documentStorageId)
-        await s3Client
-          .deleteObject({ Bucket: S3_BUCKET_FILE_STORAGE, Key: extraction.documentStorageId })
-          .promise();
-      if (extraction.chunksStorageId)
-        await s3Client
-          .deleteObject({ Bucket: S3_BUCKET_FILE_STORAGE, Key: extraction.chunksStorageId })
-          .promise();
-      if (extraction.textStorageId)
-        await s3Client
-          .deleteObject({ Bucket: S3_BUCKET_FILE_STORAGE, Key: extraction.textStorageId })
-          .promise();
-      break;
-    case ExtractionBackend.WDU:
-      if (extraction.storageId)
-        await s3Client
-          .deleteObject({ Bucket: S3_BUCKET_FILE_STORAGE, Key: extraction.storageId })
-          .promise();
-      break;
-    case ExtractionBackend.UNSTRUCTURED_OPENSOURCE:
-    case ExtractionBackend.UNSTRUCTURED_API:
-      if (extraction.storageId)
-        await s3Client
-          .deleteObject({ Bucket: S3_BUCKET_FILE_STORAGE, Key: extraction.storageId })
-          .promise();
-      break;
-  }
+
+  await Promise.all(
+    keyByProvider[extraction.backend].map(async (property) => {
+      const Key = extraction[property as keyof typeof extraction];
+      if (Key) {
+        await withAbort(s3Client.deleteObject({ Bucket: S3_BUCKET_FILE_STORAGE, Key }), signal);
+      }
+    })
+  );
+
   file.extraction = undefined;
   await ORM.em.flush();
 }
 
-export async function getExtractedText(file: Loaded<File>) {
+export async function getExtractedText(file: Loaded<File>, signal?: AbortSignal): Promise<string> {
   const extraction = file.extraction;
   if (!extraction) throw new Error('Extraction not found');
   switch (extraction.backend) {
     case ExtractionBackend.WDU: {
       if (!extraction.storageId) throw new Error('Extraction missing');
-      const object = await s3Client
-        .getObject({
+      const object = await withAbort(
+        s3Client.getObject({
           Bucket: S3_BUCKET_FILE_STORAGE,
           Key: extraction.storageId
-        })
-        .promise();
+        }),
+        signal
+      );
       const body = object.Body;
       if (!body) throw new Error('Invalid Body of a file');
       return body.toString('utf-8');
     }
     case ExtractionBackend.DOCLING: {
       if (!extraction.textStorageId) throw new Error('Extraction missing');
-      return readTextFile(extraction.textStorageId);
+      return readTextFile(extraction.textStorageId, signal);
     }
     case ExtractionBackend.UNSTRUCTURED_OPENSOURCE:
     case ExtractionBackend.UNSTRUCTURED_API: {
       if (!extraction.storageId) throw new Error('Extraction missing');
       const elements = JSON.parse(
-        await readTextFile(extraction.storageId)
+        await readTextFile(extraction.storageId, signal)
       ) as UnstructuredExtractionDocument;
       return elements.map((element) => element.text).join('');
     }
   }
 }
 
-export async function getExtractedChunks(file: Loaded<File>) {
+export async function getExtractedChunks(file: Loaded<File>, signal?: AbortSignal) {
   const extraction = file.extraction;
   if (!extraction) throw new Error('Extraction not found');
   switch (extraction.backend) {
     case ExtractionBackend.DOCLING: {
       if (!extraction.chunksStorageId) {
         if (!extraction.textStorageId) throw new Error('Extraction missing');
-        const text = await getExtractedText(file);
+        const text = await getExtractedText(file, signal);
         const splitter = recursiveSplitString(text, {
           size: 400,
           overlap: 200,
@@ -247,12 +281,12 @@ export async function getExtractedChunks(file: Loaded<File>) {
         return Array.from(splitter);
       }
       const chunks = JSON.parse(
-        await readTextFile(extraction.chunksStorageId)
+        await readTextFile(extraction.chunksStorageId, signal)
       ) as DoclingChunksExtraction;
       return chunks.map((c) => c.text);
     }
     case ExtractionBackend.WDU: {
-      const text = await getExtractedText(file);
+      const text = await getExtractedText(file, signal);
       const splitter = recursiveSplitString(text, {
         size: 400,
         overlap: 200,
@@ -264,7 +298,7 @@ export async function getExtractedChunks(file: Loaded<File>) {
     case ExtractionBackend.UNSTRUCTURED_API: {
       if (!extraction.storageId) throw new Error('Extraction missing');
       const elements = JSON.parse(
-        await readTextFile(extraction.storageId)
+        await readTextFile(extraction.storageId, signal)
       ) as UnstructuredExtractionDocument;
       return elements
         .filter((element) => element.type === 'CompositeElement')
@@ -273,13 +307,14 @@ export async function getExtractedChunks(file: Loaded<File>) {
   }
 }
 
-async function readTextFile(key: string) {
-  const object = await s3Client
-    .getObject({
+async function readTextFile(key: string, signal?: AbortSignal) {
+  const object = await withAbort(
+    s3Client.getObject({
       Bucket: S3_BUCKET_FILE_STORAGE,
       Key: key
-    })
-    .promise();
+    }),
+    signal
+  );
   const body = object.Body;
   if (!body) throw new Error('Invalid Body of a file');
   const data = body.toString('utf-8');

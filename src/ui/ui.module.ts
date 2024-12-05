@@ -17,10 +17,16 @@
 import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts';
 import { StatusCodes } from 'http-status-codes';
 
-import { lastAssistants } from './ui.service.js';
+import { lastAssistants, modulesToPackages } from './ui.service.js';
 import { lastAssistantsSchema } from './dtos/last_assistant.dto.js';
+import {
+  ModulesToPackagesQuery,
+  modulesToPackagesQuerySchema,
+  modulesToPackagesResponseSchema
+} from './dtos/modules-to-packages.js';
 
 import { Tag } from '@/swagger.js';
+import { AuthSecret } from '@/auth/utils.js';
 
 export const uiModule: FastifyPluginAsyncJsonSchemaToTs = async (app) => {
   app.get(
@@ -34,6 +40,25 @@ export const uiModule: FastifyPluginAsyncJsonSchemaToTs = async (app) => {
     },
     async () => {
       return lastAssistants();
+    }
+  );
+
+  app.get<{ Querystring: ModulesToPackagesQuery }>(
+    '/ui/modules_to_packages',
+    {
+      schema: {
+        querystring: modulesToPackagesQuerySchema,
+        response: { [StatusCodes.OK]: modulesToPackagesResponseSchema },
+        tags: [Tag.BEE_API]
+      },
+      preHandler: app.auth([
+        AuthSecret.ACCESS_TOKEN,
+        AuthSecret.API_KEY,
+        AuthSecret.ARTIFACT_SECRET
+      ])
+    },
+    async (req) => {
+      return modulesToPackages(req.query);
     }
   );
 };

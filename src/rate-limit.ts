@@ -19,7 +19,7 @@ import fp from 'fastify-plugin';
 import rateLimit, { errorResponseBuilderContext } from '@fastify/rate-limit';
 
 import { createClient } from './redis.js';
-import { AuthSecret, determineAuthType, scryptApiKey } from './auth/utils.js';
+import { AuthSecret, determineAuthType, scryptSecret } from './auth/utils.js';
 import { toErrorResponseDto } from './errors/plugin.js';
 import { APIError, APIErrorCode } from './errors/error.entity.js';
 
@@ -59,7 +59,9 @@ export const rateLimitPlugin: FastifyPluginAsync = fp.default(async (app) => {
         case AuthSecret.ACCESS_TOKEN:
           return authType.value;
         case AuthSecret.API_KEY:
-          return scryptApiKey(authType.value);
+          return scryptSecret(authType.value);
+        case AuthSecret.ARTIFACT_SECRET:
+          return scryptSecret(authType.value);
         case AuthSecret.UNKNOWN:
           return request.ip;
       }

@@ -28,7 +28,7 @@ import { User } from '@/users/entities/user.entity';
 import { getDefaultModel } from '@/runs/execution/factory';
 import { SystemTools } from '@/tools/entities/tool-calls/system-call.entity';
 import { ProjectApiKey } from '@/administration/entities/project-api-key.entity';
-import { API_KEY_PREFIX, scryptApiKey } from '@/auth/utils';
+import { API_KEY_PREFIX, scryptSecret } from '@/auth/utils';
 import { IBM_ORGANIZATION_OWNER_ID } from '@/config';
 import { redactProjectKeyValue } from '@/administration/helpers';
 import { Agent } from '@/runs/execution/constants';
@@ -85,7 +85,7 @@ export class DatabaseSeeder extends Seeder {
       .getRepository(ProjectPrincipal)
       .getReference(projectUser.id, { wrapped: true });
     const projectApiKey = new ProjectApiKey({
-      key: scryptApiKey(PROJECT_API_KEY),
+      key: scryptSecret(PROJECT_API_KEY),
       name: 'test key',
       createdBy: ref(projectUser),
       project: ref(project),

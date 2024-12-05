@@ -85,9 +85,7 @@ export async function createEmbeddingAdapter(
         projectId: WATSONX_PROJECT_ID,
         region: WATSONX_REGION ?? undefined
       });
-      // @ts-expect-error use protected property
-      const client = llm.client;
-      return new WatsonXEmbedding(model, WATSONX_PROJECT_ID, client);
+      return new WatsonXEmbedding(model, WATSONX_PROJECT_ID, llm.client);
     }
   }
 }

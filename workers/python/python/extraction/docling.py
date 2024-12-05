@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
 import tempfile
 import json
 import aioboto3
@@ -44,7 +45,9 @@ async def docling_extraction(file):
 
             await s3.meta.client.download_file(config.s3_bucket_file_storage, storage_id, source_doc)
 
-            doc = DocumentConverter().convert(source_doc).document
+            converter = DocumentConverter()
+            result = await asyncio.to_thread(converter.convert, source_doc, max_num_pages=100, max_file_size=20971520)
+            doc = result.document
             dict = doc.export_to_dict()
             markdown = doc.export_to_markdown()
             chunks = [{"text": c.text}

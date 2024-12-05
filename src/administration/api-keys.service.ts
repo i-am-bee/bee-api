@@ -34,7 +34,7 @@ import { toDto as toProjectDto } from './projects.service.js';
 import { toProjectUserDto } from './project-users.service';
 
 import { createDeleteResponse } from '@/utils/delete';
-import { generateApiKey, scryptApiKey } from '@/auth/utils';
+import { generateApiKey, scryptSecret } from '@/auth/utils';
 import { getUpdatedValue } from '@/utils/update';
 import { createPaginatedResponse, getListCursor } from '@/utils/pagination';
 import { ORM } from '@/database';
@@ -79,7 +79,7 @@ export async function createApiKey({
     });
   }
   const keyValue = generateApiKey();
-  const key = scryptApiKey(keyValue);
+  const key = scryptSecret(keyValue);
   const apiKey = new ProjectApiKey({
     name,
     key,

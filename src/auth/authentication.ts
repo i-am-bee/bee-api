@@ -20,7 +20,7 @@ import fp from 'fastify-plugin';
 import { ORM } from '../database.js';
 import { User } from '../users/entities/user.entity.js';
 
-import { AuthSecret, determineAuthType, scryptApiKey } from './utils.js';
+import { AuthSecret, determineAuthType, scryptSecret } from './utils.js';
 import { validateAccessToken } from './accessToken.js';
 
 import { APIError, APIErrorCode } from '@/errors/error.entity.js';
@@ -29,6 +29,7 @@ import { ProjectPrincipal } from '@/administration/entities/project-principal.en
 import { OrganizationUser } from '@/administration/entities/organization-user.entity.js';
 import { PrincipalType } from '@/administration/entities/principals/principal.entity.js';
 import { getLogger } from '@/logger.js';
+import { Artifact } from '@/artifacts/entities/artifact.entity.js';
 
 export async function getTrustedIdentity(request: FastifyRequest) {
   const authType = determineAuthType(request);
@@ -112,7 +113,7 @@ const authApiKey = async (request: FastifyRequest, apiKey: string) => {
   const key = await ORM.em
     .getRepository(ProjectApiKey)
     .findOne(
-      { key: scryptApiKey(apiKey) },
+      { key: scryptSecret(apiKey) },
       { populate: ['createdBy'], filters: { projectAdministrationAccess: false } }
     );
   if (!key) {
@@ -133,6 +134,19 @@ const authApiKey = async (request: FastifyRequest, apiKey: string) => {
   } catch (e) {
     getLogger().warn('lastUsedAt not updated');
   }
+};
+
+const authArtifactSecret = async (request: FastifyRequest, accessSecret: string) => {
+  const artifact = await ORM.em
+    .getRepository(Artifact)
+    .findOne({ accessSecret }, { filters: { principalAccess: false } });
+  if (!artifact) {
+    throw new APIError({
+      message: `Artifact not found`,
+      code: APIErrorCode.AUTH_ERROR
+    });
+  }
+  request.requestContext.set('artifact', artifact);
 };
 
 export type AuthFn = (allowedTypes?: AuthSecret[]) => (request: FastifyRequest) => Promise<void>;
@@ -156,6 +170,9 @@ const auth: AuthFn =
       case AuthSecret.API_KEY:
         await authApiKey(request, authType.value);
         break;
+      case AuthSecret.ARTIFACT_SECRET:
+        await authArtifactSecret(request, authType.value);
+        break;
       case AuthSecret.UNKNOWN:
         break;
     }
@@ -166,7 +183,8 @@ const auth: AuthFn =
         apiKey: request.requestContext.get('apiKey')?.id,
         user: request.requestContext.get('user')?.id,
         organizationUser: request.requestContext.get('organizationUser')?.id,
-        projectPrincipal: request.requestContext.get('projectPrincipal')?.id
+        projectPrincipal: request.requestContext.get('projectPrincipal')?.id,
+        artifact: request.requestContext.get('artifact')?.id
       },
       'Authenticated'
     );
