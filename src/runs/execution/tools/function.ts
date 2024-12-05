@@ -17,7 +17,7 @@
 import {
   BaseToolOptions,
   BaseToolRunOptions,
-  CustomToolEmitter,
+  ToolEmitter,
   StringToolOutput,
   Tool,
   ToolInput
@@ -54,7 +54,7 @@ export class FunctionTool extends Tool<FunctionToolOutput, FunctionToolOptions> 
     this.register();
   }
 
-  readonly emitter: CustomToolEmitter<Record<string, any>, StringToolOutput> = Emitter.root.child({
+  readonly emitter: ToolEmitter<Record<string, any>, StringToolOutput> = Emitter.root.child({
     namespace: ['tool', 'function'],
     creator: this
   });
