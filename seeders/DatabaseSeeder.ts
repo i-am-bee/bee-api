@@ -31,12 +31,26 @@ import { API_KEY_PREFIX, scryptSecret } from '@/auth/utils';
 import { IBM_ORGANIZATION_OWNER_ID } from '@/config';
 import { redactProjectKeyValue } from '@/administration/helpers';
 import { Agent, getDefaultModel } from '@/runs/execution/constants';
+import { ORM } from '@/database';
+import { closeAllClients } from '@/redis';
+import { closeAllQueues, closeAllWorkers } from '@/jobs/bullmq';
 
 const USER_EXTERNAL_ID = 'test';
 const PROJECT_API_KEY = `${API_KEY_PREFIX}testkey`;
 
 export class DatabaseSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
+    try {
+      return this._run(em);
+    } finally {
+      await ORM.close();
+      await closeAllQueues();
+      await closeAllWorkers();
+      await closeAllClients();
+    }
+  }
+
+  async _run(em: EntityManager): Promise<void> {
     process.env.IN_SEEDER = 'true';
 
     const existingUser = await em.getRepository(User).findOne({ externalId: USER_EXTERNAL_ID });

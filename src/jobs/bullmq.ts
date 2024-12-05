@@ -20,7 +20,7 @@ import { globby } from 'globby';
 import { DefaultJobOptions, Job, Queue, Worker, WorkerOptions } from 'bullmq';
 import { isTruthy } from 'remeda';
 
-import { createClient } from '../redis.js';
+import { closeClient, createClient } from '../redis.js';
 import { getLogger } from '../logger.js';
 import { gateway } from '../metrics.js';
 
@@ -89,6 +89,8 @@ interface CreateQueueInput<T, U> {
   jobHandler?: (job: Job<T>) => Promise<U>;
 }
 
+const Queues = new Map<QueueName, Queue>();
+
 export function createQueue<T, U>({
   name,
   jobsOptions,
@@ -119,6 +121,7 @@ export function createQueue<T, U>({
     addCallbacks(worker, queue);
     Workers.set(name, worker);
   }
+  Queues.set(name, queue);
 
   return { queue };
 }
@@ -133,9 +136,27 @@ export async function runWorkers(queueNames: QueueName[]) {
   logger.info({ queueNames }, `Workers started successfully`);
 }
 
+export async function closeAllQueues() {
+  await Promise.all(
+    [...Queues.values()].map(async (queue) => {
+      if (!(await queue.isPaused())) {
+        await queue.close();
+      }
+    })
+  );
+  await closeClient(connection);
+  logger.info('Queues shutdown successfully');
+}
+
 export async function closeAllWorkers() {
-  await Promise.all([...Workers.values()].map((worker) => worker.close()));
-  connection.quit();
+  await Promise.all(
+    [...Workers.values()].map(async (worker) => {
+      if (!worker.isPaused()) {
+        await worker.close();
+      }
+    })
+  );
+  await closeClient(connection);
   logger.info('Workers shutdown successfully');
 }
 

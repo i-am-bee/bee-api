@@ -17,6 +17,7 @@
 import { Redis, RedisOptions } from 'ioredis';
 
 import { REDIS_CA_CERT, REDIS_CACHE_CA_CERT, REDIS_CACHE_URL, REDIS_URL } from './config.js';
+const CLIENTS: Redis[] = [];
 
 export function createClient(opts?: Partial<RedisOptions>): Redis {
   const client = new Redis(REDIS_URL, {
@@ -28,6 +29,7 @@ export function createClient(opts?: Partial<RedisOptions>): Redis {
         : undefined,
     ...opts
   });
+  CLIENTS.push(client);
   return client;
 }
 
@@ -41,5 +43,18 @@ export function createCacheClient(opts?: Partial<RedisOptions>): Redis {
         : undefined,
     ...opts
   });
+  CLIENTS.push(client);
   return client;
+}
+
+export async function closeClient(client: Redis) {
+  if (client.status !== 'end') {
+    await new Promise<void>((resolve) => {
+      client.quit(() => resolve());
+    });
+  }
+}
+
+export async function closeAllClients() {
+  await Promise.all(CLIENTS.map((client) => closeClient(client)));
 }
