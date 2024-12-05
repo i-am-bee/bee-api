@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+import { IBMVllmModel } from 'bee-agent-framework/adapters/ibm-vllm/chatPreset';
+
+import { LLM_BACKEND } from '@/config';
+
 export const RUN_EXPIRATION_MILLISECONDS = 10 * 60 * 1000;
 export const STATUS_POLL_INTERVAL = 5 * 1000;
 
@@ -43,3 +47,18 @@ export const SearchToolBackend = {
   DUCK_DUCK_GO: 'duck-duck-go'
 } as const;
 export type SearchToolBackend = (typeof SearchToolBackend)[keyof typeof SearchToolBackend];
+
+export function getDefaultModel(backend: LLMBackend = LLM_BACKEND) {
+  switch (backend) {
+    case LLMBackend.IBM_VLLM:
+      return IBMVllmModel.LLAMA_3_1_70B_INSTRUCT;
+    case LLMBackend.OLLAMA:
+      return 'llama3.1';
+    case LLMBackend.OPENAI:
+      return 'gpt-4o';
+    case LLMBackend.BAM:
+      return 'meta-llama/llama-3-1-70b-instruct';
+    case LLMBackend.WATSONX:
+      return 'meta-llama/llama-3-1-70b-instruct';
+  }
+}

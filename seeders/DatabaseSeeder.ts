@@ -25,13 +25,12 @@ import { ProjectPrincipal } from '@/administration/entities/project-principal.en
 import { Project } from '@/administration/entities/project.entity';
 import { Assistant } from '@/assistants/assistant.entity';
 import { User } from '@/users/entities/user.entity';
-import { getDefaultModel } from '@/runs/execution/factory';
 import { SystemTools } from '@/tools/entities/tool-calls/system-call.entity';
 import { ProjectApiKey } from '@/administration/entities/project-api-key.entity';
 import { API_KEY_PREFIX, scryptSecret } from '@/auth/utils';
 import { IBM_ORGANIZATION_OWNER_ID } from '@/config';
 import { redactProjectKeyValue } from '@/administration/helpers';
-import { Agent } from '@/runs/execution/constants';
+import { Agent, getDefaultModel } from '@/runs/execution/constants';
 
 const USER_EXTERNAL_ID = 'test';
 const PROJECT_API_KEY = `${API_KEY_PREFIX}testkey`;

@@ -41,8 +41,7 @@ import { APIError, APIErrorCode } from '@/errors/error.entity.js';
 import { Tool, ToolType } from '@/tools/entities/tool/tool.entity.js';
 import { getUpdatedValue } from '@/utils/update.js';
 import { createDeleteResponse } from '@/utils/delete.js';
-import { getDefaultModel } from '@/runs/execution/factory';
-import { Agent } from '@/runs/execution/constants.js';
+import { Agent, getDefaultModel } from '@/runs/execution/constants.js';
 
 export function toDto(assistant: Loaded<Assistant>): AssistantDto {
   return {

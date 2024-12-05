@@ -24,10 +24,11 @@ import {
 } from './dtos/chat-completion-create';
 import { ChatMessageRole } from './constants';
 
-import { createChatLLM, getDefaultModel } from '@/runs/execution/factory';
+import { createChatLLM } from '@/runs/execution/factory';
 import { getLogger } from '@/logger';
 import { APIError, APIErrorCode } from '@/errors/error.entity';
 import { generatePrefixedObjectId } from '@/utils/id';
+import { getDefaultModel } from '@/runs/execution/constants';
 
 const getChatLogger = () => getLogger();
 

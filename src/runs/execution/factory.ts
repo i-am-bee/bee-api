@@ -21,10 +21,7 @@ import { Client as IBMvLLLClient } from 'bee-agent-framework/adapters/ibm-vllm/c
 import { IBMVllmChatLLM } from 'bee-agent-framework/adapters/ibm-vllm/chat';
 import { OllamaChatLLM } from 'bee-agent-framework/adapters/ollama/chat';
 import { OpenAIChatLLM } from 'bee-agent-framework/adapters/openai/chat';
-import {
-  IBMVllmChatLLMPresetModel,
-  IBMVllmModel
-} from 'bee-agent-framework/adapters/ibm-vllm/chatPreset';
+import { IBMVllmChatLLMPresetModel } from 'bee-agent-framework/adapters/ibm-vllm/chatPreset';
 import { BAMChatLLMPresetModel } from 'bee-agent-framework/adapters/bam/chatPreset';
 import { BAMChatLLM } from 'bee-agent-framework/adapters/bam/chat';
 import { WatsonXChatLLM } from 'bee-agent-framework/adapters/watsonx/chat';
@@ -68,21 +65,6 @@ import {
 } from '@/config';
 
 const MAX_NEW_TOKENS = 4096;
-
-export function getDefaultModel(backend: LLMBackend = LLM_BACKEND) {
-  switch (backend) {
-    case LLMBackend.IBM_VLLM:
-      return IBMVllmModel.LLAMA_3_1_70B_INSTRUCT;
-    case LLMBackend.OLLAMA:
-      return 'llama3.1';
-    case LLMBackend.OPENAI:
-      return 'gpt-4o';
-    case LLMBackend.BAM:
-      return 'meta-llama/llama-3-1-70b-instruct';
-    case LLMBackend.WATSONX:
-      return 'meta-llama/llama-3-1-70b-instruct';
-  }
-}
 
 // Clients are instantiated lazily in createLLM funciton
 let vllmClient: IBMvLLLClient | null;
