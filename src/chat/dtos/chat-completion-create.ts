@@ -47,6 +47,20 @@ export const chatCompletionCreateBodySchema = {
           }
         ]
       }
+    },
+    response_format: {
+      type: 'object',
+      required: ['type', 'json_schema'],
+      properties: {
+        type: { const: 'json_schema' },
+        json_schema: {
+          type: 'object',
+          required: ['schema'],
+          properties: {
+            schema: { type: 'object', additionalProperties: true }
+          }
+        }
+      }
     }
   }
 } as const satisfies JSONSchema;

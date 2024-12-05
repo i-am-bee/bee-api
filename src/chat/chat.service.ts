@@ -17,12 +17,23 @@ const getChatLogger = () => getLogger();
 
 export async function createChatCompletion({
   model = getDefaultModel(),
-  messages
+  messages,
+  response_format
 }: ChatCompletionCreateBody): Promise<ChatCompletionCreateResponse> {
   const llm = createChatLLM({ model });
   try {
+    const schema = response_format?.json_schema.schema;
     const output = await llm.generate(
-      messages.map(({ role, content }) => BaseMessage.of({ role, text: content }))
+      messages.map(({ role, content }) => BaseMessage.of({ role, text: content })),
+      {
+        ...(schema
+          ? {
+              guided: {
+                json: schema // We can't just set schema to undefined due to bug in the vLLM
+              }
+            }
+          : {})
+      }
     );
     return {
       id: generatePrefixedObjectId('chatcmpl'),

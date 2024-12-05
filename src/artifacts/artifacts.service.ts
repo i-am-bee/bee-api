@@ -16,7 +16,7 @@
 
 import crypto from 'node:crypto';
 
-import { Loaded, ref } from '@mikro-orm/core';
+import { FilterQuery, Loaded, ref } from '@mikro-orm/core';
 import dayjs from 'dayjs';
 
 import { ArtifactCreateBody, ArtifactCreateResponse } from './dtos/artifact-create.js';
@@ -136,7 +136,9 @@ export async function updateArtifact({
   metadata,
   name,
   description,
-  shared
+  shared,
+  message_id,
+  source_code
 }: ArtifactUpdateParams & ArtifactUpdateBody): Promise<ArtifactUpdateResponse> {
   const artifact = await ORM.em.getRepository(Artifact).findOneOrFail({
     id: artifact_id
@@ -144,6 +146,20 @@ export async function updateArtifact({
   artifact.metadata = getUpdatedValue(metadata, artifact.metadata);
   artifact.name = getUpdatedValue(name, artifact.name);
   artifact.description = getUpdatedValue(description, artifact.description);
+  if (message_id) {
+    const message = await ORM.em.getRepository(Message).findOneOrFail({ id: message_id });
+    artifact.message = getUpdatedValue(ref(message), artifact.message);
+    artifact.thread = getUpdatedValue(ref(message.thread), artifact.thread);
+  }
+  if (source_code) {
+    if (!(artifact instanceof AppArtifact)) {
+      throw new APIError({
+        message: `Source code is not supported for ${artifact.type} artifact.`,
+        code: APIErrorCode.INVALID_INPUT
+      });
+    }
+    artifact.sourceCode = getUpdatedValue(source_code, artifact.sourceCode);
+  }
   if (shared === true) {
     artifact.accessSecret = getSecret();
   } else if (shared === false) {
@@ -158,10 +174,27 @@ export async function listArtifacts({
   after,
   before,
   order,
-  order_by
+  order_by,
+  search,
+  type
 }: ArtifactsListQuery): Promise<ArtifactsListResponse> {
+  const where: FilterQuery<Artifact> = {};
+
+  if (search) {
+    const regexp = new RegExp(search, 'i');
+    where.$or = [{ description: regexp }, { name: regexp }];
+  }
+
+  if (type && type.length > 0) {
+    where.type = { $in: type };
+  }
+
   const repo = ORM.em.getRepository(Artifact);
-  const cursor = await getListCursor<Artifact>({}, { limit, order, order_by, after, before }, repo);
+  const cursor = await getListCursor<Artifact>(
+    where,
+    { limit, order, order_by, after, before },
+    repo
+  );
   return createPaginatedResponse(cursor, toDto);
 }
 
