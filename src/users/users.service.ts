@@ -91,8 +91,9 @@ export async function readUser(_: unknown): Promise<UserReadResponse> {
   return toDto(user);
 }
 
-export async function updateUser({ metadata }: UserUpdateBody): Promise<UserUpdateResponse> {
+export async function updateUser({ name, metadata }: UserUpdateBody): Promise<UserUpdateResponse> {
   const user = getUser();
+  user.name = getUpdatedValue(name, user.name);
   user.metadata = getUpdatedValue(metadata, user.metadata);
   await ORM.em.flush();
   getUserLogger(user.id).info({ metadata }, 'User updated');

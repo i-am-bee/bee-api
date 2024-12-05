@@ -22,7 +22,7 @@ import { metadataSchema } from '@/schema.js';
 
 export const userUpdateBodySchema = {
   type: 'object',
-  properties: { metadata: metadataSchema }
+  properties: { name: { type: 'string', maxLength: 100, nullable: true }, metadata: metadataSchema }
 } as const satisfies JSONSchema;
 export type UserUpdateBody = FromSchema<typeof userUpdateBodySchema>;
 
