@@ -15,7 +15,9 @@
 import logging
 
 from config import config
+from telemetry import logging_handler
 
-logging.basicConfig(level=logging.DEBUG if config.log_level ==
-                    'trace' else config.log_level.upper())
-logger = logging.getLogger('unstructured_ingest.v2')  # TODO fix this bypass
+
+def setup_logging():
+    logging.basicConfig(level=logging.DEBUG if config.log_level ==
+                        'trace' else config.log_level.upper(), handlers=[logging_handler, logging.StreamHandler()])

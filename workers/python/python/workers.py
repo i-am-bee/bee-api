@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from config import config
+import logging
 import asyncio
 from typing import List
 from bullmq import Worker
@@ -19,9 +21,10 @@ from redis.asyncio import Redis
 from redis.asyncio.retry import Retry
 from redis.exceptions import (TimeoutError, ConnectionError)
 from redis.backoff import ExponentialBackoff
+from opentelemetry.instrumentation.redis import RedisInstrumentor
 
-from logger import logger
-from config import config
+logger = logging.getLogger()
+
 
 workers: dict[str, Worker] = dict()
 
@@ -31,6 +34,9 @@ redis_options = {
     "retry": Retry(ExponentialBackoff(cap=10, base=1), 5),
     "retry_on_error": [ConnectionError, TimeoutError, ConnectionResetError]
 }
+
+RedisInstrumentor().instrument()
+
 redis_client = Redis.from_url(
     config.redis_url, **redis_options) if config.redis_ca_cert is None else Redis.from_url(
     config.redis_url, ssl_ca_data=config.redis_ca_cert, **redis_options)
