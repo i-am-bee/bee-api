@@ -43,6 +43,9 @@ export class DatabaseSeeder extends Seeder {
     try {
       return this._run(em);
     } finally {
+      // Queues, Workers, Redis clients and MikroORM are all initialized
+      // and opened on import throughout the codebase. We need to close them
+      // explicitly for the seeder to finish, otherwise they keep the process running   } finally {
       await ORM.close();
       await closeAllQueues();
       await closeAllWorkers();

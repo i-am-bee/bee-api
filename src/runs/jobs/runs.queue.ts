@@ -27,7 +27,7 @@ import { createQueue } from '@/jobs/bullmq.js';
 import { QueueName } from '@/jobs/constants.js';
 import { LoadedRun } from '@/runs/execution/types.js';
 import { waitForExtraction } from '@/files/utils/wait-for-extraction.js';
-import { createPublisher } from '@/streaming/pubsub.js';
+import { withPublisher } from '@/streaming/pubsub.js';
 import { APIError, APIErrorCode } from '@/errors/error.entity.js';
 
 const MAX_ACTIVE_RUNS_PER_USER = 5;
@@ -80,9 +80,10 @@ async function jobHandler(job: Job<{ runId: string }>) {
         new APIError({ message: 'Internal server error', code: APIErrorCode.INTERNAL_SERVER_ERROR })
       );
       await ORM.em.flush();
-      const publish = createPublisher(run);
-      await publish({ event: 'thread.run.failed', data: toRunDto(run) });
-      await publish({ event: 'done', data: '[DONE]' });
+      await withPublisher(run, async (publish) => {
+        await publish({ event: 'thread.run.failed', data: toRunDto(run) });
+        await publish({ event: 'done', data: '[DONE]' });
+      });
       throw err;
     }
   });
