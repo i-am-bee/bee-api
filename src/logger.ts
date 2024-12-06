@@ -18,7 +18,7 @@ import os from 'node:os';
 import { randomUUID } from 'node:crypto';
 import { IncomingMessage } from 'node:http';
 
-import { Logger, LoggerOptions, pino } from 'pino';
+import { Logger, LoggerOptions, pino, SerializedError } from 'pino';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { requestContext } from '@fastify/request-context';
 
@@ -46,8 +46,32 @@ export const createLogger = (
     }
   });
 
+function stringifySerializedError(err: SerializedError, depth = 1): string {
+  const depthMarker = `#`.repeat(depth);
+  return `${depthMarker} Message
+${err.message}
+${depthMarker} Type
+${err.type}
+${depthMarker} Stack
+${err.stack}${
+    err.cause
+      ? `${depthMarker} Cause
+${stringifySerializedError(err, depth + 1)}`
+      : ''
+  }`;
+}
+
 export const fastifyLogger = createLogger({
   serializers: {
+    err(err) {
+      const error = pino.stdSerializers.errWithCause(err);
+      if (process.env.OTEL_EXPORTER_OTLP_ENDPOINT) {
+        // Elastic backend used for observability doesn't seem to support nested attributes (labels)
+        return stringifySerializedError(error);
+      } else {
+        return error;
+      }
+    },
     req(request: FastifyRequest) {
       return {
         host:
