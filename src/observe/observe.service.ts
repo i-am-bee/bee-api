@@ -29,7 +29,7 @@ export async function getTrace({
   assertClient(client);
 
   return processApiProxyResponse(
-    client.GET('/trace/{id}', {
+    client.GET('/v1/traces/{id}', {
       params: {
         path: {
           id
@@ -48,10 +48,15 @@ export async function listSpans(query: SpanReadQuery) {
   await assertTracePermission({ traceId: query.trace_id });
   assertClient(client);
 
+  const { trace_id, ...restQueryObject } = query;
+
   return processApiProxyResponse(
-    client.GET('/span', {
+    client.GET('/v1/traces/{trace_id}/spans', {
       params: {
-        query: query
+        path: {
+          trace_id: trace_id
+        },
+        query: restQueryObject
       }
     })
   );

@@ -20,9 +20,6 @@ import { paths } from './schema.js';
 
 import { BEE_OBSERVE_API_AUTH_KEY, BEE_OBSERVE_API_URL } from '@/config.js';
 
-export type Span =
-  paths['/trace']['post']['requestBody']['content']['application/json']['spans'][0];
-
 export type Client = ReturnType<typeof createClient<paths>>;
 
 export const client = BEE_OBSERVE_API_URL
