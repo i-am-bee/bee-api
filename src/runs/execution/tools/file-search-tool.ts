@@ -17,7 +17,7 @@
 import {
   BaseToolOptions,
   BaseToolRunOptions,
-  CustomToolEmitter,
+  ToolEmitter,
   Tool,
   ToolInput,
   ToolOutput
@@ -82,7 +82,7 @@ export class FileSearchTool extends Tool<FileSearchToolOutput, FileSearchToolOpt
   }
   vectorStores: Loaded<VectorStore>[];
 
-  readonly emitter: CustomToolEmitter<ToolInput<this>, FileSearchToolOutput> = Emitter.root.child({
+  readonly emitter: ToolEmitter<ToolInput<this>, FileSearchToolOutput> = Emitter.root.child({
     namespace: ['tool', 'file', 'search'],
     creator: this
   });

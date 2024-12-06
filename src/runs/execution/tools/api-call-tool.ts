@@ -19,7 +19,7 @@ import { join } from 'path';
 import {
   BaseToolOptions,
   BaseToolRunOptions,
-  CustomToolEmitter,
+  ToolEmitter,
   StringToolOutput,
   Tool,
   ToolError
@@ -55,7 +55,7 @@ export class ApiCallTool extends Tool<StringToolOutput, ApiCallToolOptions> {
   openApiSchema: any;
   apiKey?: string;
 
-  readonly emitter: CustomToolEmitter<Record<string, any>, StringToolOutput> = Emitter.root.child({
+  readonly emitter: ToolEmitter<Record<string, any>, StringToolOutput> = Emitter.root.child({
     namespace: ['tool', 'api'],
     creator: this
   });

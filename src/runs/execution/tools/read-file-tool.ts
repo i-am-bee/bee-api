@@ -21,7 +21,7 @@ import {
   Tool,
   ToolError,
   BaseToolRunOptions,
-  CustomToolEmitter
+  ToolEmitter
 } from 'bee-agent-framework/tools/base';
 import { z } from 'zod';
 import { hasAtLeast } from 'remeda';
@@ -51,7 +51,7 @@ export class ReadFileTool extends Tool<StringToolOutput, ReadFileToolOptions> {
     });
   }
 
-  readonly emitter: CustomToolEmitter<ToolInput<this>, StringToolOutput> = Emitter.root.child({
+  readonly emitter: ToolEmitter<ToolInput<this>, StringToolOutput> = Emitter.root.child({
     namespace: ['tool', 'file', 'read'],
     creator: this
   });

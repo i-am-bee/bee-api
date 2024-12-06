@@ -15,7 +15,7 @@
  */
 
 import { z } from 'zod';
-import { CustomToolEmitter, Tool, ToolInput } from 'bee-agent-framework/tools/base';
+import { ToolEmitter, Tool, ToolInput } from 'bee-agent-framework/tools/base';
 import { WikipediaTool } from 'bee-agent-framework/tools/search/wikipedia';
 import {
   SimilarityTool,
@@ -39,7 +39,7 @@ export class WikipediaSimilaritySearchTool extends Tool<SimilarityToolOutput> {
   wikipediaTool: WikipediaTool;
   similarityTool: SimilarityTool<unknown>;
 
-  readonly emitter: CustomToolEmitter<ToolInput<this>, SimilarityToolOutput> = Emitter.root.child({
+  readonly emitter: ToolEmitter<ToolInput<this>, SimilarityToolOutput> = Emitter.root.child({
     namespace: ['tool', 'search', 'wikipediaSimilarity'],
     creator: this
   });
