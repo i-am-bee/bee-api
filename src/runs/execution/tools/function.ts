@@ -26,10 +26,11 @@ import { SchemaObject } from 'ajv';
 import { Loaded } from '@mikro-orm/core';
 import { GetRunContext } from 'bee-agent-framework/context';
 import { Emitter } from 'bee-agent-framework/emitter/emitter';
+import { Redis } from 'ioredis';
 
 import { AgentContext } from '../execute.js';
 
-import { createClient } from '@/redis.js';
+import { withRedisClient } from '@/redis.js';
 import { Run } from '@/runs/entities/run.entity.js';
 import { ORM } from '@/database.js';
 import { toRunDto } from '@/runs/runs.service.js';
@@ -81,46 +82,52 @@ export class FunctionTool extends Tool<FunctionToolOutput, FunctionToolOptions> 
     const toolCall = this.options.context.toolCall;
     if (!(toolCall instanceof FunctionCall)) throw new Error('Invalid tool call');
 
-    const client = createClient();
-    return await new Promise<FunctionToolOutput>((resolve, reject) => {
-      client.subscribe(
-        FunctionTool.createChannel(this.options.context.run, toolCall.id),
-        async (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            this.options.context.run.requireAction(
-              new RequiredToolOutput({
-                toolCalls: [...(this.options.context.run.requiredAction?.toolCalls ?? []), toolCall]
-              })
-            );
+    return await withRedisClient(
+      (client) =>
+        new Promise<FunctionToolOutput>((resolve, reject) => {
+          client.subscribe(
+            FunctionTool.createChannel(this.options.context.run, toolCall.id),
+            async (err) => {
+              if (err) {
+                reject(err);
+              } else {
+                this.options.context.run.requireAction(
+                  new RequiredToolOutput({
+                    toolCalls: [
+                      ...(this.options.context.run.requiredAction?.toolCalls ?? []),
+                      toolCall
+                    ]
+                  })
+                );
+                await ORM.em.flush();
+                await this.options.context.publish({
+                  event: 'thread.run.requires_action',
+                  data: toRunDto(this.options.context.run)
+                });
+                await this.options.context.publish({
+                  event: 'done',
+                  data: '[DONE]'
+                });
+              }
+            }
+          );
+          client.on('message', async (_, output) => {
+            this.options.context.run.submitAction();
             await ORM.em.flush();
-            await this.options.context.publish({
-              event: 'thread.run.requires_action',
-              data: toRunDto(this.options.context.run)
-            });
-            await this.options.context.publish({
-              event: 'done',
-              data: '[DONE]'
-            });
-          }
-        }
-      );
-      client.on('message', async (_, output) => {
-        this.options.context.run.submitAction();
-        await ORM.em.flush();
-        resolve(new FunctionToolOutput(output));
-      });
-      run.signal.addEventListener('abort', () => {
-        reject(run.signal.reason);
-      });
-    });
+            resolve(new FunctionToolOutput(output));
+          });
+          run.signal.addEventListener('abort', () => {
+            reject(run.signal.reason);
+          });
+        })
+    );
   }
 
   static async submit(
+    client: Redis,
     output: string,
     { run, toolCallId }: { run: Loaded<Run>; toolCallId: string }
   ) {
-    await createClient().publish(FunctionTool.createChannel(run, toolCallId), output);
+    await client.publish(FunctionTool.createChannel(run, toolCallId), output);
   }
 }

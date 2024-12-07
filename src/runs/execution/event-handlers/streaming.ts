@@ -15,7 +15,7 @@
  */
 
 import { FrameworkError, Version } from 'bee-agent-framework';
-import { EventMeta, Emitter, Callback } from 'bee-agent-framework/emitter/emitter';
+import { Callback, Emitter, EventMeta } from 'bee-agent-framework/emitter/emitter';
 import { ref } from '@mikro-orm/core';
 import { Role } from 'bee-agent-framework/llms/primitives/message';
 import { BeeCallbacks } from 'bee-agent-framework/agents/bee/types';
@@ -43,11 +43,11 @@ import { RunStatus } from '@/runs/entities/run.entity.js';
 import { APIError } from '@/errors/error.entity.js';
 import { jobRegistry } from '@/metrics.js';
 import { EmitterEvent } from '@/run-steps/entities/emitter-event.entity';
-import { createClient } from '@/redis.js';
 import { createApproveChannel, toRunDto } from '@/runs/runs.service';
 import { RequiredToolApprove } from '@/runs/entities/requiredToolApprove.entity';
 import { ToolApprovalType } from '@/runs/entities/toolApproval.entity';
 import { ToolType } from '@/tools/entities/tool/tool.entity';
+import { withRedisClient } from '@/redis.js';
 
 const agentToolExecutionTime = new Summary({
   name: 'agent_tool_execution_time_seconds',
@@ -111,50 +111,52 @@ export function createBeeStreamingHandler(ctx: AgentContext) {
                   : toolCall.type)
           )?.requireApproval === ToolApprovalType.ALWAYS
         ) {
-          const client = createClient();
-          await new Promise((resolve, reject) => {
-            client.subscribe(createApproveChannel(ctx.run, toolCall), async (err) => {
-              try {
-                if (err) {
-                  reject(err);
-                } else {
-                  ctx.run.requireAction(
-                    new RequiredToolApprove({
-                      toolCalls: [...(ctx.run.requiredAction?.toolCalls ?? []), toolCall]
-                    })
-                  );
-                  await ORM.em.flush();
-                  await ctx.publish({
-                    event: 'thread.run.requires_action',
-                    data: toRunDto(ctx.run)
-                  });
-                  await ctx.publish({
-                    event: 'done',
-                    data: '[DONE]'
-                  });
-                }
-              } catch (err) {
-                reject(err);
-              }
-            });
-            client.on('message', async (_, approval) => {
-              try {
-                ctx.run.submitAction();
-                await ORM.em.flush();
-                if (approval !== 'true') {
-                  reject(
-                    new ToolError('User has not approved this tool to run.', [], {
-                      isFatal: false,
-                      isRetryable: false
-                    })
-                  );
-                }
-                resolve(true);
-              } catch (err) {
-                reject(err);
-              }
-            });
-          });
+          await withRedisClient(
+            (client) =>
+              new Promise((resolve, reject) => {
+                client.subscribe(createApproveChannel(ctx.run, toolCall), async (err) => {
+                  try {
+                    if (err) {
+                      reject(err);
+                    } else {
+                      ctx.run.requireAction(
+                        new RequiredToolApprove({
+                          toolCalls: [...(ctx.run.requiredAction?.toolCalls ?? []), toolCall]
+                        })
+                      );
+                      await ORM.em.flush();
+                      await ctx.publish({
+                        event: 'thread.run.requires_action',
+                        data: toRunDto(ctx.run)
+                      });
+                      await ctx.publish({
+                        event: 'done',
+                        data: '[DONE]'
+                      });
+                    }
+                  } catch (err) {
+                    reject(err);
+                  }
+                });
+                client.on('message', async (_, approval) => {
+                  try {
+                    ctx.run.submitAction();
+                    await ORM.em.flush();
+                    if (approval !== 'true') {
+                      reject(
+                        new ToolError('User has not approved this tool to run.', [], {
+                          isFatal: false,
+                          isRetryable: false
+                        })
+                      );
+                    }
+                    resolve(true);
+                  } catch (err) {
+                    reject(err);
+                  }
+                });
+              })
+          );
         }
       }
 
