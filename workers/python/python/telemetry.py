@@ -26,9 +26,9 @@ def setup_telemetry():
         return
 
     traceProvider.add_span_processor(BatchSpanProcessor(
-        OTLPSpanExporter(endpoint=config.otel_exporter_otlp_endpoint)))
+        OTLPSpanExporter()))
     trace.set_tracer_provider(traceProvider)
 
     set_logger_provider(logger_provider)
     logger_provider.add_log_record_processor(
-        BatchLogRecordProcessor(OTLPLogExporter(endpoint=config.otel_exporter_otlp_endpoint)))
+        BatchLogRecordProcessor(OTLPLogExporter()))
