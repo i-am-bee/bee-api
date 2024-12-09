@@ -18,6 +18,7 @@ import path from 'node:path';
 import { Utils } from '@mikro-orm/core';
 import { globby } from 'globby';
 import { DefaultJobOptions, Job, Queue, Worker, WorkerOptions } from 'bullmq';
+import { BullMQOtel } from 'bullmq-otel';
 import { isTruthy } from 'remeda';
 
 import { defaultRedisConnectionOptions } from '../redis.js';
@@ -27,6 +28,8 @@ import { gateway } from '../metrics.js';
 import { QueueName } from './constants.js';
 
 import { jobLocalStorage } from '@/context.js';
+
+const telemetry = new BullMQOtel('bullmq');
 
 const getQueueLogger = (queueName: string, job?: Job) =>
   getLogger().child({
@@ -100,6 +103,7 @@ export function createQueue<T, U>({
 }: CreateQueueInput<T, U>) {
   const queue = new Queue<T, U>(name, {
     connection: connectionOpts,
+    telemetry,
     defaultJobOptions: jobsOptions ? { ...defaultJobOptions, ...jobsOptions } : defaultJobOptions
   });
 
@@ -115,6 +119,7 @@ export function createQueue<T, U>({
       {
         // We need to set autorun to false otherwise the worker might pick up stuff while ORM is not ready
         autorun: false,
+        telemetry,
         ...workerOptions,
         connection: connectionOpts
       }

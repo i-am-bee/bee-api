@@ -23,7 +23,6 @@
     "release": "release-it"
   },
   "dependencies": {
-    "@appsignal/opentelemetry-instrumentation-bullmq": "^0.7.3",
     "@fastify/multipart": "^8.3.0",
     "@fastify/rate-limit": "^9.1.0",
     "@fastify/request-context": "^5.1.0",
@@ -50,7 +49,8 @@
     "axios": "^1.7.7",
     "bee-agent-framework": "0.0.52",
     "bee-observe-connector": "0.0.6",
-    "bullmq": "5.8.1",
+    "bullmq": "^5.32.0",
+    "bullmq-otel": "^1.0.1",
     "cache-manager": "^5.7.6",
     "dayjs": "^1.11.11",
     "dotenv": "^16.4.5",
