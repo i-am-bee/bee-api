@@ -30,9 +30,9 @@ export type ArtifactSharedReadResponse = FromSchema<typeof artifactSharedReadRes
 export const artifactSharedReadQuerySchema = {
   type: 'object',
   additionalProperties: false,
-  required: ['secret'],
+  required: ['token'],
   properties: {
-    secret: {
+    token: {
       type: 'string',
       nullable: false
     }
