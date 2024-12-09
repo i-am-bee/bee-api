@@ -15,16 +15,20 @@ resource = Resource(attributes={
 })
 
 traceProvider = TracerProvider(resource=resource)
-if not config.otel_sdk_disabled:
+logger_provider = LoggerProvider(
+    resource=resource
+)
+logging_handler = LoggingHandler(logger_provider=logger_provider)
+
+
+def setup_telemetry():
+    if not config.otel_sdk_disabled:
+        return
+
     traceProvider.add_span_processor(BatchSpanProcessor(
         OTLPSpanExporter(endpoint=config.otel_exporter_otlp_endpoint)))
     trace.set_tracer_provider(traceProvider)
 
-logger_provider = LoggerProvider(
-    resource=resource
-)
-if not config.otel_sdk_disabled:
     set_logger_provider(logger_provider)
     logger_provider.add_log_record_processor(
         BatchLogRecordProcessor(OTLPLogExporter(endpoint=config.otel_exporter_otlp_endpoint)))
-logging_handler = LoggingHandler(logger_provider=logger_provider)

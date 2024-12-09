@@ -14,6 +14,7 @@
 
 import logging
 from logger import setup_logging
+from telemetry import setup_telemetry
 
 import asyncio
 import signal
@@ -76,6 +77,7 @@ async def create_web_app(workers: list[Worker]):
 
 async def main():
     setup_logging()
+    setup_telemetry()
 
     shutdown_event = await create_shudown_event()
     workers, stop_workers = await create_workers()
