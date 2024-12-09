@@ -136,10 +136,10 @@ const authApiKey = async (request: FastifyRequest, apiKey: string) => {
   }
 };
 
-const authArtifactSecret = async (request: FastifyRequest, accessSecret: string) => {
+const authArtifactSecret = async (request: FastifyRequest, accessToken: string) => {
   const artifact = await ORM.em
     .getRepository(Artifact)
-    .findOne({ accessSecret }, { filters: { principalAccess: false } });
+    .findOne({ accessToken }, { filters: { principalAccess: false } });
   if (!artifact) {
     throw new APIError({
       message: `Artifact not found`,
