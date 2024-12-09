@@ -15,6 +15,7 @@
  */
 
 import { FilterQuery, Loaded, QueryOrder, ref } from '@mikro-orm/core';
+import { Redis } from 'ioredis';
 
 import { RunCreateBody, RunCreateParams, RunCreateResponse } from './dtos/run-create.js';
 import { Run, RunStatus } from './entities/run.entity.js';
@@ -48,7 +49,7 @@ import { Assistant } from '@/assistants/assistant.entity.js';
 import { getServiceLogger } from '@/logger.js';
 import { createThread } from '@/threads/threads.service.js';
 import { createPaginatedResponse, getListCursor } from '@/utils/pagination.js';
-import { createPublisher, subscribeAndForward } from '@/streaming/pubsub.js';
+import { subscribeAndForward, withPublisher } from '@/streaming/pubsub.js';
 import { listenToSocketClose } from '@/utils/networking.js';
 import { APIError, APIErrorCode } from '@/errors/error.entity.js';
 import { toErrorDto } from '@/errors/plugin.js';
@@ -61,7 +62,7 @@ import { getRunVectorStores } from '@/runs/execution/helpers.js';
 import { getUpdatedValue } from '@/utils/update.js';
 import { RunStep } from '@/run-steps/entities/run-step.entity.js';
 import { RunStepDetailsType } from '@/run-steps/entities/details/run-step-details.entity.js';
-import { createClient } from '@/redis.js';
+import { withRedisClient } from '@/redis.js';
 import { ToolCall } from '@/tools/entities/tool-calls/tool-call.entity.js';
 import { SystemTools } from '@/tools/entities/tool-calls/system-call.entity.js';
 import { ensureRequestContextData } from '@/context.js';
@@ -231,23 +232,24 @@ export async function createRun({
   await ORM.em.flush();
 
   const queueAndPublish = async () => {
-    const publish = createPublisher(run);
-    try {
-      await publish({ event: 'thread.run.created', data: toRunDto(run) });
-      await queue.add(QueueName.RUNS, { runId: run.id }, { jobId: run.id });
-      await publish({ event: 'thread.run.queued', data: toRunDto(run) });
-    } catch (err) {
-      getRunsLogger(run.id).error({ err }, 'Failed to create run job');
-      run.fail(
-        new APIError({
-          message: 'Failed to create run job',
-          code: APIErrorCode.INTERNAL_SERVER_ERROR
-        })
-      );
-      await ORM.em.flush();
-      await publish({ event: 'thread.run.failed', data: toRunDto(run) });
-      await publish({ event: 'done', data: '[DONE]' });
-    }
+    await withPublisher(run, async (publish) => {
+      try {
+        await publish({ event: 'thread.run.created', data: toRunDto(run) });
+        await queue.add(QueueName.RUNS, { runId: run.id }, { jobId: run.id });
+        await publish({ event: 'thread.run.queued', data: toRunDto(run) });
+      } catch (err) {
+        getRunsLogger(run.id).error({ err }, 'Failed to create run job');
+        run.fail(
+          new APIError({
+            message: 'Failed to create run job',
+            code: APIErrorCode.INTERNAL_SERVER_ERROR
+          })
+        );
+        await ORM.em.flush();
+        await publish({ event: 'thread.run.failed', data: toRunDto(run) });
+        await publish({ event: 'done', data: '[DONE]' });
+      }
+    });
   };
 
   if (stream) {
@@ -383,7 +385,9 @@ export async function cancelRun({
 
   run.startCancel();
   await ORM.em.flush();
-  await createPublisher(run)({ event: 'thread.run.cancelling', data: toRunDto(run) });
+  await withPublisher(run, (publish) =>
+    publish({ event: 'thread.run.cancelling', data: toRunDto(run) })
+  );
   return toRunDto(run);
 }
 
@@ -421,12 +425,12 @@ export async function submitToolOutput({
       code: APIErrorCode.INVALID_INPUT
     });
 
-  const submit = async () => {
+  const submit = async (client: Redis) => {
     await Promise.all(
       suppliedToolCalls.map(({ toolCall, output }) => {
         switch (toolCall.type) {
           case ToolType.FUNCTION:
-            return FunctionTool.submit(output, { run, toolCallId: toolCall.id });
+            return FunctionTool.submit(client, output, { run, toolCallId: toolCall.id });
           default:
             throw new Error('Unexpected tool call type');
         }
@@ -475,11 +479,10 @@ export async function submitToolApproval({
       code: APIErrorCode.INVALID_INPUT
     });
 
-  const redisClient = createClient();
-  const submit = async () => {
+  const submit = async (client: Redis) => {
     await Promise.all(
       suppliedToolCalls.map(({ toolCall, approve }) => {
-        redisClient.publish(createApproveChannel(run, toolCall), approve.toString());
+        client.publish(createApproveChannel(run, toolCall), approve.toString());
       })
     );
   };
@@ -494,24 +497,26 @@ async function continueRun({
 }: {
   stream: boolean | null | undefined;
   run: Run;
-  submit: () => Promise<void>;
+  submit: (client: Redis) => Promise<void>;
 }) {
-  if (stream) {
-    const req = ensureRequestContextData('req');
-    const res = ensureRequestContextData('res');
-    const controller = new AbortController();
-    const unsub = listenToSocketClose(req.socket, () => controller.abort());
-    try {
-      await subscribeAndForward(run, res, {
-        signal: controller.signal,
-        onReady: submit,
-        onFailed: submit
-      });
-    } finally {
-      unsub();
+  return await withRedisClient(async (client) => {
+    if (stream) {
+      const req = ensureRequestContextData('req');
+      const res = ensureRequestContextData('res');
+      const controller = new AbortController();
+      const unsub = listenToSocketClose(req.socket, () => controller.abort());
+      try {
+        await subscribeAndForward(run, res, {
+          signal: controller.signal,
+          onReady: () => submit(client),
+          onFailed: () => submit(client)
+        });
+      } finally {
+        unsub();
+      }
+    } else {
+      await submit(client);
+      return toRunDto(run);
     }
-  } else {
-    await submit();
-    return toRunDto(run);
-  }
+  });
 }

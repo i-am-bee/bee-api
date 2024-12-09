@@ -16,11 +16,12 @@
 
 import { FastifyReply } from 'fastify';
 import { Loaded } from '@mikro-orm/core';
+import { Redis } from 'ioredis';
 
 import { Event } from './dtos/event.js';
 import * as sse from './sse.js';
 
-import { createClient } from '@/redis.js';
+import { withRedisClient } from '@/redis.js';
 import { Run } from '@/runs/entities/run.entity.js';
 import { getLogger } from '@/logger.js';
 
@@ -28,11 +29,21 @@ function createChannel(run: Loaded<Run>) {
   return `run:${run.id}`;
 }
 
-export function createPublisher(run: Loaded<Run>) {
-  const client = createClient();
+function createPublisherFn(client: Redis, run: Loaded<Run>) {
   return async function publish(event: Event) {
-    await client.publish(createChannel(run), JSON.stringify(event));
+    return client.publish(createChannel(run), JSON.stringify(event));
   };
+}
+
+export type Publisher = ReturnType<typeof createPublisherFn>;
+
+export async function withPublisher<R>(
+  run: Loaded<Run>,
+  asyncCallback: (publish: ReturnType<typeof createPublisherFn>) => Promise<R>
+) {
+  return await withRedisClient((client) => {
+    return asyncCallback(createPublisherFn(client, run));
+  });
 }
 
 export async function subscribeAndForward(
@@ -48,35 +59,36 @@ export async function subscribeAndForward(
     onFailed: () => Promise<void>;
   }
 ) {
-  const client = createClient();
-  const channel = createChannel(run);
-  sse.init(res);
-  try {
-    await new Promise<void>((resolve, reject) => {
-      client.subscribe(channel, (err) => {
-        if (err) {
-          getLogger().error({ err, channel }, 'Subscription failed');
-          onFailed().catch(reject);
-          reject(err);
-        } else {
-          getLogger().trace({ channel }, 'Subscribed');
-          onReady().catch(reject);
-        }
+  return withRedisClient(async (client: Redis) => {
+    const channel = createChannel(run);
+    sse.init(res);
+    try {
+      await new Promise<void>((resolve, reject) => {
+        client.subscribe(channel, (err) => {
+          if (err) {
+            getLogger().error({ err, channel }, 'Subscription failed');
+            onFailed().catch(reject);
+            reject(err);
+          } else {
+            getLogger().trace({ channel }, 'Subscribed');
+            onReady().catch(reject);
+          }
+        });
+        client.on('message', (_, message) => {
+          const event = JSON.parse(message) as Event;
+          sse.send(res, event);
+          if (event.event === 'done' || event.event === 'error') {
+            resolve();
+          }
+        });
+        signal.addEventListener('abort', () => {
+          reject(signal.reason);
+        });
       });
-      client.on('message', (_, message) => {
-        const event = JSON.parse(message) as Event;
-        sse.send(res, event);
-        if (event.event === 'done' || event.event === 'error') {
-          resolve();
-        }
-      });
-      signal.addEventListener('abort', () => {
-        reject(signal.reason);
-      });
-    });
-  } catch (err) {
-    sse.send(res, { event: 'error', data: err });
-  } finally {
-    sse.end(res);
-  }
+    } catch (err) {
+      sse.send(res, { event: 'error', data: err });
+    } finally {
+      sse.end(res);
+    }
+  });
 }

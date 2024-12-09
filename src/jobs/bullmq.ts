@@ -20,7 +20,7 @@ import { globby } from 'globby';
 import { DefaultJobOptions, Job, Queue, Worker, WorkerOptions } from 'bullmq';
 import { isTruthy } from 'remeda';
 
-import { createClient } from '../redis.js';
+import { defaultRedisConnectionOptions } from '../redis.js';
 import { getLogger } from '../logger.js';
 import { gateway } from '../metrics.js';
 
@@ -42,10 +42,11 @@ const getQueueLogger = (queueName: string, job?: Job) =>
 
 const logger = getLogger();
 
-const connection = createClient({
+const connectionOpts = {
+  ...defaultRedisConnectionOptions,
   // https://docs.bullmq.io/guide/going-to-production#maxretriesperrequest
   maxRetriesPerRequest: null
-});
+};
 
 const defaultJobOptions = {
   removeOnComplete: true,
@@ -89,6 +90,8 @@ interface CreateQueueInput<T, U> {
   jobHandler?: (job: Job<T>) => Promise<U>;
 }
 
+const Queues = new Map<QueueName, Queue>();
+
 export function createQueue<T, U>({
   name,
   jobsOptions,
@@ -96,7 +99,7 @@ export function createQueue<T, U>({
   jobHandler
 }: CreateQueueInput<T, U>) {
   const queue = new Queue<T, U>(name, {
-    connection: connection.options,
+    connection: connectionOpts,
     defaultJobOptions: jobsOptions ? { ...defaultJobOptions, ...jobsOptions } : defaultJobOptions
   });
 
@@ -113,12 +116,13 @@ export function createQueue<T, U>({
         // We need to set autorun to false otherwise the worker might pick up stuff while ORM is not ready
         autorun: false,
         ...workerOptions,
-        connection: connection.options
+        connection: connectionOpts
       }
     );
     addCallbacks(worker, queue);
     Workers.set(name, worker);
   }
+  Queues.set(name, queue);
 
   return { queue };
 }
@@ -133,9 +137,25 @@ export async function runWorkers(queueNames: QueueName[]) {
   logger.info({ queueNames }, `Workers started successfully`);
 }
 
+export async function closeAllQueues() {
+  await Promise.all(
+    [...Queues.values()].map(async (queue) => {
+      if (!(await queue.isPaused())) {
+        await queue.close();
+      }
+    })
+  );
+  logger.info('Queues shutdown successfully');
+}
+
 export async function closeAllWorkers() {
-  await Promise.all([...Workers.values()].map((worker) => worker.close()));
-  connection.quit();
+  await Promise.all(
+    [...Workers.values()].map(async (worker) => {
+      if (!worker.isPaused()) {
+        await worker.close();
+      }
+    })
+  );
   logger.info('Workers shutdown successfully');
 }
 
