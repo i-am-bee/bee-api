@@ -25,7 +25,7 @@ tracer = trace.get_tracer("job-trace")
 
 logger = logging.getLogger()
 
-EXTRACTION_QUEUE_NAME = "files:extraction:python"
+EXTRACTION_QUEUE_NAME = "files-extraction-python"
 
 
 async def processExtraction(job: Job, job_token):
