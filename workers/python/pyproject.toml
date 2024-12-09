@@ -14,7 +14,7 @@ aioboto3 = "^13.2.0"
 optional = true
 
 [tool.poetry.group.docling.dependencies]
-docling = "^2.8.0"
+docling = "^2.9.0"
 
 [tool.poetry.group.unstructured]
 optional = true
