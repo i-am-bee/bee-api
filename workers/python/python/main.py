@@ -12,14 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+from logger import setup_logging
+from telemetry import setup_telemetry
+
 import asyncio
 import signal
 from aiohttp import web
 from bullmq import Worker
 
-from logger import logger
 from workers import run_workers, shutdown_workers
 from config import config
+
+logger = logging.getLogger()
 
 
 async def create_shudown_event():
@@ -71,6 +76,9 @@ async def create_web_app(workers: list[Worker]):
 
 
 async def main():
+    setup_logging()
+    setup_telemetry()
+
     shutdown_event = await create_shudown_event()
     workers, stop_workers = await create_workers()
     stop_web_app = await create_web_app(workers)

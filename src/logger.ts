@@ -47,6 +47,7 @@ export const createLogger = (
   });
 
 function stringifySerializedError(err: SerializedError, depth = 1): string {
+  if (depth > 5) return 'Causes too deep, truncating ...';
   const depthMarker = `#`.repeat(depth);
   return `${depthMarker} Message
 ${err.message}

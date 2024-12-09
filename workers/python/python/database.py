@@ -15,6 +15,7 @@
 import tempfile
 
 from pymongo import AsyncMongoClient
+from opentelemetry.instrumentation.pymongo import PymongoInstrumentor
 
 from config import config
 
@@ -23,6 +24,8 @@ if config.mongodb_ca_cert is not None:
     cert = tempfile.NamedTemporaryFile(delete=False, mode='w')
     cert.write(config.mongodb_ca_cert)
     cert.close()
+
+PymongoInstrumentor().instrument()
 
 client = AsyncMongoClient(
     config.mongodb_url, tlsCAFile=cert.name) if cert is not None else AsyncMongoClient(config.mongodb_url)
