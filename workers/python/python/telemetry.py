@@ -22,7 +22,7 @@ logging_handler = LoggingHandler(logger_provider=logger_provider)
 
 
 def setup_telemetry():
-    if not config.otel_sdk_disabled:
+    if config.otel_sdk_disabled:
         return
 
     traceProvider.add_span_processor(BatchSpanProcessor(
