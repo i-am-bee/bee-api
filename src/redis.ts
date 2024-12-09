@@ -15,7 +15,7 @@
  */
 
 import { Redis, RedisOptions } from 'ioredis';
-import { parseURL } from 'ioredis/built/utils';
+import { parseURL } from 'ioredis/built/utils/index.js';
 
 import { REDIS_CA_CERT, REDIS_CACHE_CA_CERT, REDIS_CACHE_URL, REDIS_URL } from './config.js';
 

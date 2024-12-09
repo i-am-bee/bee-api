@@ -16,7 +16,6 @@
 
 import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts';
 import { StatusCodes } from 'http-status-codes';
-import { FastifyRequest } from 'fastify';
 
 import {
   ChatCompletionCreateBody,
@@ -26,8 +25,7 @@ import {
 import { createChatCompletion } from './chat.service.js';
 
 import { Tag } from '@/swagger.js';
-import { AuthSecret, determineAuthType } from '@/auth/utils.js';
-import { ARTIFACT_SECRET_RATE_LIMIT } from '@/config.js';
+import { AuthSecret } from '@/auth/utils.js';
 
 export const chatModule: FastifyPluginAsyncJsonSchemaToTs = async (app) => {
   app.post<{ Body: ChatCompletionCreateBody }>(
@@ -44,15 +42,6 @@ export const chatModule: FastifyPluginAsyncJsonSchemaToTs = async (app) => {
           [StatusCodes.OK]: chatCompletionCreateResponseSchema
         },
         tags: [Tag.OPENAI_API]
-      },
-      config: {
-        rateLimit: {
-          max: (request: FastifyRequest) => {
-            const authType = determineAuthType(request);
-            if (authType.type === AuthSecret.ARTIFACT_SECRET) return ARTIFACT_SECRET_RATE_LIMIT;
-            return 1;
-          }
-        }
       }
     },
     async (req) => createChatCompletion(req.body)

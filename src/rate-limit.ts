@@ -22,6 +22,7 @@ import { closeClient, createRedisClient } from './redis.js';
 import { AuthSecret, determineAuthType, scryptSecret } from './auth/utils.js';
 import { toErrorResponseDto } from './errors/plugin.js';
 import { APIError, APIErrorCode } from './errors/error.entity.js';
+import { ARTIFACT_SECRET_RATE_LIMIT, DEFAULT_RATE_LIMIT } from './config.js';
 
 const redis = createRedisClient({
   /**
@@ -35,7 +36,15 @@ const redis = createRedisClient({
 export const rateLimitPlugin: FastifyPluginAsync = fp.default(async (app) => {
   await app.register(rateLimit, {
     global: true,
-    max: 25,
+    max: (request: FastifyRequest) => {
+      const authType = determineAuthType(request);
+      switch (authType.type) {
+        case AuthSecret.ARTIFACT_SECRET:
+          return ARTIFACT_SECRET_RATE_LIMIT;
+        default:
+          return DEFAULT_RATE_LIMIT;
+      }
+    },
     hook: 'onRequest',
     timeWindow: 1000,
     cache: 5000,

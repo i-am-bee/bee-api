@@ -18,7 +18,7 @@ import json
 import aioboto3
 
 from docling.document_converter import DocumentConverter
-from docling_core.transforms.chunker import HierarchicalChunker
+from docling_core.transforms.chunker.hybrid_chunker import HybridChunker
 
 from config import config
 from database import database
@@ -51,7 +51,7 @@ async def docling_extraction(file):
             dict = doc.export_to_dict()
             markdown = doc.export_to_markdown()
             chunks = [{"text": c.text}
-                      for c in list(HierarchicalChunker().chunk(doc))]
+                      for c in list(HybridChunker(tokenizer="BAAI/bge-small-en-v1.5").chunk(doc))]
 
             document_storage_id = f"{EXTRACTION_DIR}/{storage_id}/document.json"
             await s3.meta.client.put_object(
