@@ -19,7 +19,7 @@ from enums import ExtractionBackend
 from database import database
 from logger import logger
 
-EXTRACTION_QUEUE_NAME = "files:extraction:python"
+EXTRACTION_QUEUE_NAME = "files-extraction-python"
 
 
 async def processExtraction(job: Job, job_token):
