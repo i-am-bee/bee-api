@@ -52,5 +52,7 @@ class Config(BaseSettings):
     s3_access_key_id: str
     s3_secret_access_key: str
 
+    otel_sdk_disabled: bool = False
+
 
 config = Config()

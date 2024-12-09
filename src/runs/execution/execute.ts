@@ -37,7 +37,7 @@ import { createAgentRun, createChatLLM } from './factory.js';
 
 import { ORM } from '@/database.js';
 import { getLogger } from '@/logger.js';
-import { createPublisher } from '@/streaming/pubsub.js';
+import { Publisher, withPublisher } from '@/streaming/pubsub.js';
 import { APIError } from '@/errors/error.entity.js';
 import { jobRegistry } from '@/metrics.js';
 import { getTraceLogger } from '@/observe/utils.js';
@@ -61,7 +61,7 @@ const agentExecutionTime = new Summary({
 
 export type AgentContext = {
   run: Loaded<Run, 'assistant'>;
-  publish: ReturnType<typeof createPublisher>;
+  publish: Publisher;
   runStep?: Loaded<RunStep>;
   message?: Loaded<Message>;
   toolCall?: Loaded<AnyToolCall>;
@@ -69,8 +69,6 @@ export type AgentContext = {
 
 export async function executeRun(run: LoadedRun) {
   const runLogger = getLogger().child({ runId: run.id });
-
-  const publish = createPublisher(run);
 
   // create messages and add file ids to message content
   const messages = run.thread.$.messages.$.filter((message) => !message.deletedAt).map(
@@ -123,85 +121,89 @@ export async function executeRun(run: LoadedRun) {
 
   run.start();
   await ORM.em.flush();
-  await publish({ event: 'thread.run.in_progress', data: toRunDto(run) });
-  const context = { run, publish } as AgentContext;
+  await withPublisher(run, async (publish) => {
+    await publish({ event: 'thread.run.in_progress', data: toRunDto(run) });
+    const context = { run, publish } as AgentContext;
 
-  const tools = await getTools(run, context);
-  const llm = createChatLLM(run);
-  const memory = new TokenMemory({ llm });
-  await memory.addMany(messages);
+    const tools = await getTools(run, context);
+    const llm = createChatLLM(run);
+    const memory = new TokenMemory({ llm });
+    await memory.addMany(messages);
 
-  const cancellationController = new AbortController();
-  const unsub = watchForCancellation(Run, run, () => cancellationController.abort());
+    const cancellationController = new AbortController();
+    const unsub = watchForCancellation(Run, run, () => cancellationController.abort());
 
-  const expirationSignal = AbortSignal.timeout(dayjs(run.expiresAt).diff(dayjs(), 'milliseconds'));
-
-  try {
-    const endAgentExecutionTimer = agentExecutionTime.labels({ framework: Version }).startTimer();
-    const [agentRun, agent] = createAgentRun(
-      run,
-      { llm, tools, memory },
-      {
-        signal: AbortSignal.any([cancellationController.signal, expirationSignal]),
-        ctx: context
-      }
+    const expirationSignal = AbortSignal.timeout(
+      dayjs(run.expiresAt).diff(dayjs(), 'milliseconds')
     );
 
-    // apply observe middleware only when the observe API is enabled
-    if (BEE_OBSERVE_API_URL && BEE_OBSERVE_API_AUTH_KEY && agent instanceof BeeAgent) {
-      (agentRun as ReturnType<BeeAgent['run']>).middleware(
-        createObserveConnector({
-          api: {
-            baseUrl: BEE_OBSERVE_API_URL,
-            apiAuthKey: BEE_OBSERVE_API_AUTH_KEY,
-            ignored_keys: [
-              'apiToken',
-              'apiKey',
-              'cseId',
-              'accessToken',
-              'proxy',
-              'username',
-              'password'
-            ]
-          },
-          cb: async (err, traceResponse) => {
-            if (err) {
-              getTraceLogger().warn({ err }, 'bee-observe API error');
-            } else if (traceResponse) {
-              run.trace = new Trace({ id: traceResponse.result.id });
-            }
-          }
-        })
+    try {
+      const endAgentExecutionTimer = agentExecutionTime.labels({ framework: Version }).startTimer();
+      const [agentRun, agent] = createAgentRun(
+        run,
+        { llm, tools, memory },
+        {
+          signal: AbortSignal.any([cancellationController.signal, expirationSignal]),
+          ctx: context
+        }
       );
-    }
 
-    await agentRun;
+      // apply observe middleware only when the observe API is enabled
+      if (BEE_OBSERVE_API_URL && BEE_OBSERVE_API_AUTH_KEY && agent instanceof BeeAgent) {
+        (agentRun as ReturnType<BeeAgent['run']>).middleware(
+          createObserveConnector({
+            api: {
+              baseUrl: BEE_OBSERVE_API_URL,
+              apiAuthKey: BEE_OBSERVE_API_AUTH_KEY,
+              ignored_keys: [
+                'apiToken',
+                'apiKey',
+                'cseId',
+                'accessToken',
+                'proxy',
+                'username',
+                'password'
+              ]
+            },
+            cb: async (err, traceResponse) => {
+              if (err) {
+                getTraceLogger().warn({ err }, 'bee-observe API error');
+              } else if (traceResponse) {
+                run.trace = new Trace({ id: traceResponse.result.id });
+              }
+            }
+          })
+        );
+      }
 
-    endAgentExecutionTimer();
-    run.complete();
+      await agentRun;
 
-    await ORM.em.flush();
-    await publish({ event: 'thread.run.completed', data: toRunDto(run) });
-  } catch (err) {
-    if (expirationSignal.aborted) {
-      run.expire();
+      endAgentExecutionTimer();
+      run.complete();
+
       await ORM.em.flush();
-      await publish({ event: 'thread.run.expired', data: toRunDto(run) });
-      return;
-    } else if (cancellationController.signal.aborted) {
-      run.cancel();
-      await ORM.em.flush();
-      await publish({ event: 'thread.run.cancelled', data: toRunDto(run) });
-      return;
-    }
+      await publish({ event: 'thread.run.completed', data: toRunDto(run) });
+    } catch (err) {
+      if (expirationSignal.aborted) {
+        run.expire();
+        await ORM.em.flush();
+        await publish({ event: 'thread.run.expired', data: toRunDto(run) });
+        return;
+      } else if (cancellationController.signal.aborted) {
+        run.cancel();
+        await ORM.em.flush();
+        await publish({ event: 'thread.run.cancelled', data: toRunDto(run) });
+        return;
+      }
 
-    runLogger.error({ err }, 'Run execution failed');
-    run.fail(APIError.from(err));
-    await ORM.em.flush();
-    await publish({ event: 'thread.run.failed', data: toRunDto(run) });
-    return;
-  } finally {
-    await publish({ event: 'done', data: '[DONE]' });
-    unsub();
-  }
+      runLogger.error({ err }, 'Run execution failed');
+      run.fail(APIError.from(err));
+      await ORM.em.flush();
+      await publish({ event: 'thread.run.failed', data: toRunDto(run) });
+      return;
+    } finally {
+      await publish({ event: 'done', data: '[DONE]' });
+      unsub();
+    }
+  });
 }

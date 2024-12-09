@@ -21,12 +21,20 @@ import { RawServerBase } from 'fastify/types/utils.js';
 import { getLogger } from './logger.js';
 import { SHUTDOWN_GRACEFUL_PERIOD } from './config.js';
 
-import { closeAllWorkers } from '@/jobs/bullmq.js';
+import { closeAllQueues, closeAllWorkers } from '@/jobs/bullmq.js';
+import { closeAllClients } from '@/redis';
 
 export function createTerminus(server: RawServerBase) {
   async function beforeShutdown() {
     getLogger().info('Server shutdown started...');
-    closeAllWorkers();
+
+    const cleanupBullMqAndRedis = async () => {
+      await closeAllWorkers();
+      await closeAllQueues();
+      await closeAllClients();
+    };
+    cleanupBullMqAndRedis();
+
     return new Promise((resolve) => {
       setTimeout(resolve, SHUTDOWN_GRACEFUL_PERIOD);
     });
