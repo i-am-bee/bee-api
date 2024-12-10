@@ -15,7 +15,7 @@
  */
 
 import { client } from './api/client.js';
-import { SpanReadParamsSchema, SpanReadQuery } from './dtos/span-read.js';
+import { SpanReadParams, SpanReadQuery } from './dtos/span-read.js';
 import { assertTracePermission, assertClient, processApiProxyResponse } from './utils.js';
 import { TraceReadParams, TraceReadQuery } from './dtos/trace-read.js';
 
@@ -44,7 +44,7 @@ export async function getTrace({
   );
 }
 
-export async function listSpans(props: SpanReadQuery & SpanReadParamsSchema) {
+export async function listSpans(props: SpanReadQuery & SpanReadParams) {
   await assertTracePermission({ traceId: props.trace_id });
   assertClient(client);
 

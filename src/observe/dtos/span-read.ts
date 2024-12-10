@@ -36,4 +36,4 @@ export const spanReadParamsSchema = {
 } as const satisfies JSONSchema;
 
 export type SpanReadQuery = FromSchema<typeof spanReadQuerySchema>;
-export type SpanReadParamsSchema = FromSchema<typeof spanReadParamsSchema>;
+export type SpanReadParams = FromSchema<typeof spanReadParamsSchema>;
