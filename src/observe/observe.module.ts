@@ -18,11 +18,11 @@ import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-sc
 
 import { listSpans, getTrace } from './observe.service.js';
 import { traceReadParamsSchema, traceReadQuerySchema } from './dtos/trace-read.js';
-import { spanReadQuerySchema } from './dtos/span-read.js';
+import { spanReadParamsSchema, spanReadQuerySchema } from './dtos/span-read.js';
 
 export const observeModule: FastifyPluginAsyncJsonSchemaToTs = async (app) => {
   app.get(
-    '/trace/:id',
+    '/traces/:id',
     {
       preHandler: app.auth(),
       schema: {
@@ -37,16 +37,17 @@ export const observeModule: FastifyPluginAsyncJsonSchemaToTs = async (app) => {
   );
 
   app.get(
-    '/span',
+    '/traces/:trace_id/spans',
     {
       preHandler: app.auth(),
       schema: {
         querystring: spanReadQuerySchema,
+        params: spanReadParamsSchema,
         hide: true
       }
     },
     async (req) => {
-      return listSpans(req.query);
+      return listSpans({ ...req.query, ...req.params });
     }
   );
 };
