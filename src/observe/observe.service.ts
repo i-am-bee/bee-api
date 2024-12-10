@@ -15,7 +15,7 @@
  */
 
 import { client } from './api/client.js';
-import { SpanReadQuery } from './dtos/span-read.js';
+import { SpanReadParamsSchema, SpanReadQuery } from './dtos/span-read.js';
 import { assertTracePermission, assertClient, processApiProxyResponse } from './utils.js';
 import { TraceReadParams, TraceReadQuery } from './dtos/trace-read.js';
 
@@ -44,11 +44,11 @@ export async function getTrace({
   );
 }
 
-export async function listSpans(query: SpanReadQuery) {
-  await assertTracePermission({ traceId: query.trace_id });
+export async function listSpans(props: SpanReadQuery & SpanReadParamsSchema) {
+  await assertTracePermission({ traceId: props.trace_id });
   assertClient(client);
 
-  const { trace_id, ...restQueryObject } = query;
+  const { trace_id, ...restQueryObject } = props;
 
   return processApiProxyResponse(
     client.GET('/v1/traces/{trace_id}/spans', {
