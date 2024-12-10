@@ -10,7 +10,7 @@ from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
 
 from config import config
 
-resource = Resource(attributes={
+resource = Resource.create(attributes={
     SERVICE_NAME: "bee-api"
 })
 
