@@ -16,6 +16,7 @@
 
 import { BaseMessage } from 'bee-agent-framework/llms/primitives/message';
 import { LLMError } from 'bee-agent-framework/llms/base';
+import { Loaded } from '@mikro-orm/core';
 import dayjs from 'dayjs';
 
 import {
@@ -23,14 +24,32 @@ import {
   ChatCompletionCreateResponse
 } from './dtos/chat-completion-create';
 import { ChatMessageRole } from './constants';
+import { Chat } from './entities/chat.entity';
 
 import { createChatLLM } from '@/runs/execution/factory';
 import { getLogger } from '@/logger';
 import { APIError, APIErrorCode } from '@/errors/error.entity';
-import { generatePrefixedObjectId } from '@/utils/id';
 import { getDefaultModel } from '@/runs/execution/constants';
+import { ORM } from '@/database';
 
 const getChatLogger = () => getLogger();
+
+export function toDto(chat: Loaded<Chat>): ChatCompletionCreateResponse {
+  return {
+    id: chat.id,
+    object: 'chat.completion',
+    created: dayjs(chat.createdAt).unix(),
+    model: chat.model,
+    choices: (chat.output?.messages || []).map((message, index) => {
+      if (message.role !== ChatMessageRole.ASSISTANT)
+        throw new LLMError(`Unexpected message role ${message.role}`);
+      return {
+        index,
+        message: { role: message.role, content: message.text }
+      };
+    })
+  };
+}
 
 export async function createChatCompletion({
   model = getDefaultModel(),
@@ -38,6 +57,8 @@ export async function createChatCompletion({
   response_format
 }: ChatCompletionCreateBody): Promise<ChatCompletionCreateResponse> {
   const llm = createChatLLM({ model });
+  const chat = new Chat({ model, messages, responseFormat: response_format });
+  await ORM.em.persistAndFlush(chat);
   try {
     const schema = response_format?.json_schema.schema;
     const output = await llm.generate(
@@ -52,22 +73,14 @@ export async function createChatCompletion({
           : {})
       }
     );
-    return {
-      id: generatePrefixedObjectId('chatcmpl'),
-      object: 'chat.completion',
-      created: dayjs().unix(),
-      model,
-      choices: output.messages.map((message, index) => {
-        if (message.role !== ChatMessageRole.ASSISTANT)
-          throw new LLMError(`Unexpected message role ${message.role}`);
-        return {
-          index,
-          message: { role: message.role, content: message.text }
-        };
-      })
-    };
+    chat.output = output;
+    await ORM.em.flush();
+
+    return toDto(chat);
   } catch (err) {
     getChatLogger().error({ err }, 'LLM generation failed');
+    chat.error = err.toString();
+    await ORM.em.flush();
     if (err instanceof LLMError) {
       throw new APIError({ code: APIErrorCode.SERVICE_ERROR, message: err.message });
     }
