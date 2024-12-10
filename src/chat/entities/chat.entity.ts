@@ -14,16 +14,39 @@
  * limitations under the License.
  */
 
-import { Entity, Property } from '@mikro-orm/core';
+import {
+  BeforeCreate,
+  BeforeDelete,
+  BeforeUpdate,
+  ChangeSetType,
+  Entity,
+  EventArgs,
+  Filter,
+  ManyToOne,
+  Property,
+  ref,
+  Ref
+} from '@mikro-orm/core';
 import { ChatLLMOutput } from 'bee-agent-framework/llms/chat';
+import { requestContext } from '@fastify/request-context';
 
 import { ChatMessageRole } from '../constants';
 
-import { PrincipalScopedEntity } from '@/common/principal-scoped.entity';
-import { ProjectScopedEntityInput } from '@/common/project-scoped.entity';
+import { inJob, inSeeder } from '@/context';
+import { Artifact } from '@/artifacts/entities/artifact.entity';
+import { ProjectPrincipal } from '@/administration/entities/project-principal.entity';
+import { BaseEntity, BaseEntityInput } from '@/common/base.entity';
+import { User } from '@/users/entities/user.entity';
 
 @Entity()
-export class Chat extends PrincipalScopedEntity {
+@Filter({
+  name: 'ChatAccess',
+  cond: async () => {
+    throw new Error('Not Implemented');
+  },
+  default: true
+})
+export class Chat extends BaseEntity {
   getIdPrefix(): string {
     return 'chatcmpl';
   }
@@ -43,15 +66,58 @@ export class Chat extends PrincipalScopedEntity {
   @Property()
   error?: string;
 
+  @ManyToOne()
+  artifact?: Ref<Artifact>;
+
+  @ManyToOne()
+  projectPrincipal?: Ref<ProjectPrincipal>;
+
+  @ManyToOne()
+  user?: Ref<User>;
+
   constructor({ model, messages, responseFormat, ...rest }: ChatInput) {
     super(rest);
 
     this.model = model;
     this.responseFormat = responseFormat;
     this.messages = messages;
+
+    const artifact = requestContext.get('artifact');
+    if (artifact) {
+      this.artifact = ref(artifact);
+    }
+    const projectPrincipal = requestContext.get('projectPrincipal');
+    if (projectPrincipal) {
+      this.projectPrincipal = ref(projectPrincipal);
+    }
+    const user = requestContext.get('user');
+    if (user) {
+      this.user = ref(user);
+    }
+  }
+
+  @BeforeCreate()
+  @BeforeUpdate()
+  @BeforeDelete()
+  async authorize(event: EventArgs<any>) {
+    if (inJob() || inSeeder()) return;
+    if (event.changeSet?.type === ChangeSetType.CREATE) {
+      return;
+    }
+    const projectPrincipal = requestContext.get('projectPrincipal');
+    const artifact = requestContext.get('artifact');
+    const user = requestContext.get('user');
+    if (
+      (projectPrincipal && this.projectPrincipal === ref(projectPrincipal)) ||
+      (artifact && this.artifact === ref(artifact)) ||
+      (user && this.user === ref(user))
+    ) {
+      return;
+    }
+    throw new Error('Not Implemented');
   }
 }
 
-export type ChatInput = ProjectScopedEntityInput &
+export type ChatInput = BaseEntityInput &
   Pick<Chat, 'model' | 'messages'> &
   Partial<Pick<Chat, 'responseFormat'>>;
