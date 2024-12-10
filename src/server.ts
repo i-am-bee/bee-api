@@ -102,7 +102,7 @@ try {
 
   // bee observe proxy
   if (BEE_OBSERVE_API_URL) {
-    app.register(observeModule, { prefix: '/observe' });
+    app.register(observeModule, { prefix: '/observe/v1' });
   }
 
   await createCronJobs();
