@@ -18,7 +18,6 @@ import {
   BeforeCreate,
   BeforeDelete,
   BeforeUpdate,
-  ChangeSetType,
   Entity,
   EventArgs,
   Filter,
@@ -36,7 +35,6 @@ import { inJob, inSeeder } from '@/context';
 import { Artifact } from '@/artifacts/entities/artifact.entity';
 import { ProjectPrincipal } from '@/administration/entities/project-principal.entity';
 import { BaseEntity, BaseEntityInput } from '@/common/base.entity';
-import { User } from '@/users/entities/user.entity';
 
 @Entity()
 @Filter({
@@ -72,9 +70,6 @@ export class Chat extends BaseEntity {
   @ManyToOne()
   projectPrincipal?: Ref<ProjectPrincipal>;
 
-  @ManyToOne()
-  user?: Ref<User>;
-
   constructor({ model, messages, responseFormat, ...rest }: ChatInput) {
     super(rest);
 
@@ -90,31 +85,22 @@ export class Chat extends BaseEntity {
     if (projectPrincipal) {
       this.projectPrincipal = ref(projectPrincipal);
     }
-    const user = requestContext.get('user');
-    if (user) {
-      this.user = ref(user);
-    }
   }
 
   @BeforeCreate()
   @BeforeUpdate()
   @BeforeDelete()
-  async authorize(event: EventArgs<any>) {
+  async authorize(_: EventArgs<any>) {
     if (inJob() || inSeeder()) return;
-    if (event.changeSet?.type === ChangeSetType.CREATE) {
-      return;
-    }
     const projectPrincipal = requestContext.get('projectPrincipal');
     const artifact = requestContext.get('artifact');
-    const user = requestContext.get('user');
     if (
       (projectPrincipal && this.projectPrincipal === ref(projectPrincipal)) ||
-      (artifact && this.artifact === ref(artifact)) ||
-      (user && this.user === ref(user))
+      (artifact && this.artifact === ref(artifact))
     ) {
       return;
     }
-    throw new Error('Not Implemented');
+    throw new Error('Unauthorized');
   }
 }
 
