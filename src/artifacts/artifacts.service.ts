@@ -52,8 +52,8 @@ export function toDto(artifact: Loaded<Artifact>): ArtifactDto {
     object: 'artifact',
     thread_id: artifact.thread?.id ?? null,
     message_id: artifact.message?.id ?? null,
-    share_url: artifact.accessSecret
-      ? `/v1/artifacts/${artifact.id}/shared?secret=${artifact.accessSecret}`
+    share_url: artifact.accessToken
+      ? `/v1/artifacts/${artifact.id}/shared?token=${artifact.accessToken}`
       : null
   };
 }
@@ -78,7 +78,7 @@ export function toSharedDto(artifact: Loaded<Artifact>): ArtifactShared {
   }
 }
 
-function getSecret() {
+function getToken() {
   return `${ARTIFACT_KEY_PREFIX}${crypto.randomBytes(24).toString('base64url')}`;
 }
 
@@ -94,7 +94,7 @@ export async function createArtifact(body: ArtifactCreateBody): Promise<Artifact
         message: message && ref(message),
         sourceCode: body.source_code,
         metadata: body.metadata,
-        accessSecret: body.shared === true ? getSecret() : undefined,
+        accessToken: body.shared === true ? getToken() : undefined,
         name: body.name,
         description: body.description
       });
@@ -119,13 +119,13 @@ export async function readArtifact({
 }
 
 export async function readSharedArtifact({
-  secret,
+  token,
   artifact_id
 }: ArtifactSharedReadParams & ArtifactSharedReadQuery): Promise<ArtifactSharedReadResponse> {
   const artifact = await ORM.em.getRepository(Artifact).findOneOrFail(
     {
       id: artifact_id,
-      accessSecret: secret
+      accessToken: token
     },
     { filters: { principalAccess: false } }
   );
@@ -163,9 +163,9 @@ export async function updateArtifact({
     artifact.sourceCode = getUpdatedValue(source_code, artifact.sourceCode);
   }
   if (shared === true) {
-    artifact.accessSecret = getSecret();
+    artifact.accessToken = getToken();
   } else if (shared === false) {
-    artifact.accessSecret = undefined;
+    artifact.accessToken = undefined;
   }
   await ORM.em.flush();
   return toDto(artifact);
