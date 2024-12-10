@@ -56,6 +56,7 @@ COPY --from=build-upm /workdir/upm/internal/backends/python/pypi_map.sqlite ./st
 
 COPY --chown=node:node --from=deps ${APP_DIR}/package.json ./
 COPY --chown=node:node --from=deps ${APP_DIR}/node_modules ./node_modules
+COPY --chown=node:node --from=builder ${APP_DIR}/tsconfig.json ./
 COPY --chown=node:node --from=builder ${APP_DIR}/dist ./dist
 
 RUN chown -R 1001:0 ${APP_DIR} &&\
