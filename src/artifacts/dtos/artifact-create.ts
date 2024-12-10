@@ -34,7 +34,7 @@ export const artifactCreateBodySchema = {
   type: 'object',
   oneOf: [
     {
-      required: ['type', 'message_id', 'source_code', 'name'],
+      required: ['type', 'source_code', 'name'],
       additionalProperties: false,
       properties: {
         ...commonArtifactProperties,

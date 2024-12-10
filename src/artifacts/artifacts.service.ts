@@ -83,13 +83,15 @@ function getSecret() {
 }
 
 export async function createArtifact(body: ArtifactCreateBody): Promise<ArtifactCreateResponse> {
-  const message = await ORM.em.getRepository(Message).findOneOrFail({ id: body.message_id });
+  const message = body.message_id
+    ? await ORM.em.getRepository(Message).findOneOrFail({ id: body.message_id })
+    : undefined;
 
   switch (body.type) {
     case ArtifactType.APP: {
       const artifact = new AppArtifact({
-        thread: ref(message.thread),
-        message: ref(message),
+        thread: message && ref(message.thread),
+        message: message && ref(message),
         sourceCode: body.source_code,
         metadata: body.metadata,
         accessSecret: body.shared === true ? getSecret() : undefined,
