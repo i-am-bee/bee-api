@@ -31,11 +31,21 @@ EXTRACTION_DIR = "docling"
 
 S3_URL = f"s3://{config.s3_bucket_file_storage}"
 
+converter = DocumentConverter(format_options={
+    InputFormat.PDF: PdfFormatOption(
+        pipeline_options=PdfPipelineOptions(
+            do_table_structure=config.docling_do_table_structure,
+            do_ocr=config.docling_pdf_do_ocr)
+    )
+})
+chunker = HybridChunker(
+    tokenizer="BAAI/bge-small-en-v1.5") if config.docling_advanced_chunker else HierarchicalChunker()
+
 
 async def docling_extraction(file):
     storage_id = file["storageId"]
     file_name = file["filename"]
-    print("start")
+
     session = aioboto3.Session()
     async with session.resource("s3",
                                 endpoint_url=config.s3_endpoint,
@@ -44,23 +54,15 @@ async def docling_extraction(file):
                                 aws_session_token=None,
                                 ) as s3:
         with tempfile.TemporaryDirectory() as tmp_dir:
-            # Use file_name to support file type discrimination.
+           # Use file_name to support file type discrimination.
             source_doc = f"{tmp_dir}/{file_name}"
 
             await s3.meta.client.download_file(config.s3_bucket_file_storage, storage_id, source_doc)
 
-            converter = DocumentConverter(format_options={
-                InputFormat.PDF: PdfFormatOption(
-                    pipeline_options=PdfPipelineOptions(
-                        do_ocr=config.docling_pdf_do_ocr)
-                )
-            })
             result = await asyncio.to_thread(converter.convert, source_doc, max_num_pages=100, max_file_size=20971520)
             doc = result.document
             dict = doc.export_to_dict()
             markdown = doc.export_to_markdown()
-            chunker = HybridChunker(
-                tokenizer="BAAI/bge-small-en-v1.5") if config.docling_advanced_chunker else HierarchicalChunker()
             chunks = [{"text": c.text}
                       for c in list(chunker.chunk(doc))]
 

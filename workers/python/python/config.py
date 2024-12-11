@@ -52,6 +52,7 @@ class Config(BaseSettings):
 
     otel_sdk_disabled: bool = False
 
+    docling_do_table_structure: bool = True
     docling_pdf_do_ocr: bool = True
     docling_advanced_chunker: bool = True
 
