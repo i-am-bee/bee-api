@@ -25,6 +25,7 @@ import { Migrator } from '@mikro-orm/migrations-mongodb';
 import { SeedManager } from '@mikro-orm/seeder';
 
 import { MONGODB_CA_CERT, MONGODB_DATABASE_NAME, MONGODB_URL } from './config.js';
+import { LogSubscriber } from './common/log.subscriber.js';
 
 if (process.env.NODE_ENV === 'production') {
   process.env.MIKRO_ORM_NO_COLOR = 'true';
@@ -69,6 +70,7 @@ const config: Options<MongoDriver> = {
     ...createMongoTLSConfig()
   },
   extensions: [Migrator, SeedManager],
+  subscribers: [new LogSubscriber()],
   migrations: {
     path: './dist/migrations',
     pathTs: './migrations',
