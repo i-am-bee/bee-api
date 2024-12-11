@@ -64,7 +64,7 @@ async def docling_extraction(file):
             dict = doc.export_to_dict()
             markdown = doc.export_to_markdown()
             chunks = [{"text": c.text}
-                      for c in list(chunker.chunk(doc))]
+                      for c in list(await asyncio.to_thread(chunker.chunk, doc))]
 
             document_storage_id = f"{EXTRACTION_DIR}/{storage_id}/document.json"
             await s3.meta.client.put_object(
