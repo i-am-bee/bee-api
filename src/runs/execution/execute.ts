@@ -20,8 +20,6 @@ import { Version } from 'bee-agent-framework';
 import { Summary } from 'prom-client';
 import dayjs from 'dayjs';
 import { isTruthy } from 'remeda';
-import { createObserveConnector } from 'bee-observe-connector';
-import { BeeAgent } from 'bee-agent-framework/agents/bee/agent';
 import { TokenMemory } from 'bee-agent-framework/memory/tokenMemory';
 
 import { Run } from '../entities/run.entity.js';
@@ -40,16 +38,13 @@ import { getLogger } from '@/logger.js';
 import { Publisher, withPublisher } from '@/streaming/pubsub.js';
 import { APIError } from '@/errors/error.entity.js';
 import { jobRegistry } from '@/metrics.js';
-import { getTraceLogger } from '@/observe/utils.js';
 import { watchForCancellation } from '@/utils/jobs.js';
-import { Trace } from '@/observe/entities/trace.entity.js';
 import { RunStep } from '@/run-steps/entities/run-step.entity.js';
 import { Message } from '@/messages/message.entity.js';
 import { AnyToolCall } from '@/tools/entities/tool-calls/tool-call.entity.js';
 import { LoadedRun } from '@/runs/execution/types.js';
 import { UserResource } from '@/tools/entities/tool-resources/user-resource.entity.js';
 import { SystemResource } from '@/tools/entities/tool-resources/system-resource.entity.js';
-import { BEE_OBSERVE_API_AUTH_KEY, BEE_OBSERVE_API_URL } from '@/config.js';
 import { Attachment } from '@/messages/attachment.entity';
 
 const agentExecutionTime = new Summary({
@@ -139,7 +134,7 @@ export async function executeRun(run: LoadedRun) {
 
     try {
       const endAgentExecutionTimer = agentExecutionTime.labels({ framework: Version }).startTimer();
-      const [agentRun, agent] = createAgentRun(
+      const [agentRun] = createAgentRun(
         run,
         { llm, tools, memory },
         {
@@ -147,34 +142,6 @@ export async function executeRun(run: LoadedRun) {
           ctx: context
         }
       );
-
-      // apply observe middleware only when the observe API is enabled
-      if (BEE_OBSERVE_API_URL && BEE_OBSERVE_API_AUTH_KEY && agent instanceof BeeAgent) {
-        (agentRun as ReturnType<BeeAgent['run']>).middleware(
-          createObserveConnector({
-            api: {
-              baseUrl: BEE_OBSERVE_API_URL,
-              apiAuthKey: BEE_OBSERVE_API_AUTH_KEY,
-              ignored_keys: [
-                'apiToken',
-                'apiKey',
-                'cseId',
-                'accessToken',
-                'proxy',
-                'username',
-                'password'
-              ]
-            },
-            cb: async (err, traceResponse) => {
-              if (err) {
-                getTraceLogger().warn({ err }, 'bee-observe API error');
-              } else if (traceResponse) {
-                run.trace = new Trace({ id: traceResponse.result.id });
-              }
-            }
-          })
-        );
-      }
 
       await agentRun;
 

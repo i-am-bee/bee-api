@@ -35,8 +35,8 @@ module.exports = {
       {
         argsIgnorePattern: '^_',
         varsIgnorePattern: '^_',
-        caughtErrorsIgnorePattern: '^_',
-      },
+        caughtErrorsIgnorePattern: '^_'
+      }
     ],
     '@typescript-eslint/no-empty-function': 'off',
     'no-console': 'error'
