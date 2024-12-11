@@ -17,8 +17,12 @@ import tempfile
 import json
 import aioboto3
 
-from docling.document_converter import DocumentConverter
+from docling.datamodel.base_models import InputFormat
+from docling.document_converter import DocumentConverter, PdfFormatOption
+from docling_core.transforms.chunker.hierarchical_chunker import HierarchicalChunker
 from docling_core.transforms.chunker.hybrid_chunker import HybridChunker
+from docling.datamodel.pipeline_options import PdfPipelineOptions
+
 
 from config import config
 from database import database
@@ -31,7 +35,7 @@ S3_URL = f"s3://{config.s3_bucket_file_storage}"
 async def docling_extraction(file):
     storage_id = file["storageId"]
     file_name = file["filename"]
-
+    print("start")
     session = aioboto3.Session()
     async with session.resource("s3",
                                 endpoint_url=config.s3_endpoint,
@@ -45,13 +49,20 @@ async def docling_extraction(file):
 
             await s3.meta.client.download_file(config.s3_bucket_file_storage, storage_id, source_doc)
 
-            converter = DocumentConverter()
+            converter = DocumentConverter(format_options={
+                InputFormat.PDF: PdfFormatOption(
+                    pipeline_options=PdfPipelineOptions(
+                        do_ocr=config.docling_pdf_do_ocr)
+                )
+            })
             result = await asyncio.to_thread(converter.convert, source_doc, max_num_pages=100, max_file_size=20971520)
             doc = result.document
             dict = doc.export_to_dict()
             markdown = doc.export_to_markdown()
+            chunker = HybridChunker(
+                tokenizer="BAAI/bge-small-en-v1.5") if config.docling_advanced_chunker else HierarchicalChunker()
             chunks = [{"text": c.text}
-                      for c in list(HybridChunker(tokenizer="BAAI/bge-small-en-v1.5").chunk(doc))]
+                      for c in list(chunker.chunk(doc))]
 
             document_storage_id = f"{EXTRACTION_DIR}/{storage_id}/document.json"
             await s3.meta.client.put_object(
