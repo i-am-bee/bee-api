@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-import { ChangeSetType, Entity, ManyToOne, PrimaryKey, Property, ref, Ref } from '@mikro-orm/core';
-import { User } from '@zilliz/milvus2-sdk-node';
-import { requestContext } from '@fastify/request-context';
+import { ChangeSetType, Entity, PrimaryKey, Property } from '@mikro-orm/core';
+import { requestContext, RequestContextData } from '@fastify/request-context';
 
 import { generatePrefixedObjectId } from '@/utils/id.js';
-import { ProjectPrincipal } from '@/administration/entities/project-principal.entity';
+import { jobLocalStorage } from '@/context';
 
 @Entity()
 export class Log {
@@ -29,11 +28,8 @@ export class Log {
   @Property()
   createdAt: Date = new Date();
 
-  @ManyToOne()
-  projectPrincipal?: Ref<ProjectPrincipal>;
-
-  @ManyToOne()
-  user?: Ref<User>;
+  @Property()
+  requestContext: any = {};
 
   @Property()
   entity?: string;
@@ -48,16 +44,24 @@ export class Log {
   change?: any;
 
   @Property()
-  additionalData: any;
+  additionalData?: any;
 
   constructor({ entity, entityId, type, change, additionalData }: LogInput) {
-    const user = requestContext.get('user');
-    if (user) {
-      this.user = ref(user);
-    }
-    const projectPrincipal = requestContext.get('projectPrincipal');
-    if (projectPrincipal) {
-      this.projectPrincipal = ref(projectPrincipal);
+    const contextData: (keyof RequestContextData)[] = [
+      'user',
+      'organizationUser',
+      'apiKey',
+      'projectPrincipal',
+      'artifact'
+    ];
+
+    contextData.forEach((key: keyof RequestContextData) => {
+      const value = requestContext.get(key);
+      if (value) Object.assign(this.requestContext, { [key]: value.id });
+    });
+    const job = jobLocalStorage.getStore()?.job.name;
+    if (job) {
+      Object.assign(this.requestContext, { job });
     }
     this.entity = entity;
     this.entityId = entityId;

@@ -4,82 +4,92 @@ import { Log } from './log.entity';
 import { BaseEntity } from './base.entity';
 
 import { inJob, inSeeder } from '@/context';
+import { getLogger } from '@/logger';
 
 const loggedEntities: { [key: string]: { types?: ChangeSetType[]; entities: string[] } } = {
-  Assistant: {
+  assistant: {
     entities: ['project', 'agent']
   },
-  Artifact: {
+  artifact: {
     entities: ['project', 'thread', 'name']
   },
-  Chat: {
+  chat: {
     types: [ChangeSetType.CREATE],
-    entities: ['artifact']
+    entities: []
   },
-  Message: {
+  message: {
     entities: ['project']
   },
-  Thread: {
+  thread: {
     entities: ['project']
   },
-  Tool: {
+  tool: {
     entities: ['project', 'name']
   },
-  VectorStore: {
+  'vector-store': {
     entities: ['project', 'name']
   },
-  VectorStoreFile: {
+  'vector-store-file': {
     entities: ['project', 'file']
   },
-  File: {
+  file: {
     entities: ['project', 'filename']
   },
-  Run: {
+  run: {
     entities: ['project', 'assistant', 'status']
   },
-  User: {
+  user: {
     entities: ['email']
   },
-  Organization: {
+  organization: {
     entities: ['name']
   },
-  Project: {
+  project: {
     entities: ['name', 'organization']
   },
-  ApiKey: {
+  'project-api-key': {
     entities: ['project']
   }
 };
 
 export class LogSubscriber implements EventSubscriber {
   onFlush(args: FlushEventArgs): void | Promise<void> {
-    args.uow.getChangeSets().forEach((cs) => {
-      if (
-        loggedEntities[cs.name] &&
-        (loggedEntities[cs.name].types?.includes(cs.type) ?? true) &&
-        inSeeder() === false
-      ) {
-        if (cs.type === ChangeSetType.DELETE && inJob()) return;
+    try {
+      args.uow.getChangeSets().forEach((cs) => {
+        if (
+          loggedEntities[cs.collection] &&
+          (loggedEntities[cs.collection].types?.includes(cs.type) ?? true) &&
+          inSeeder() === false
+        ) {
+          // Do not log cleanup deletes from jobs
+          if (cs.type === ChangeSetType.DELETE && inJob()) return;
 
-        const log = new Log({
-          entity: cs.name,
-          entityId: cs.entity?.id,
-          type: cs.type,
-          change: cs.type === ChangeSetType.UPDATE ? cs.payload : undefined,
-          additionalData:
-            loggedEntities[cs.name].entities.reduce(
-              (acc, name) => ({
-                ...acc,
-                [name]:
-                  cs.entity[name].entity instanceof BaseEntity
-                    ? cs.entity[name].id
-                    : cs.entity[name]
-              }),
-              {}
-            ) ?? undefined
-        });
-        args.uow.computeChangeSet(log);
-      }
-    });
+          const log = new Log({
+            entity: cs.name,
+            entityId: cs.entity?.id,
+            type: cs.type,
+            // save changes only for update operation
+            change: cs.type === ChangeSetType.UPDATE ? cs.payload : undefined,
+            ...(loggedEntities[cs.collection].entities.length > 0
+              ? {
+                  additionalData: loggedEntities[cs.collection].entities.reduce(
+                    (acc, name) => ({
+                      ...acc,
+                      [name]:
+                        cs.entity[name]?.entity instanceof BaseEntity
+                          ? cs.entity[name].id
+                          : cs.entity[name]
+                    }),
+                    {}
+                  )
+                }
+              : {})
+          });
+          args.uow.computeChangeSet(log);
+        }
+      });
+    } catch (e) {
+      getLogger().warn(e, 'Error during database logging.');
+    }
   }
 }
