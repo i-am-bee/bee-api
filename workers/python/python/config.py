@@ -42,8 +42,6 @@ class Config(BaseSettings):
     mongodb_database_name: str
     mongodb_ca_cert: Optional[str] = None
 
-    extraction_backend: ExtractionBackend
-
     unstructured_api_url: Optional[str] = None
     unstructured_api_key: Optional[str] = None
 

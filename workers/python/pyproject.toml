@@ -25,8 +25,8 @@ docling = "^2.9.0"
 optional = true
 
 [tool.poetry.group.unstructured.dependencies]
-unstructured-ingest = {extras = ["s3"], version = "^0.2.1"}
-unstructured = {extras = ["all-docs"], version = "^0.16.4"}
+unstructured-ingest = {extras = ["s3"], version = "^0.3.8"}
+unstructured = {extras = ["all-docs"], version = "^0.16.11"}
 
 [build-system]
 requires = ["poetry-core"]

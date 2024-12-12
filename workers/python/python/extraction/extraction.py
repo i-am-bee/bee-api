@@ -47,7 +47,7 @@ async def processExtraction(job: Job, job_token):
         if backend == ExtractionBackend.UNSTRUCTURED_OPENSOURCE or backend == ExtractionBackend.UNSTRUCTURED_API:
             try:
                 from extraction.unstructured import unstructuredExtraction
-                await unstructuredExtraction(file)
+                await unstructuredExtraction(file, backend)
             except ImportError:
                 logger.exception(
                     f"Unable to import unstructured, throwing away job {job.id}")
