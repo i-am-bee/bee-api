@@ -34,7 +34,7 @@ const loggedEntities: { [key: string]: { types?: ChangeSetType[]; entities: stri
     entities: []
   },
   message: {
-    entities: ['project']
+    entities: ['project', 'thread']
   },
   thread: {
     entities: ['project']
@@ -43,16 +43,16 @@ const loggedEntities: { [key: string]: { types?: ChangeSetType[]; entities: stri
     entities: ['project', 'name']
   },
   'vector-store': {
-    entities: ['project', 'name']
+    entities: ['project', 'name', 'dependsOn']
   },
   'vector-store-file': {
-    entities: ['project', 'file']
+    entities: ['project', 'file', 'dependsOn']
   },
   file: {
-    entities: ['project', 'filename']
+    entities: ['project', 'filename', 'dependsOn']
   },
   run: {
-    entities: ['project', 'assistant', 'status']
+    entities: ['project', 'assistant', 'status', 'thread']
   },
   user: {
     entities: ['email']
