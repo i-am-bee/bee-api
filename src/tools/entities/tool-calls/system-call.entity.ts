@@ -25,7 +25,9 @@ export enum SystemTools {
   WIKIPEDIA = 'wikipedia',
   WEATHER = 'weather',
   ARXIV = 'arxiv',
-  READ_FILE = 'read_file'
+  READ_FILE = 'read_file',
+  LLM = 'llm',
+  CALCULATOR = 'calculator'
 }
 
 @Embeddable({ discriminatorValue: ToolType.SYSTEM })

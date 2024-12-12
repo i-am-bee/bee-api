@@ -33,13 +33,17 @@ import { LLMChatTemplates } from 'bee-agent-framework/adapters/shared/llmChatTem
 import { DuckDuckGoSearchTool } from 'bee-agent-framework/tools/search/duckDuckGoSearch';
 import { SearchToolOptions, SearchToolOutput } from 'bee-agent-framework/tools/search/base';
 import { PromptTemplate } from 'bee-agent-framework/template';
+import { CalculatorTool } from 'bee-agent-framework/tools/calculator';
+import { LLMTool } from 'bee-agent-framework/tools/llm';
+import { BaseMessage } from 'bee-agent-framework/llms/primitives/message';
 
 import { AgentContext } from '../execute.js';
 import { getRunVectorStores } from '../helpers.js';
 import { CodeInterpreterTool as CodeInterpreterUserTool } from '../../../tools/entities/tool/code-interpreter-tool.entity.js';
 import { ApiTool as ApiCallUserTool } from '../../../tools/entities/tool/api-tool.entity.js';
-import { createCodeLLM } from '../factory.js';
+import { createChatLLM, createCodeLLM } from '../factory.js';
 import { RedisCache } from '../cache.js';
+import { getDefaultModel } from '../constants.js';
 
 import { createPythonStorage } from './python-tool-storage.js';
 import { FunctionTool, FunctionToolOutput } from './function.js';
@@ -127,6 +131,23 @@ export async function getTools(run: LoadedRun, context: AgentContext): Promise<F
       tool.type === ToolType.SYSTEM && tool.toolId === SystemTools.WIKIPEDIA
   );
   if (wikipediaUsage) tools.push(new WikipediaSimilaritySearchTool());
+
+  const llmUsage = run.tools.find(
+    (tool): tool is SystemUsage => tool.type === ToolType.SYSTEM && tool.toolId === SystemTools.LLM
+  );
+  if (llmUsage)
+    tools.push(
+      new LLMTool({
+        llm: createChatLLM({ model: getDefaultModel() }),
+        transform: (text) => [new BaseMessage('assistant', text)]
+      })
+    );
+
+  const calculatorUsage = run.tools.find(
+    (tool): tool is SystemUsage =>
+      tool.type === ToolType.SYSTEM && tool.toolId === SystemTools.CALCULATOR
+  );
+  if (calculatorUsage) tools.push(new CalculatorTool());
 
   const weatherUsage = run.tools.find(
     (tool): tool is SystemUsage =>
@@ -342,6 +363,16 @@ export async function createToolCall(
       toolId: SystemTools.READ_FILE,
       input: await tool.parse(input)
     });
+  } else if (tool instanceof LLMTool) {
+    return new SystemCall({
+      toolId: SystemTools.LLM,
+      input: await tool.parse(input)
+    });
+  } else if (tool instanceof CalculatorTool) {
+    return new SystemCall({
+      toolId: SystemTools.CALCULATOR,
+      input: await tool.parse(input)
+    });
   } else if (tool instanceof FunctionTool) {
     return new FunctionCall({ name: tool.name, arguments: JSON.stringify(input) });
   } else if (tool instanceof CustomTool || tool instanceof ApiCallTool) {
@@ -387,6 +418,8 @@ export async function finalizeToolCall(
         toolCall.output = result;
         break;
       }
+      case SystemTools.CALCULATOR:
+      case SystemTools.LLM:
       case SystemTools.READ_FILE: {
         if (!(result instanceof StringToolOutput)) throw new TypeError();
         toolCall.output = result.result;
