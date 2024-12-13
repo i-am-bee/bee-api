@@ -53,6 +53,7 @@ import { QueueName } from '@/jobs/constants.js';
 import { getProjectPrincipal } from '@/administration/helpers.js';
 import { VECTOR_STORE_FILE_QUOTA_DAILY } from '@/config.js';
 import { dayjs, getLatestDailyFixedTime } from '@/utils/datetime.js';
+import { updateRateLimitHeadersWithDailyQuota } from '@/utils/rate-limit.js';
 
 const getFileLogger = (vectorStoreFileIds?: string[]) =>
   getServiceLogger('vector-store-files').child({ vectorStoreFileIds });
@@ -62,6 +63,7 @@ export async function assertVectorStoreFilesQuota(newFilesCount = 1) {
     createdBy: getProjectPrincipal(),
     createdAt: { $gte: getLatestDailyFixedTime().toDate() }
   });
+  updateRateLimitHeadersWithDailyQuota({ quota: VECTOR_STORE_FILE_QUOTA_DAILY, used: count });
   if (count + newFilesCount > VECTOR_STORE_FILE_QUOTA_DAILY) {
     throw new APIError({
       message: 'Your daily vector store file quota has been exceeded',
