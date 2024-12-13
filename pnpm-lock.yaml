@@ -81,8 +81,8 @@ importers:
         specifier: ^1.7.7
         version: 1.7.7
       bee-agent-framework:
-        specifier: 0.0.52
-        version: 0.0.52(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0(encoding@0.1.13))(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.4(encoding@0.1.13))(@zilliz/milvus2-sdk-node@2.4.4)(encoding@0.1.13)(google-auth-library@9.15.0(encoding@0.1.13))(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(encoding@0.1.13)(zod@3.23.8))
+        specifier: 0.0.53
+        version: 0.0.53(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0(encoding@0.1.13))(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.4(encoding@0.1.13))(@zilliz/milvus2-sdk-node@2.4.4)(encoding@0.1.13)(google-auth-library@9.15.0(encoding@0.1.13))(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(encoding@0.1.13)(zod@3.23.8))
       bullmq:
         specifier: ^5.32.0
         version: 5.32.0
@@ -2130,8 +2130,8 @@ packages:
     resolution: {integrity: sha512-4Bcg1P8xhUuqcii/S0Z9wiHIrQVPMermM1any+MX5GeGD7faD3/msQUDGLol9wOcz4/jbg/WJnGqoJF6LiBdtg==}
     engines: {node: '>=10.0.0'}
 
-  bee-agent-framework@0.0.52:
-    resolution: {integrity: sha512-FsyfzYZ7ptTZtJIc3jqqWneFjG0I3dKYybMKfw4bJNAD+9LOp5QHdIvZkYTXlweIim1d/awmwTV99TF8QF6kUg==}
+  bee-agent-framework@0.0.53:
+    resolution: {integrity: sha512-NqLsvPsvguXtiAhZqH3m5/WzdD5D+PAbBi8RUqv8r5W2StDQbrHLY1lUItcSeWqYrzd4c3FsupBuEcmFf4dYrw==}
     peerDependencies:
       '@aws-sdk/client-bedrock-runtime': ^3.687.0
       '@elastic/elasticsearch': ^8.0.0
@@ -7869,7 +7869,7 @@ snapshots:
 
   basic-ftp@5.0.5: {}
 
-  bee-agent-framework@0.0.52(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0(encoding@0.1.13))(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.4(encoding@0.1.13))(@zilliz/milvus2-sdk-node@2.4.4)(encoding@0.1.13)(google-auth-library@9.15.0(encoding@0.1.13))(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(encoding@0.1.13)(zod@3.23.8)):
+  bee-agent-framework@0.0.53(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0(encoding@0.1.13))(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.4(encoding@0.1.13))(@zilliz/milvus2-sdk-node@2.4.4)(encoding@0.1.13)(google-auth-library@9.15.0(encoding@0.1.13))(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(encoding@0.1.13)(zod@3.23.8)):
     dependencies:
       '@ai-zen/node-fetch-event-source': 2.1.4(encoding@0.1.13)
       '@connectrpc/connect': 1.6.1(@bufbuild/protobuf@1.10.0)
