@@ -69,10 +69,10 @@ export class ReadFileTool extends Tool<StringToolOutput, ReadFileToolOptions> {
     let text: string;
     try {
       text = await getExtractedText(file, run.signal);
-    } catch (e) {
-      getJobLogger('runs').warn(e, 'Failed to get extracted text.');
+    } catch (err) {
+      getJobLogger('runs').warn({ err }, 'Failed to get extracted text.');
 
-      throw new ToolError('This can not be read.', [], {
+      throw new ToolError('Unable to read text from the file.', [], {
         isFatal: false,
         isRetryable: true
       });
