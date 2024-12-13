@@ -30,6 +30,7 @@ import { Emitter } from 'bee-agent-framework/emitter/emitter';
 
 import { File } from '@/files/entities/file.entity.js';
 import { getExtractedText } from '@/files/extraction/helpers';
+import { getJobLogger } from '@/logger';
 
 export interface ReadFileToolOptions extends BaseToolOptions {
   fileSize: number;
@@ -65,25 +66,28 @@ export class ReadFileTool extends Tool<StringToolOutput, ReadFileToolOptions> {
     if (!file) {
       throw new ToolError(`File ${filename} not found.`);
     }
+    let text: string;
     try {
-      const text = await getExtractedText(file, run.signal);
-      if (text.length > this.options.fileSize) {
-        throw new ToolError(
-          `The text is too big (${text.length} characters). Maximum allowed size is ${this.options.fileSize} characters`,
-          [],
-          {
-            isFatal: false,
-            isRetryable: true
-          }
-        );
-      }
+      text = await getExtractedText(file, run.signal);
+    } catch (e) {
+      getJobLogger('runs').warn(e, 'Failed to get extracted text.');
 
-      return new StringToolOutput('file content: \n' + text);
-    } catch {
-      throw new ToolError('This file is not a text file and can not be read.', [], {
+      throw new ToolError('This can not be read.', [], {
         isFatal: false,
         isRetryable: true
       });
     }
+    if (text.length > this.options.fileSize) {
+      throw new ToolError(
+        `The text is too big (${text.length} characters). Maximum allowed size is ${this.options.fileSize} characters`,
+        [],
+        {
+          isFatal: false,
+          isRetryable: true
+        }
+      );
+    }
+
+    return new StringToolOutput('file content: \n' + text);
   }
 }
