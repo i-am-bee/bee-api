@@ -35,7 +35,6 @@ import { SearchToolOptions, SearchToolOutput } from 'bee-agent-framework/tools/s
 import { PromptTemplate } from 'bee-agent-framework/template';
 import { CalculatorTool } from 'bee-agent-framework/tools/calculator';
 import { LLMTool } from 'bee-agent-framework/tools/llm';
-import { BaseMessage } from 'bee-agent-framework/llms/primitives/message';
 
 import { AgentContext } from '../execute.js';
 import { getRunVectorStores } from '../helpers.js';
@@ -138,8 +137,7 @@ export async function getTools(run: LoadedRun, context: AgentContext): Promise<F
   if (llmUsage)
     tools.push(
       new LLMTool({
-        llm: createChatLLM({ model: getDefaultModel() }),
-        transform: (text) => [new BaseMessage('assistant', text)]
+        llm: createChatLLM({ model: getDefaultModel() })
       })
     );
 

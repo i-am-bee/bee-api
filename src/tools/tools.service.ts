@@ -29,7 +29,6 @@ import { OpenMeteoTool } from 'bee-agent-framework/tools/weather/openMeteo';
 import { ArXivTool } from 'bee-agent-framework/tools/arxiv';
 import { PythonTool } from 'bee-agent-framework/tools/python/python';
 import { parse } from 'yaml';
-import { BaseMessage } from 'bee-agent-framework/llms/primitives/message';
 
 import { Tool as ToolDto } from './dtos/tool.js';
 import { AnyTool, Tool, ToolExecutor, ToolType } from './entities/tool/tool.entity.js';
@@ -468,8 +467,7 @@ function getSystemTools() {
   const fileSearch = new FileSearchTool({ vectorStores: [], maxNumResults: 0 });
   const readFile = new ReadFileTool({ files: [], fileSize: 0 });
   const llmTool = new LLMTool({
-    llm: createChatLLM({ model: getDefaultModel() }),
-    transform: (text) => [new BaseMessage('assistant', text)]
+    llm: createChatLLM({ model: getDefaultModel() })
   });
   const calculatorTool = new CalculatorTool();
 
