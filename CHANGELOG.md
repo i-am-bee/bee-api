@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.17](https://github.com/i-am-bee/bee-api/compare/v0.0.16...v0.0.17) (2024-12-13)
+
+### Features
+
+* **deps:** upgrade bee-agent-framework ([#135](https://github.com/i-am-bee/bee-api/issues/135)) ([ede714f](https://github.com/i-am-bee/bee-api/commit/ede714f7557bcb336f36385c74a6580c9e4d68f3))
+
 ## [0.0.16](https://github.com/i-am-bee/bee-api/compare/v0.0.15...v0.0.16) (2024-12-12)
 
 ### Bug Fixes
