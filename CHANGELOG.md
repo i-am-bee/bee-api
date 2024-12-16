@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.19](https://github.com/i-am-bee/bee-api/compare/v0.0.18...v0.0.19) (2024-12-16)
+
+### Features
+
+* **user:** update default assistant for new users ([#138](https://github.com/i-am-bee/bee-api/issues/138)) ([233c138](https://github.com/i-am-bee/bee-api/commit/233c138f3075803bffeb127c1956c2742ee98ea5))
+
 ## [0.0.18](https://github.com/i-am-bee/bee-api/compare/v0.0.17...v0.0.18) (2024-12-15)
 
 ### Features
