@@ -138,13 +138,19 @@ export async function createUser({
       new FileSearchUsage({ maxNumResults: VECTOR_STORE_DEFAULT_MAX_NUM_RESULTS }),
       new CodeInterpreterUsage()
     ],
-    name: 'Agent Bee',
+    name: 'Bee',
     project: ref(project),
     createdBy: ref(projectPrincipal),
     description: 'A general purpose agent for everyday tasks',
     metadata: {
       $ui_color: 'black',
-      $ui_icon: 'Bee'
+      $ui_icon: 'Bee',
+      '$ui_starterQuestion_c9f7253b-4fb3-4b2c-b576-d783f399ab6d':
+        'Summarize key findings and methodology of the attached research paper.',
+      '$ui_starterQuestion_9207fe3c-9a01-4e37-bdf8-ddfbe9114397':
+        'Bring me up to speed on the latest news and developments in the field of agentic AI. Be sure to cite your sources.',
+      '$ui_starterQuestion_919aa137-f90c-4580-b587-ab73d3d6b4b1':
+        'Search for the top 5 most popular programming languages in 2024 and create a bar chart comparing the relative popularity of each language.'
     }
   });
 
