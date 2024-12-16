@@ -585,7 +585,7 @@ function getSystemTools() {
     inputSchema: llmTool.inputSchema.bind(llmTool),
     isExternal: false,
     userDescription:
-      'Give a prompt to an LLM assistant. Useful to extract and re-format information, and answer intermediate questions.'
+      'Uses expert LLM to work with data in the existing conversation (classification, entity extraction, summarization, ...)'
   });
   systemTools.set(SystemTools.CALCULATOR, {
     type: ToolType.SYSTEM,
