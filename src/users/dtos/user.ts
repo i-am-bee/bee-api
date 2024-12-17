@@ -20,12 +20,14 @@ import { metadataSchema } from '@/schema.js';
 
 export const userSchema = {
   type: 'object',
-  required: ['id', 'object', 'name', 'email'],
+  required: ['id', 'object', 'name', 'email', 'default_organization', 'default_project'],
   properties: {
     id: { type: 'string' },
     object: { const: 'user' },
     name: { type: 'string', nullable: true },
     email: { type: 'string', nullable: true },
+    default_organization: { type: 'string', nullable: false },
+    default_project: { type: 'string', nullable: false },
     metadata: metadataSchema
   }
 } as const satisfies JSONSchema;

@@ -20,12 +20,20 @@ import { includeProperty } from './shared.js';
 
 export const spanReadQuerySchema = {
   type: 'object',
-  required: ['trace_id'],
   additionalProperties: false,
   properties: {
-    trace_id: { type: 'string' },
     include_attributes_ctx: includeProperty
   }
 } as const satisfies JSONSchema;
 
+export const spanReadParamsSchema = {
+  type: 'object',
+  required: ['trace_id'],
+  additionalProperties: false,
+  properties: {
+    trace_id: { type: 'string' }
+  }
+} as const satisfies JSONSchema;
+
 export type SpanReadQuery = FromSchema<typeof spanReadQuerySchema>;
+export type SpanReadParams = FromSchema<typeof spanReadParamsSchema>;

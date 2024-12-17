@@ -18,24 +18,34 @@ import { FastifyPluginAsync, FastifyRequest } from 'fastify';
 import fp from 'fastify-plugin';
 import rateLimit, { errorResponseBuilderContext } from '@fastify/rate-limit';
 
-import { createClient } from './redis.js';
-import { AuthSecret, determineAuthType, scryptApiKey } from './auth/utils.js';
+import { closeClient, createRedisClient } from './redis.js';
+import { AuthSecret, determineAuthType, scryptSecret } from './auth/utils.js';
 import { toErrorResponseDto } from './errors/plugin.js';
 import { APIError, APIErrorCode } from './errors/error.entity.js';
+import { ARTIFACT_SECRET_RATE_LIMIT, DEFAULT_RATE_LIMIT } from './config.js';
+
+const redis = createRedisClient({
+  /**
+   * "The default parameters of a redis connection are not the fastest to provide a rate-limit. We suggest to customize the connectTimeout and maxRetriesPerRequest.
+   * Source: https://github.com/fastify/fastify-rate-limit
+   */
+  connectTimeout: 1000, // 500 was too low, getting ETIMEDOUT
+  maxRetriesPerRequest: 1
+});
 
 export const rateLimitPlugin: FastifyPluginAsync = fp.default(async (app) => {
-  const redis = createClient({
-    /**
-     * "The default parameters of a redis connection are not the fastest to provide a rate-limit. We suggest to customize the connectTimeout and maxRetriesPerRequest.
-     * Source: https://github.com/fastify/fastify-rate-limit
-     */
-    connectTimeout: 1000, // 500 was too low, getting ETIMEDOUT
-    maxRetriesPerRequest: 1
-  });
-
   await app.register(rateLimit, {
     global: true,
-    max: 25,
+    enableDraftSpec: true,
+    max: (request: FastifyRequest) => {
+      const authType = determineAuthType(request);
+      switch (authType.type) {
+        case AuthSecret.ARTIFACT_SECRET:
+          return ARTIFACT_SECRET_RATE_LIMIT;
+        default:
+          return DEFAULT_RATE_LIMIT;
+      }
+    },
     hook: 'onRequest',
     timeWindow: 1000,
     cache: 5000,
@@ -59,10 +69,13 @@ export const rateLimitPlugin: FastifyPluginAsync = fp.default(async (app) => {
         case AuthSecret.ACCESS_TOKEN:
           return authType.value;
         case AuthSecret.API_KEY:
-          return scryptApiKey(authType.value);
+          return scryptSecret(authType.value);
+        case AuthSecret.ARTIFACT_SECRET:
+          return scryptSecret(authType.value);
         case AuthSecret.UNKNOWN:
           return request.ip;
       }
     }
   });
+  app.addHook('onClose', () => closeClient(redis));
 });

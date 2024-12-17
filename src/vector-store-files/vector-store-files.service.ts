@@ -15,7 +15,6 @@
  */
 
 import { ref, RequestContext } from '@mikro-orm/core';
-import dayjs from 'dayjs';
 import { Loaded } from '@mikro-orm/mongodb';
 
 import { VectorStoreFile, VectorStoreFileStatus } from './entities/vector-store-file.entity.js';
@@ -53,6 +52,8 @@ import { toErrorDto } from '@/errors/plugin.js';
 import { QueueName } from '@/jobs/constants.js';
 import { getProjectPrincipal } from '@/administration/helpers.js';
 import { VECTOR_STORE_FILE_QUOTA_DAILY } from '@/config.js';
+import { dayjs, getLatestDailyFixedTime } from '@/utils/datetime.js';
+import { updateRateLimitHeadersWithDailyQuota } from '@/utils/rate-limit.js';
 
 const getFileLogger = (vectorStoreFileIds?: string[]) =>
   getServiceLogger('vector-store-files').child({ vectorStoreFileIds });
@@ -60,8 +61,9 @@ const getFileLogger = (vectorStoreFileIds?: string[]) =>
 export async function assertVectorStoreFilesQuota(newFilesCount = 1) {
   const count = await ORM.em.getRepository(VectorStoreFile).count({
     createdBy: getProjectPrincipal(),
-    createdAt: { $gte: dayjs().subtract(1, 'day').toDate() }
+    createdAt: { $gte: getLatestDailyFixedTime().toDate() }
   });
+  updateRateLimitHeadersWithDailyQuota({ quota: VECTOR_STORE_FILE_QUOTA_DAILY, used: count });
   if (count + newFilesCount > VECTOR_STORE_FILE_QUOTA_DAILY) {
     throw new APIError({
       message: 'Your daily vector store file quota has been exceeded',

@@ -2,15 +2,31 @@
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "3.11.10"
+python = "~3.11"
 bullmq = "2.9.4"
 redis = "^5.2.0"
-unstructured-ingest = {extras = ["s3"], version = "^0.2.1"}
-unstructured = {extras = ["all-docs"], version = "^0.16.4"}
 pymongo = "^4.10.1"
 pydantic-settings = "^2.6.1"
 aiohttp = "^3.10.10"
+aioboto3 = "^13.2.0"
+opentelemetry-api = "^1.28.2"
+opentelemetry-sdk = "^1.28.2"
+opentelemetry-exporter-otlp-proto-http = "^1.28.2"
+opentelemetry-instrumentation-pymongo = "^0.49b2"
+opentelemetry-instrumentation-redis = "^0.49b2"
 
+[tool.poetry.group.docling]
+optional = true
+
+[tool.poetry.group.docling.dependencies]
+docling = "^2.10.0"
+
+[tool.poetry.group.unstructured]
+optional = true
+
+[tool.poetry.group.unstructured.dependencies]
+unstructured-ingest = {extras = ["s3"], version = "^0.3.8"}
+unstructured = {extras = ["all-docs"], version = "^0.16.11"}
 
 [build-system]
 requires = ["poetry-core"]

@@ -42,8 +42,6 @@ class Config(BaseSettings):
     mongodb_database_name: str
     mongodb_ca_cert: Optional[str] = None
 
-    extraction_backend: ExtractionBackend
-
     unstructured_api_url: Optional[str] = None
     unstructured_api_key: Optional[str] = None
 
@@ -51,6 +49,12 @@ class Config(BaseSettings):
     s3_bucket_file_storage: str
     s3_access_key_id: str
     s3_secret_access_key: str
+
+    otel_sdk_disabled: bool = False
+
+    docling_do_table_structure: bool = True
+    docling_pdf_do_ocr: bool = True
+    docling_advanced_chunker: bool = True
 
 
 config = Config()

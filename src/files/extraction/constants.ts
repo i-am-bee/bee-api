@@ -15,6 +15,7 @@
  */
 
 export const ExtractionBackend = {
+  DOCLING: 'docling',
   UNSTRUCTURED_OPENSOURCE: 'unstructured-opensource',
   UNSTRUCTURED_API: 'unstructured-api',
   WDU: 'wdu'

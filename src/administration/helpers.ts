@@ -33,6 +33,13 @@ export function getProjectPrincipal() {
   return projectPrincipal;
 }
 
+export function getArtifact() {
+  const artifact = requestContext.get('artifact');
+  if (!artifact)
+    throw new APIError({ message: 'Artifact not found', code: APIErrorCode.NOT_FOUND });
+  return artifact;
+}
+
 export const redactProjectKeyValue = (key: string) =>
   key.replace(
     key.substring(API_KEY_PREFIX.length + 2, key.length - 2),

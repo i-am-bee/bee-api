@@ -16,13 +16,22 @@
 
 import { join } from 'path';
 
-import { BaseToolOptions, StringToolOutput, Tool, ToolError } from 'bee-agent-framework/tools/base';
+import {
+  BaseToolOptions,
+  BaseToolRunOptions,
+  ToolEmitter,
+  StringToolOutput,
+  Tool,
+  ToolError
+} from 'bee-agent-framework/tools/base';
 import { SchemaObject } from 'ajv';
 import { parse } from 'yaml';
 import { isEmpty } from 'remeda';
 import axios from 'axios';
 import { HttpProxyAgent } from 'http-proxy-agent';
 import { HttpsProxyAgent } from 'https-proxy-agent';
+import { GetRunContext } from 'bee-agent-framework/context';
+import { Emitter } from 'bee-agent-framework/emitter/emitter';
 
 import { AgentContext } from '../execute.js';
 
@@ -45,6 +54,11 @@ export class ApiCallTool extends Tool<StringToolOutput, ApiCallToolOptions> {
   description: string;
   openApiSchema: any;
   apiKey?: string;
+
+  readonly emitter: ToolEmitter<Record<string, any>, StringToolOutput> = Emitter.root.child({
+    namespace: ['tool', 'api'],
+    creator: this
+  });
 
   inputSchema() {
     return {
@@ -89,6 +103,10 @@ export class ApiCallTool extends Tool<StringToolOutput, ApiCallToolOptions> {
     } as const satisfies SchemaObject;
   }
 
+  static {
+    this.register();
+  }
+
   public constructor({ name, description, openApiSchema, apiKey, ...rest }: ApiCallToolOptions) {
     super({ name, description, ...rest });
     this.name = name;
@@ -103,7 +121,11 @@ export class ApiCallTool extends Tool<StringToolOutput, ApiCallToolOptions> {
     }
   }
 
-  protected async _run(input: any) {
+  protected async _run(
+    input: any,
+    _options: Partial<BaseToolRunOptions>,
+    run: GetRunContext<typeof this>
+  ) {
     let path: string = input.path || '';
     const url = new URL(this.openApiSchema.servers[0].url);
     Object.keys(input.parameters ?? {}).forEach((key) => {
@@ -127,11 +149,11 @@ export class ApiCallTool extends Tool<StringToolOutput, ApiCallToolOptions> {
         transformResponse: [(data) => data],
         httpsAgent: HTTP_PROXY_URL && new HttpsProxyAgent(HTTP_PROXY_URL),
         httpAgent: HTTP_PROXY_URL && new HttpProxyAgent(HTTP_PROXY_URL),
-        signal: AbortSignal.timeout(30_000)
+        signal: AbortSignal.any([AbortSignal.timeout(30_000), run.signal])
       });
       return new StringToolOutput(response.data);
     } catch (error) {
-      throw new ToolError(`Request to ${url} failed.`);
+      throw new ToolError(`Request to ${url} failed.`, [error]);
     }
   }
 }

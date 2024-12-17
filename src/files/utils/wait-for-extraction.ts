@@ -30,9 +30,7 @@ export async function waitForExtraction(
   for (const file of files) {
     try {
       if (!file.extraction) throw new Error('Extraction not found');
-      if (!file.extraction.storageId) {
-        if (!file.extraction.jobId) throw new Error('Extraction job not found');
-
+      if (file.extraction.jobId) {
         const extractionJob =
           (await nodeQueue.getJob(file.extraction.jobId)) ??
           (await pythonQueue.getJob(file.extraction.jobId));
@@ -44,7 +42,7 @@ export async function waitForExtraction(
           throw new Error('Extraction job failed, unable to proceed');
         }
         // Extraction (or posprocessing) hasn't completed yet
-        if (state !== 'completed' || !file.extraction.storageId) {
+        if (state !== 'completed') {
           await job.moveToDelayed(Date.now() + 3000, job.token);
           throw new DelayedError();
         }

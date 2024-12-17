@@ -18,6 +18,7 @@ import { pipeline } from 'node:stream/promises';
 
 import { Loaded } from '@mikro-orm/core';
 import { AbortError } from 'bee-agent-framework/errors';
+import { sumBy } from 'remeda';
 
 import { getLogger } from '@/logger.js';
 import {
@@ -25,7 +26,6 @@ import {
   VectorStoreFileStatus
 } from '@/vector-store-files/entities/vector-store-file.entity.js';
 import { ORM } from '@/database.js';
-import { getExtractedFileStats } from '@/files/files.service.js';
 import { APIError } from '@/errors/error.entity.js';
 import { getVectorStoreClient } from '@/vector-store-files/execution/client.js';
 import { watchForCancellation } from '@/utils/jobs.js';
@@ -96,13 +96,12 @@ export async function processVectorStoreFile(vectorStoreFile: Loaded<VectorStore
   }
 
   try {
-    const fileStats = await getExtractedFileStats(vectorStoreFile.file.$);
+    const chunks = await getExtractedChunks(vectorStoreFile.file.$);
     const maxTextLength = MAX_NUM_TOKENS * CHARS_PER_TOKEN_AVG;
     const maxContentLengthBytes = maxTextLength * 1.5; //~ 2 bytes per char in utf-8 + margin of error
-    if ((fileStats.ContentLength ?? Infinity) > maxContentLengthBytes) {
+    if ((sumBy(chunks, (chunk) => chunk.length) ?? Infinity) > maxContentLengthBytes) {
       throw Error('The file contains too much text'); // Skip downloading file
     }
-    const chunks = await getExtractedChunks(vectorStoreFile.file.$);
     controller.signal.throwIfAborted();
 
     await pipeline(

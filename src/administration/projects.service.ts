@@ -39,6 +39,7 @@ import { ORM } from '@/database';
 import { createPaginatedResponse, getListCursor } from '@/utils/pagination';
 import { APIError, APIErrorCode } from '@/errors/error.entity';
 import { getUpdatedValue } from '@/utils/update';
+import { User } from '@/users/entities/user.entity';
 
 export function toDto(project: Loaded<Project>): ProjectDto {
   return {
@@ -151,6 +152,13 @@ export async function listProjects({
 export async function archiveProject({
   project_id
 }: ProjectArchiveParams): Promise<ProjectArchiveResponse> {
+  const user = await ORM.em.getRepository(User).findOne({ defaultProject: project_id });
+  if (user) {
+    throw new APIError({
+      message: 'Can not archive default project.',
+      code: APIErrorCode.FORBIDDEN
+    });
+  }
   const project = await ORM.em.getRepository(Project).findOneOrFail({ id: project_id });
 
   project.archive();

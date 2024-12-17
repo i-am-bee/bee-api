@@ -144,6 +144,7 @@ export async function createFile({
       .headObject({ Bucket: S3_BUCKET_FILE_STORAGE, Key: file.storageId })
       .promise();
     file.contentHash = passthroughHash.hash.digest('hex');
+    file.mimeType = head.ContentType;
     file.bytes = head.ContentLength ?? 0;
     await ORM.em.persistAndFlush(file);
     getFilesLogger(file.id).info('File created');
@@ -205,26 +206,6 @@ export async function listFiles({
   const repo = ORM.em.getRepository(File);
   const cursor = await getListCursor<File>(where, { limit, order, order_by, after, before }, repo);
   return createPaginatedResponse(cursor, toFileDto);
-}
-
-export async function getExtractedFileStats(file: Loaded<File>) {
-  if (!file.extraction?.storageId) throw new Error('Extraction not found');
-  return s3Client
-    .headObject({
-      Bucket: S3_BUCKET_FILE_STORAGE,
-      Key: file.extraction.storageId
-    })
-    .promise();
-}
-
-export async function getExtractedFileObject(file: Loaded<File>) {
-  if (!file.extraction?.storageId) throw new Error('Extraction not found');
-  return s3Client
-    .getObject({
-      Bucket: S3_BUCKET_FILE_STORAGE,
-      Key: file.extraction.storageId
-    })
-    .promise();
 }
 
 export async function readFileContent({

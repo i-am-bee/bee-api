@@ -75,13 +75,10 @@ import { File } from '@/files/entities/file.entity.js';
 import { Attachment } from '@/messages/attachment.entity.js';
 import { SystemResource } from '@/tools/entities/tool-resources/system-resource.entity.js';
 import { createSearchTool } from '@/runs/execution/tools/search-tool';
-import { createCacheClient } from '@/redis.js';
+import { sharedRedisCacheClient } from '@/redis.js';
 
 const searchCache: SearchToolOptions['cache'] = new RedisCache({
-  client: createCacheClient({
-    connectTimeout: 1000,
-    maxRetriesPerRequest: 1
-  }),
+  client: sharedRedisCacheClient,
   keyPrefix: 'search:',
   ttlSeconds: 60 * 60
 });
@@ -404,7 +401,7 @@ export async function finalizeToolCall(
     );
   } else if (toolCall instanceof FunctionCall) {
     if (!(result instanceof FunctionToolOutput)) throw new TypeError();
-    toolCall.output = result.output;
+    toolCall.output = result.result;
   } else if (toolCall instanceof FileSearchCall) {
     if (!(result instanceof FileSearchToolOutput)) throw new TypeError();
     toolCall.results = result.results;

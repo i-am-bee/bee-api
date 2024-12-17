@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-import { Entity, Property } from '@mikro-orm/core';
+import { Entity, ManyToOne, Property, Ref } from '@mikro-orm/core';
 
 import { BaseEntity, BaseEntityInput } from '@/common/base.entity.js';
+import { Project } from '@/administration/entities/project.entity';
+import { Organization } from '@/administration/entities/organization.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -33,12 +35,28 @@ export class User extends BaseEntity {
   @Property()
   name?: string;
 
-  constructor({ externalId, email, name, ...rest }: UserInput) {
+  @ManyToOne()
+  defaultOrganization: Ref<Organization>;
+
+  @ManyToOne()
+  defaultProject: Ref<Project>;
+
+  constructor({
+    externalId,
+    email,
+    name,
+    defaultOrganization,
+    defaultProject,
+    ...rest
+  }: UserInput) {
     super(rest);
     this.externalId = externalId;
     this.email = email;
     this.name = name;
+    this.defaultOrganization = defaultOrganization;
+    this.defaultProject = defaultProject;
   }
 }
 
-export type UserInput = BaseEntityInput & Pick<User, 'externalId' | 'name' | 'email'>;
+export type UserInput = BaseEntityInput &
+  Pick<User, 'externalId' | 'name' | 'email' | 'defaultOrganization' | 'defaultProject'>;

@@ -19,6 +19,7 @@ import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 import { toolUsageSchema } from '@/tools/dtos/tools-usage.js';
 import { metadataSchema } from '@/schema.js';
 import { toolResourcesSchema } from '@/tools/dtos/tool-resources.js';
+import { Agent } from '@/runs/execution/constants';
 
 export const assistantSchema = {
   type: 'object',
@@ -31,7 +32,8 @@ export const assistantSchema = {
     'description',
     'metadata',
     'created_at',
-    'model'
+    'model',
+    'agent'
   ],
   properties: {
     id: { type: 'string' },
@@ -61,6 +63,10 @@ export const assistantSchema = {
     created_at: { type: 'number' },
     model: {
       type: 'string'
+    },
+    agent: {
+      type: 'string',
+      enum: Object.values(Agent)
     },
     top_p: {
       type: 'number',

@@ -21,6 +21,7 @@ import { assistantSchema } from './assistant.js';
 import { toolUsageSchema } from '@/tools/dtos/tools-usage.js';
 import { metadataSchema } from '@/schema.js';
 import { toolResourcesSchema } from '@/tools/dtos/tool-resources.js';
+import { Agent } from '@/runs/execution/constants.js';
 
 export const assistantCreateBodySchema = {
   type: 'object',
@@ -54,6 +55,11 @@ export const assistantCreateBodySchema = {
     metadata: metadataSchema,
     model: {
       type: 'string'
+    },
+    agent: {
+      type: 'string',
+      enum: Object.values(Agent),
+      default: Agent.BEE
     },
     top_p: {
       type: 'number',

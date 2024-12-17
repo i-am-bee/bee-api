@@ -15,17 +15,7 @@
  */
 
 import { Loaded, ref, Ref } from '@mikro-orm/core';
-import { BeeSystemPrompt } from 'bee-agent-framework/agents/bee/prompts';
 import { unique } from 'remeda';
-import { PromptTemplate } from 'bee-agent-framework/template';
-import { GraniteBeeSystemPrompt } from 'bee-agent-framework/agents/granite/prompts';
-import { ZodType } from 'zod';
-import { GraniteBeeAgent } from 'bee-agent-framework/agents/granite/agent';
-import { TokenMemory } from 'bee-agent-framework/memory/tokenMemory';
-import { BeeAgent } from 'bee-agent-framework/agents/bee/agent';
-import { AnyTool } from 'bee-agent-framework/tools/base';
-
-import { Run } from '../entities/run.entity.js';
 
 import { ORM } from '@/database.js';
 import { File } from '@/files/entities/file.entity.js';
@@ -40,7 +30,6 @@ import { FileContainer } from '@/files/entities/files-container.entity.js';
 import { VectorStore } from '@/vector-stores/entities/vector-store.entity.js';
 import { UserResource } from '@/tools/entities/tool-resources/user-resource.entity.js';
 import { SystemResource } from '@/tools/entities/tool-resources/system-resource.entity.js';
-import { createChatLLM } from '@/runs/execution/factory';
 
 export function getRunVectorStores(
   assistant: Loaded<Assistant, 'toolResources.vectorStoreContainers.vectorStore'>,
@@ -53,44 +42,6 @@ export function getRunVectorStores(
     )
     .flatMap((container) => container.vectorStore.$);
   return unique(vectorStores); // filter out duplicates
-}
-
-export function createAgent(run: Loaded<Run, 'assistant'>, tools: AnyTool[]) {
-  const llm = createChatLLM(run);
-  if (run.model.includes('granite')) {
-    return new GraniteBeeAgent({
-      llm,
-      memory: new TokenMemory({ llm }),
-      tools,
-      templates: { system: getPromptTemplate(run, GraniteBeeSystemPrompt) }
-    });
-  } else {
-    return new BeeAgent({
-      llm,
-      memory: new TokenMemory({ llm }),
-      tools,
-      templates: { system: getPromptTemplate(run, BeeSystemPrompt) }
-    });
-  }
-}
-
-function getPromptTemplate<T extends ZodType>(
-  run: Loaded<Run, 'assistant'>,
-  promptTemplate: PromptTemplate<T>
-): PromptTemplate<T> {
-  const instructions = run.additionalInstructions
-    ? `${run.instructions} ${run.additionalInstructions}`
-    : run.instructions;
-  return promptTemplate.fork((input) => ({
-    ...input,
-    ...(run.assistant.$.systemPromptOverwrite
-      ? { template: run.assistant.$.systemPromptOverwrite }
-      : {}),
-    defaults: {
-      ...input.defaults,
-      ...(instructions ? { instructions } : {})
-    }
-  }));
 }
 
 export async function checkFileExistsOnToolResource(

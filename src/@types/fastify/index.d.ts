@@ -24,6 +24,7 @@ import type { AuthFn } from '@/auth/authentication.ts';
 import { ProjectPrincipal } from '@/administration/entities/project-principal.entity';
 import { OrganizationUser } from '@/administration/entities/organization-user.entity';
 import { ProjectApiKey } from '@/administration/entities/project-api-key.entity';
+import { Artifact } from '@/artifacts/entities/artifact.entity';
 
 declare module 'fastify' {
   interface FastifyInstance<
@@ -44,5 +45,6 @@ declare module '@fastify/request-context' {
     organizationUser?: Loaded<OrganizationUser>;
     apiKey?: Loaded<ProjectApiKey>;
     projectPrincipal?: Loaded<ProjectPrincipal>;
+    artifact?: Loaded<Artifact>;
   }
 }
