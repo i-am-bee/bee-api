@@ -69,12 +69,14 @@ import { ensureRequestContextData } from '@/context.js';
 import { getProjectPrincipal } from '@/administration/helpers.js';
 import { RUNS_QUOTA_DAILY } from '@/config.js';
 import { dayjs, getLatestDailyFixedTime } from '@/utils/datetime.js';
+import { updateRateLimitHeadersWithDailyQuota } from '@/utils/rate-limit.js';
 
 export async function assertRunsQuota(newRuns = 1) {
   const count = await ORM.em.getRepository(Run).count({
     createdBy: getProjectPrincipal(),
     createdAt: { $gte: getLatestDailyFixedTime().toDate() }
   });
+  updateRateLimitHeadersWithDailyQuota({ quota: RUNS_QUOTA_DAILY, used: count });
   if (count + newRuns > RUNS_QUOTA_DAILY) {
     throw new APIError({
       message: 'Your daily runs quota has been exceeded',

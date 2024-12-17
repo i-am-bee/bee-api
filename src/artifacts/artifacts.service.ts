@@ -162,9 +162,9 @@ export async function updateArtifact({
     }
     artifact.sourceCode = getUpdatedValue(source_code, artifact.sourceCode);
   }
-  if (shared === true) {
+  if (!artifact.accessToken && shared === true) {
     artifact.accessToken = getToken();
-  } else if (shared === false) {
+  } else if (artifact.accessToken && shared === false) {
     artifact.accessToken = undefined;
   }
   await ORM.em.flush();

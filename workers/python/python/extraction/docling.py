@@ -17,8 +17,12 @@ import tempfile
 import json
 import aioboto3
 
-from docling.document_converter import DocumentConverter
+from docling.datamodel.base_models import InputFormat
+from docling.document_converter import DocumentConverter, PdfFormatOption
+from docling_core.transforms.chunker.hierarchical_chunker import HierarchicalChunker
 from docling_core.transforms.chunker.hybrid_chunker import HybridChunker
+from docling.datamodel.pipeline_options import PdfPipelineOptions
+
 
 from config import config
 from database import database
@@ -26,6 +30,16 @@ from database import database
 EXTRACTION_DIR = "docling"
 
 S3_URL = f"s3://{config.s3_bucket_file_storage}"
+
+converter = DocumentConverter(format_options={
+    InputFormat.PDF: PdfFormatOption(
+        pipeline_options=PdfPipelineOptions(
+            do_table_structure=config.docling_do_table_structure,
+            do_ocr=config.docling_pdf_do_ocr)
+    )
+})
+chunker = HybridChunker(
+    tokenizer="BAAI/bge-small-en-v1.5") if config.docling_advanced_chunker else HierarchicalChunker()
 
 
 async def docling_extraction(file):
@@ -40,18 +54,17 @@ async def docling_extraction(file):
                                 aws_session_token=None,
                                 ) as s3:
         with tempfile.TemporaryDirectory() as tmp_dir:
-            # Use file_name to support file type discrimination.
+           # Use file_name to support file type discrimination.
             source_doc = f"{tmp_dir}/{file_name}"
 
             await s3.meta.client.download_file(config.s3_bucket_file_storage, storage_id, source_doc)
 
-            converter = DocumentConverter()
             result = await asyncio.to_thread(converter.convert, source_doc, max_num_pages=100, max_file_size=20971520)
             doc = result.document
             dict = doc.export_to_dict()
             markdown = doc.export_to_markdown()
             chunks = [{"text": c.text}
-                      for c in list(HybridChunker(tokenizer="BAAI/bge-small-en-v1.5").chunk(doc))]
+                      for c in list(await asyncio.to_thread(chunker.chunk, doc))]
 
             document_storage_id = f"{EXTRACTION_DIR}/{storage_id}/document.json"
             await s3.meta.client.put_object(

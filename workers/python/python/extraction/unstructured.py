@@ -32,7 +32,7 @@ EXTRACTION_DIR = "unstructured"
 S3_URL = f"s3://{config.s3_bucket_file_storage}"
 
 
-async def unstructuredExtraction(file):
+async def unstructuredExtraction(file, backend):
     storage_id = file.get("storageId")
     if storage_id is None:
         raise RuntimeError("storageId not found")
@@ -50,12 +50,12 @@ async def unstructuredExtraction(file):
         downloader_config=S3DownloaderConfig(),
         source_connection_config=s3_connection_config,
         partitioner_config=PartitionerConfig(
-            partition_by_api=config.extraction_backend == ExtractionBackend.UNSTRUCTURED_API,
+            partition_by_api=backend == ExtractionBackend.UNSTRUCTURED_API,
             partition_endpoint=config.unstructured_api_url,
             api_key=config.unstructured_api_key
         ),
         chunker_config=ChunkerConfig(
-            chunk_by_api=config.extraction_backend == ExtractionBackend.UNSTRUCTURED_API,
+            chunk_by_api=backend == ExtractionBackend.UNSTRUCTURED_API,
             chunking_endpoint=config.unstructured_api_url,
             chunk_api_key=config.unstructured_api_key,
             chunking_strategy="by_title",

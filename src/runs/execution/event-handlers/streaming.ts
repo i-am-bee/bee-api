@@ -48,6 +48,7 @@ import { RequiredToolApprove } from '@/runs/entities/requiredToolApprove.entity'
 import { ToolApprovalType } from '@/runs/entities/toolApproval.entity';
 import { ToolType } from '@/tools/entities/tool/tool.entity';
 import { withRedisClient } from '@/redis.js';
+import { Trace } from '@/observe/entities/trace.entity';
 
 const agentToolExecutionTime = new Summary({
   name: 'agent_tool_execution_time_seconds',
@@ -57,8 +58,12 @@ const agentToolExecutionTime = new Summary({
 });
 
 export function createBeeStreamingHandler(ctx: AgentContext) {
-  return (emitter: Emitter<BeeCallbacks>) => {
+  return async (emitter: Emitter<BeeCallbacks>) => {
     const logger = getLogger().child({ runId: ctx.run.id, agent: Agent.BEE });
+    if (emitter.trace?.id) {
+      ctx.run.trace = new Trace({ id: emitter.trace.id });
+      await ORM.em.flush();
+    }
 
     let toolExecutionEnd: (() => number) | null = null;
 
@@ -336,7 +341,12 @@ export function createBeeStreamingHandler(ctx: AgentContext) {
 
 export function createStreamlitStreamingHandler(ctx: AgentContext) {
   const logger = getLogger().child({ runId: ctx.run.id, agent: Agent.STREAMLIT });
-  return (emitter: Emitter<StreamlitEvents>) => {
+  return async (emitter: Emitter<StreamlitEvents>) => {
+    if (emitter.trace?.id) {
+      ctx.run.trace = new Trace({ id: emitter.trace.id });
+      await ORM.em.flush();
+    }
+
     emitter.on('newToken', async ({ delta }) => {
       if (!ctx.message) {
         ctx.message = new Message({
