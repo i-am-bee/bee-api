@@ -19,7 +19,7 @@ opentelemetry-instrumentation-redis = "^0.49b2"
 optional = true
 
 [tool.poetry.group.docling.dependencies]
-docling = "^2.9.0"
+docling = "^2.10.0"
 
 [tool.poetry.group.unstructured]
 optional = true

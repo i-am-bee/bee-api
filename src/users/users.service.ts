@@ -34,6 +34,13 @@ import { OrganizationUserRole, ProjectRole } from '@/administration/entities/con
 import { Project } from '@/administration/entities/project.entity.js';
 import { Organization } from '@/administration/entities/organization.entity.js';
 import { IBM_ORGANIZATION_OWNER_ID } from '@/config.js';
+import { Assistant } from '@/assistants/assistant.entity.js';
+import { Agent, getDefaultModel } from '@/runs/execution/constants.js';
+import { SystemTools } from '@/tools/entities/tool-calls/system-call.entity.js';
+import { VECTOR_STORE_DEFAULT_MAX_NUM_RESULTS } from '@/vector-stores/constants.js';
+import { SystemUsage } from '@/tools/entities/tool-usages/system-usage.entity.js';
+import { FileSearchUsage } from '@/tools/entities/tool-usages/file-search-usage.entity.js';
+import { CodeInterpreterUsage } from '@/tools/entities/tool-usages/code-interpreter-usage.entity.js';
 
 const getUserLogger = (userId: string) => getServiceLogger('user').child({ userId });
 
@@ -122,7 +129,32 @@ export async function createUser({
     .getReference(organization.id, { wrapped: true });
   user.defaultProject = ORM.em.getRepository(Project).getReference(project.id, { wrapped: true });
 
-  await ORM.em.persistAndFlush([user, organization, orgUser, project, projectPrincipal]);
+  const assistant = new Assistant({
+    model: getDefaultModel(),
+    agent: Agent.BEE,
+    tools: [
+      new SystemUsage({ toolId: SystemTools.WEB_SEARCH }),
+      new SystemUsage({ toolId: SystemTools.READ_FILE }),
+      new FileSearchUsage({ maxNumResults: VECTOR_STORE_DEFAULT_MAX_NUM_RESULTS }),
+      new CodeInterpreterUsage()
+    ],
+    name: 'Bee',
+    project: ref(project),
+    createdBy: ref(projectPrincipal),
+    description: 'A general purpose agent for everyday tasks',
+    metadata: {
+      $ui_color: 'black',
+      $ui_icon: 'Bee',
+      '$ui_starterQuestion_c9f7253b-4fb3-4b2c-b576-d783f399ab6d':
+        'Summarize key findings and methodology of the attached research paper.',
+      '$ui_starterQuestion_9207fe3c-9a01-4e37-bdf8-ddfbe9114397':
+        'Bring me up to speed on the latest news and developments in the field of agentic AI. Be sure to cite your sources.',
+      '$ui_starterQuestion_919aa137-f90c-4580-b587-ab73d3d6b4b1':
+        'Search for the top 5 most popular programming languages in 2024 and create a bar chart comparing the relative popularity of each language.'
+    }
+  });
+
+  await ORM.em.persistAndFlush([user, organization, orgUser, project, projectPrincipal, assistant]);
   getUserLogger(user.id).info({ externalId, metadata }, 'User created');
   return toDto(user);
 }

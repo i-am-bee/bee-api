@@ -1,5 +1,40 @@
 # Changelog
 
+## [0.0.20](https://github.com/i-am-bee/bee-api/compare/v0.0.19...v0.0.20) (2024-12-16)
+
+### Bug Fixes
+
+* **artifact:** update the share token only when the share property changes ([#139](https://github.com/i-am-bee/bee-api/issues/139)) ([c808d39](https://github.com/i-am-bee/bee-api/commit/c808d39b3f8c3af6ef206d553512ab7183fd440d))
+
+## [0.0.19](https://github.com/i-am-bee/bee-api/compare/v0.0.18...v0.0.19) (2024-12-16)
+
+### Features
+
+* **user:** update default assistant for new users ([#138](https://github.com/i-am-bee/bee-api/issues/138)) ([233c138](https://github.com/i-am-bee/bee-api/commit/233c138f3075803bffeb127c1956c2742ee98ea5))
+
+## [0.0.18](https://github.com/i-am-bee/bee-api/compare/v0.0.17...v0.0.18) (2024-12-15)
+
+### Features
+
+* **user:** add default assistant when user created ([#137](https://github.com/i-am-bee/bee-api/issues/137)) ([328c8de](https://github.com/i-am-bee/bee-api/commit/328c8ded996db1d8d8d649fbcff24c67f5cee2ed))
+
+### Bug Fixes
+
+* **limits:** merge window and rate limits, fix streaming headers ([#134](https://github.com/i-am-bee/bee-api/issues/134)) ([e997180](https://github.com/i-am-bee/bee-api/commit/e9971803ae1f2e0d11f3a2d4cc0f4c194e83fb5a))
+* **readFile:** fix error for read file tool ([#133](https://github.com/i-am-bee/bee-api/issues/133)) ([05a59d9](https://github.com/i-am-bee/bee-api/commit/05a59d98b035bde280c71284b43c005a604d2128))
+
+## [0.0.17](https://github.com/i-am-bee/bee-api/compare/v0.0.16...v0.0.17) (2024-12-13)
+
+### Features
+
+* **deps:** upgrade bee-agent-framework ([#135](https://github.com/i-am-bee/bee-api/issues/135)) ([ede714f](https://github.com/i-am-bee/bee-api/commit/ede714f7557bcb336f36385c74a6580c9e4d68f3))
+
+## [0.0.16](https://github.com/i-am-bee/bee-api/compare/v0.0.15...v0.0.16) (2024-12-12)
+
+### Bug Fixes
+
+* **log:** update logged properties ([#130](https://github.com/i-am-bee/bee-api/issues/130)) ([e6ee1ec](https://github.com/i-am-bee/bee-api/commit/e6ee1ec5ed071b025b604a6410c5865279659f83))
+
 ## [0.0.15](https://github.com/i-am-bee/bee-api/compare/v0.0.14...v0.0.15) (2024-12-11)
 
 ### Features

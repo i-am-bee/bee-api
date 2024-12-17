@@ -15,12 +15,17 @@
  */
 
 import { FastifyReply } from 'fastify';
+import { entries } from 'remeda';
 
 import { Event } from './dtos/event.js';
 
 export const init = (res: FastifyReply) => {
   res.hijack();
   if (!res.raw.headersSent) {
+    const headers = res.getHeaders();
+    entries(headers).forEach(([key, value]) => {
+      if (value) res.raw.setHeader(key, value);
+    });
     res.raw.setHeader('Content-Type', 'text/event-stream');
     res.raw.setHeader('Connection', 'keep-alive');
     res.raw.setHeader('Cache-Control', 'no-cache,no-transform');

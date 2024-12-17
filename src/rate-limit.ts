@@ -36,6 +36,7 @@ const redis = createRedisClient({
 export const rateLimitPlugin: FastifyPluginAsync = fp.default(async (app) => {
   await app.register(rateLimit, {
     global: true,
+    enableDraftSpec: true,
     max: (request: FastifyRequest) => {
       const authType = determineAuthType(request);
       switch (authType.type) {
