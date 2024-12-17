@@ -149,13 +149,11 @@ That's it! You have implemented the tool in the Bee API. :rocket:
 
 For the tool to be available in the UI, you need to follow these steps:
 
-1. Add the tool the the schema in *src/app/api/schema.d.ts* file:
+1. Regenerate types (file *src/app/api/schema.d.ts* should change):
 
-```typescript
-"web_search" | "wikipedia" | "weather" | "arxiv" | "read_file" | "riddle";
+```bash
+pnpm schema:generate:api
 ```
-
-There are several lines like this in the file. I recommend replacing all of them.
 
 2. Add the tool to `SYSTEM_TOOL_NAME` and `SYSTEM_TOOL_ICONS`in *src/modules/tools/hooks/useToolInfo.tsx* file:
 
