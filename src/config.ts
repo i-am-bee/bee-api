@@ -18,11 +18,10 @@ import 'dotenv/config';
 import { difference } from 'remeda';
 
 import {
+  AIBackend,
   CodeInterpreterStorageBackend,
-  LLMBackend,
   SearchToolBackend
 } from './runs/execution/constants';
-import { EmbeddingBackend } from './embedding/constants';
 import { ExtractionBackend } from './files/extraction/constants';
 
 import { QueueName } from '@/jobs/constants.js';
@@ -81,8 +80,7 @@ export const AUTH_CLIENT_SECRET = getEnv('AUTH_CLIENT_SECRET');
 export const AUTH_AUDIENCE = getEnv('AUTH_AUDIENCE');
 
 // Backends
-export const LLM_BACKEND = getEnum('LLM_BACKEND', Object.values(LLMBackend));
-export const EMBEDDING_BACKEND = getEnum('EMBEDDING_BACKEND', Object.values(EmbeddingBackend));
+export const AI_BACKEND = getEnum('AI_BACKEND', Object.values(AIBackend));
 export const EXTRACTION_BACKEND = getEnum('EXTRACTION_BACKEND', Object.values(ExtractionBackend));
 
 export const OLLAMA_URL = getEnv('OLLAMA_URL', null);
