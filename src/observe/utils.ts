@@ -15,6 +15,7 @@
  */
 
 import { FetchResponse } from 'openapi-fetch';
+import { FastifyReply } from 'fastify';
 
 import { Client } from './api/client.js';
 
@@ -42,18 +43,44 @@ export function assertClient(client: Client | undefined): asserts client is Clie
   }
 }
 
+function pickHeaders(headers: Headers, keys: string[]): Record<string, string> {
+  const result: Record<string, string> = {};
+
+  keys.forEach((key) => {
+    if (headers.has(key)) {
+      result[key] = headers.get(key) as string;
+    }
+  });
+
+  return result;
+}
+
+function isAPIErrorCode(value: any): value is APIErrorCode {
+  return Object.values(APIErrorCode).includes(value);
+}
+
 type MediaType = `${string}/${string}`;
 export async function processApiProxyResponse<T, O, M extends MediaType>(
-  response: Promise<FetchResponse<T, O, M>>
+  response: Promise<FetchResponse<T, O, M>>,
+  reply: FastifyReply
 ): Promise<FetchResponse<T, O, M>['data']> {
-  const { data, error } = await response;
+  const {
+    data,
+    error,
+    response: { headers }
+  } = await response;
+
+  // apply only allowed headers from Observe API response
+  reply.headers(pickHeaders(headers, ['Retry-After']));
 
   if (error) {
     getTraceLogger().error({ err: error }, 'Observe API: Invalid response');
+    const errorCode = error.code.toLocaleLowerCase();
+
     throw new APIError(
       {
-        message: 'Observe API: Invalid response',
-        code: APIErrorCode.SERVICE_ERROR
+        message: error.message ?? 'Observe API: Invalid response',
+        code: isAPIErrorCode(errorCode) ? errorCode : APIErrorCode.SERVICE_ERROR
       },
       {
         cause: error
