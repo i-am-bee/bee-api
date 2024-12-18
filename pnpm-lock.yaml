@@ -32,12 +32,6 @@ importers:
       '@googleapis/customsearch':
         specifier: ^3.2.0
         version: 3.2.0(encoding@0.1.13)
-      '@grpc/grpc-js':
-        specifier: ^1.12.2
-        version: 1.12.2
-      '@grpc/proto-loader':
-        specifier: ^0.7.13
-        version: 0.7.13
       '@ibm-generative-ai/node-sdk':
         specifier: ^3.2.4
         version: 3.2.4(encoding@0.1.13)
