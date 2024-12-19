@@ -24,12 +24,21 @@ import { ATTR_DEPLOYMENT_ENVIRONMENT_NAME } from '@opentelemetry/semantic-conven
 
 const ENV = process.env.ENVIRONMENT;
 
+const metricReader = new metrics.PeriodicExportingMetricReader({
+  exporter: new OTLPMetricExporter()
+});
+
 export const opentelemetrySDK = new NodeSDK({
   resource: new resources.Resource({
     [ATTR_SERVICE_NAME]: `bee-api`,
     [ATTR_DEPLOYMENT_ENVIRONMENT_NAME]: ENV
   }),
-  metricReader: new metrics.PeriodicExportingMetricReader({ exporter: new OTLPMetricExporter() }),
+  metricReader,
   instrumentations: [...getNodeAutoInstrumentations()]
 });
 opentelemetrySDK.start();
+
+process.on('beforeExit', async () => {
+  await metricReader.forceFlush();
+  await opentelemetrySDK.shutdown();
+});
