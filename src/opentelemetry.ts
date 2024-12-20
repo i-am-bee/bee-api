@@ -33,3 +33,16 @@ export const opentelemetrySDK = new NodeSDK({
   instrumentations: [...getNodeAutoInstrumentations()]
 });
 opentelemetrySDK.start();
+
+process.on('beforeExit', async () => {
+  await Promise.all(
+    Object.entries(opentelemetrySDK)
+      .filter(([_, value]) => value && typeof value.forceFlush === 'function')
+      .map(([name, value]) => {
+        // eslint-disable-next-line no-console
+        console.log(`OpenTelemetry: cleanup ${name}`);
+        return value.forceFlush.call(value);
+      })
+  );
+  await opentelemetrySDK.shutdown();
+});
