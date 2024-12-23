@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.21](https://github.com/i-am-bee/bee-api/compare/v0.0.20...v0.0.21) (2024-12-19)
+
+### Features
+
+* **observe:** add response headers and status code ([#141](https://github.com/i-am-bee/bee-api/issues/141)) ([96c06ba](https://github.com/i-am-bee/bee-api/commit/96c06bad0dfb2aaeadc8774899ba2bca1771ad0a))
+* **tools:** add llm and calculator tools ([#132](https://github.com/i-am-bee/bee-api/issues/132)) ([1797a53](https://github.com/i-am-bee/bee-api/commit/1797a53ad9a681b5daadca58acba8ca044085efd))
+
 ## [0.0.20](https://github.com/i-am-bee/bee-api/compare/v0.0.19...v0.0.20) (2024-12-16)
 
 ### Bug Fixes
