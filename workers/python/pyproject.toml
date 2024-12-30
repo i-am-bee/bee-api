@@ -1,5 +1,9 @@
 [tool.poetry]
-package-mode = false
+name = "python-worker"
+version = "0.0.1"
+description = "Bee API Python Worker for file extraction."
+authors = ["IBM Corp."]
+license = "Apache-2.0"
 
 [tool.poetry.dependencies]
 python = "~3.11"
