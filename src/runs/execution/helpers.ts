@@ -50,6 +50,7 @@ export async function checkFileExistsOnToolResource(
 ): Promise<boolean> {
   switch (toolResource.type) {
     case ToolType.USER:
+    case ToolType.SYSTEM:
     case ToolType.CODE_INTERPRETER:
       return !!toolResource.fileContainers.find((fc) => fc.file.id === file.id);
     case ToolType.FILE_SEARCH: {
