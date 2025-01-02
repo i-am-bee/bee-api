@@ -35,12 +35,13 @@ import { Project } from '@/administration/entities/project.entity.js';
 import { Organization } from '@/administration/entities/organization.entity.js';
 import { IBM_ORGANIZATION_OWNER_ID } from '@/config.js';
 import { Assistant } from '@/assistants/assistant.entity.js';
-import { Agent, getDefaultModel } from '@/runs/execution/constants.js';
+import { Agent } from '@/runs/execution/constants.js';
 import { SystemTools } from '@/tools/entities/tool-calls/system-call.entity.js';
 import { VECTOR_STORE_DEFAULT_MAX_NUM_RESULTS } from '@/vector-stores/constants.js';
 import { SystemUsage } from '@/tools/entities/tool-usages/system-usage.entity.js';
 import { FileSearchUsage } from '@/tools/entities/tool-usages/file-search-usage.entity.js';
 import { CodeInterpreterUsage } from '@/tools/entities/tool-usages/code-interpreter-usage.entity.js';
+import { defaultAIProvider } from '@/runs/execution/provider';
 
 const getUserLogger = (userId: string) => getServiceLogger('user').child({ userId });
 
@@ -130,7 +131,7 @@ export async function createUser({
   user.defaultProject = ORM.em.getRepository(Project).getReference(project.id, { wrapped: true });
 
   const assistant = new Assistant({
-    model: getDefaultModel(),
+    model: defaultAIProvider.createAssistantBackend().modelId,
     agent: Agent.BEE,
     tools: [
       new SystemUsage({ toolId: SystemTools.WEB_SEARCH }),

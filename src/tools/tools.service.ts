@@ -74,8 +74,7 @@ import { createCodeInterpreterConnectionOptions } from '@/runs/execution/tools/h
 import { ReadFileTool } from '@/runs/execution/tools/read-file-tool.js';
 import { snakeToCamel } from '@/utils/strings.js';
 import { createSearchTool } from '@/runs/execution/tools/search-tool';
-import { createChatLLM } from '@/runs/execution/factory.js';
-import { getDefaultModel } from '@/runs/execution/constants.js';
+import { defaultAIProvider } from '@/runs/execution/provider';
 
 type SystemTool = Pick<FrameworkTool, 'description' | 'name' | 'inputSchema'> & {
   type: ToolType;
@@ -466,9 +465,7 @@ function getSystemTools() {
   });
   const fileSearch = new FileSearchTool({ vectorStores: [], maxNumResults: 0 });
   const readFile = new ReadFileTool({ files: [], fileSize: 0 });
-  const llmTool = new LLMTool({
-    llm: createChatLLM({ model: getDefaultModel() })
-  });
+  const llmTool = new LLMTool({ llm: defaultAIProvider.createChatBackend() });
   const calculatorTool = new CalculatorTool();
 
   const systemTools = new Map<string, SystemTool>();

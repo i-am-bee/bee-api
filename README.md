@@ -90,7 +90,7 @@ pnpm mikro-orm seeder:run
 cp .env.example .env
 ```
 
-- Add values the env vars: CRYPTO_CIPHER_KEY, LLM_BACKEND, EMBEDDING_BACKEND and API key for which ever provider you have chosen.
+- Add values the env vars: CRYPTO_CIPHER_KEY, AI_BACKEND and API key for which ever provider you have chosen.
 
 - Run the bee-api:
 

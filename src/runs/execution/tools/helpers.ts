@@ -40,9 +40,7 @@ import { AgentContext } from '../execute.js';
 import { getRunVectorStores } from '../helpers.js';
 import { CodeInterpreterTool as CodeInterpreterUserTool } from '../../../tools/entities/tool/code-interpreter-tool.entity.js';
 import { ApiTool as ApiCallUserTool } from '../../../tools/entities/tool/api-tool.entity.js';
-import { createChatLLM, createCodeLLM } from '../factory.js';
 import { RedisCache } from '../cache.js';
-import { getDefaultModel } from '../constants.js';
 
 import { createPythonStorage } from './python-tool-storage.js';
 import { FunctionTool, FunctionToolOutput } from './function.js';
@@ -71,7 +69,7 @@ import { UserUsage } from '@/tools/entities/tool-usages/user-usage.entity.js';
 import { FileSearchUsage } from '@/tools/entities/tool-usages/file-search-usage.entity.js';
 import { FileSearchCall } from '@/tools/entities/tool-calls/file-search-call.entity.js';
 import { FunctionTool as FunctionUserTool } from '@/tools/entities/tool/function-tool.entity.js';
-import { WikipediaSimilaritySearchTool } from '@/runs/execution/tools/wikipedia-similarity-search-tool.js';
+import { wikipediaTool } from '@/runs/execution/tools/wikipedia-tool';
 import { LoadedRun } from '@/runs/execution/types.js';
 import { CodeInterpreterResource } from '@/tools/entities/tool-resources/code-interpreter-resource.entity.js';
 import { File } from '@/files/entities/file.entity.js';
@@ -79,6 +77,7 @@ import { Attachment } from '@/messages/attachment.entity.js';
 import { SystemResource } from '@/tools/entities/tool-resources/system-resource.entity.js';
 import { createSearchTool } from '@/runs/execution/tools/search-tool';
 import { sharedRedisCacheClient } from '@/redis.js';
+import { defaultAIProvider } from '@/runs/execution/provider';
 
 const searchCache: SearchToolOptions['cache'] = new RedisCache({
   client: sharedRedisCacheClient,
@@ -129,17 +128,14 @@ export async function getTools(run: LoadedRun, context: AgentContext): Promise<F
     (tool): tool is SystemUsage =>
       tool.type === ToolType.SYSTEM && tool.toolId === SystemTools.WIKIPEDIA
   );
-  if (wikipediaUsage) tools.push(new WikipediaSimilaritySearchTool());
+  if (wikipediaUsage) tools.push(wikipediaTool());
 
   const llmUsage = run.tools.find(
     (tool): tool is SystemUsage => tool.type === ToolType.SYSTEM && tool.toolId === SystemTools.LLM
   );
-  if (llmUsage)
-    tools.push(
-      new LLMTool({
-        llm: createChatLLM({ model: getDefaultModel() })
-      })
-    );
+  if (llmUsage) {
+    tools.push(new LLMTool({ llm: defaultAIProvider.createChatBackend() }));
+  }
 
   const calculatorUsage = run.tools.find(
     (tool): tool is SystemUsage =>
@@ -190,7 +186,7 @@ export async function getTools(run: LoadedRun, context: AgentContext): Promise<F
         .flatMap((container) => container.file.$);
 
       if (codeInterpreterUsage) {
-        const codeLLM = createCodeLLM();
+        const codeLLM = defaultAIProvider.createCodeBackend();
         tools.push(
           new PythonTool({
             codeInterpreter,
@@ -332,7 +328,7 @@ export async function createToolCall(
     return new FileSearchCall({
       input: await tool.parse(input).then((result) => result.query)
     });
-  } else if (tool instanceof WikipediaSimilaritySearchTool) {
+  } else if (tool.name === wikipediaTool().name) {
     return new SystemCall({
       toolId: SystemTools.WIKIPEDIA,
       input: await tool.parse(input)

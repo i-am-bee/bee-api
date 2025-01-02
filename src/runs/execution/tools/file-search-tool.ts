@@ -17,8 +17,8 @@
 import {
   BaseToolOptions,
   BaseToolRunOptions,
-  ToolEmitter,
   Tool,
+  ToolEmitter,
   ToolInput,
   ToolOutput
 } from 'bee-agent-framework/tools/base';
@@ -30,7 +30,7 @@ import { Emitter } from 'bee-agent-framework/emitter/emitter';
 
 import { getVectorStoreClient } from '@/vector-store-files/execution/client.js';
 import { VectorStore } from '@/vector-stores/entities/vector-store.entity.js';
-import { createEmbeddingAdapter } from '@/embedding/factory';
+import { defaultAIProvider } from '@/runs/execution/provider';
 
 export interface FileSearchToolOptions extends BaseToolOptions {
   vectorStores: Loaded<VectorStore>[];
@@ -94,10 +94,11 @@ export class FileSearchTool extends Tool<FileSearchToolOutput, FileSearchToolOpt
   ): Promise<FileSearchToolOutput> {
     const vectorStoreClient = getVectorStoreClient();
 
-    const embeddingAdapter = await createEmbeddingAdapter();
+    const embeddingModel = defaultAIProvider.createEmbeddingBackend();
 
-    const embedding = await embeddingAdapter.embed(query, { signal: run.signal });
-    if (!embedding) throw new Error('Missing embedding data in embedding response');
+    const {
+      embeddings: [embedding]
+    } = await embeddingModel.embed([query], { signal: run.signal });
 
     if (this.vectorStores.some((vectorStore) => vectorStore.expired)) {
       throw new Error('Some of the vector stores are expired');

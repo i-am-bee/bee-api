@@ -41,7 +41,8 @@ import { APIError, APIErrorCode } from '@/errors/error.entity.js';
 import { Tool, ToolType } from '@/tools/entities/tool/tool.entity.js';
 import { getUpdatedValue } from '@/utils/update.js';
 import { createDeleteResponse } from '@/utils/delete.js';
-import { Agent, getDefaultModel } from '@/runs/execution/constants.js';
+import { Agent } from '@/runs/execution/constants.js';
+import { defaultAIProvider } from '@/runs/execution/provider';
 
 export function toDto(assistant: Loaded<Assistant>): AssistantDto {
   return {
@@ -113,7 +114,7 @@ export async function createAssistant({
     description: description ?? undefined,
     metadata,
     topP: top_p ?? undefined,
-    model: model ?? getDefaultModel(),
+    model: model ?? defaultAIProvider.createAssistantBackend().modelId,
     agent,
     temperature: temperature ?? undefined,
     systemPromptOverwrite: system_prompt_overwrite ?? undefined

@@ -31,7 +31,7 @@ import {
   createToolResource
 } from './helpers.js';
 import { getTools } from './tools/helpers.js';
-import { createAgentRun, createChatLLM } from './factory.js';
+import { createAgentRun } from './factory.js';
 
 import { ORM } from '@/database.js';
 import { getLogger } from '@/logger.js';
@@ -46,6 +46,7 @@ import { LoadedRun } from '@/runs/execution/types.js';
 import { UserResource } from '@/tools/entities/tool-resources/user-resource.entity.js';
 import { SystemResource } from '@/tools/entities/tool-resources/system-resource.entity.js';
 import { Attachment } from '@/messages/attachment.entity';
+import { defaultAIProvider } from '@/runs/execution/provider';
 
 const agentExecutionTime = new Summary({
   name: 'agent_execution_time_seconds',
@@ -121,7 +122,7 @@ export async function executeRun(run: LoadedRun) {
     const context = { run, publish } as AgentContext;
 
     const tools = await getTools(run, context);
-    const llm = createChatLLM(run);
+    const llm = defaultAIProvider.createAssistantBackend(run);
     const memory = new TokenMemory({ llm });
     await memory.addMany(messages);
 

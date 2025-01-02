@@ -5,7 +5,7 @@
   "author": "IBM Corp.",
   "type": "module",
   "scripts": {
-    "build": "vite build && cp -R src/embedding/adapters/caikit/grpc/protos dist/embedding/adapters/caikit/grpc/protos",
+    "build": "vite build",
     "start": "node --enable-source-maps --experimental-loader=@opentelemetry/instrumentation/hook.mjs --import ./dist/opentelemetry.js ./dist/server.js",
     "start:dev": "tsx watch src/server.ts | pino-pretty --singleLine",
     "start:dev:nowatch": "tsx src/server.ts | pino-pretty --singleLine",
@@ -20,7 +20,6 @@
     "lint": "eslint ./",
     "lint:fix": "eslint --fix ./",
     "ts:check": "tsc --noEmit",
-    "grpc:generate-types": "proto-loader-gen-types --defaults --keepCase --oneofs --longs=Number --enums=String --grpcLib=@grpc/grpc-js --outDir=./src/embedding/adapters/caikit/grpc/types ./src/embedding/adapters/caikit/grpc/protos/*.proto",
     "copyright": "./scripts/copyright.sh",
     "release": "release-it"
   },
@@ -33,8 +32,6 @@
     "@fastify/type-provider-json-schema-to-ts": "^3.0.0",
     "@godaddy/terminus": "^4.12.1",
     "@googleapis/customsearch": "^3.2.0",
-    "@grpc/grpc-js": "^1.12.2",
-    "@grpc/proto-loader": "^0.7.13",
     "@ibm-generative-ai/node-sdk": "^3.2.4",
     "@mikro-orm/core": "6.2.9",
     "@mikro-orm/migrations-mongodb": "6.2.9",

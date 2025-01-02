@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ref, type EntityManager } from '@mikro-orm/core';
+import { type EntityManager, ref } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
 
 import { OrganizationUserRole, ProjectRole } from '@/administration/entities/constants';
@@ -30,7 +30,8 @@ import { ProjectApiKey } from '@/administration/entities/project-api-key.entity'
 import { API_KEY_PREFIX, scryptSecret } from '@/auth/utils';
 import { IBM_ORGANIZATION_OWNER_ID } from '@/config';
 import { redactProjectKeyValue } from '@/administration/helpers';
-import { Agent, getDefaultModel } from '@/runs/execution/constants';
+import { Agent } from '@/runs/execution/constants';
+import { defaultAIProvider } from '@/runs/execution/provider';
 
 const USER_EXTERNAL_ID = 'test';
 const PROJECT_API_KEY = `${API_KEY_PREFIX}testkey`;
@@ -91,7 +92,7 @@ export class DatabaseSeeder extends Seeder {
       redactedValue: redactProjectKeyValue(PROJECT_API_KEY)
     });
     const beeAssistant = new Assistant({
-      model: getDefaultModel(),
+      model: defaultAIProvider.createAssistantBackend().modelId,
       agent: Agent.BEE,
       tools: [
         {
@@ -120,7 +121,7 @@ export class DatabaseSeeder extends Seeder {
       }
     });
     const streamlitAssistant = new Assistant({
-      model: getDefaultModel(),
+      model: defaultAIProvider.createAssistantBackend().modelId,
       agent: Agent.STREAMLIT,
       tools: [],
       name: 'Builder Assistant',

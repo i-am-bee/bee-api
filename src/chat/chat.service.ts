@@ -26,11 +26,10 @@ import {
 import { ChatMessageRole } from './constants';
 import { Chat } from './entities/chat.entity';
 
-import { createChatLLM } from '@/runs/execution/factory';
 import { getLogger } from '@/logger';
 import { APIError, APIErrorCode } from '@/errors/error.entity';
-import { getDefaultModel } from '@/runs/execution/constants';
 import { ORM } from '@/database';
+import { defaultAIProvider } from '@/runs/execution/provider';
 
 const getChatLogger = () => getLogger();
 
@@ -52,12 +51,12 @@ export function toDto(chat: Loaded<Chat>): ChatCompletionCreateResponse {
 }
 
 export async function createChatCompletion({
-  model = getDefaultModel(),
+  model,
   messages,
   response_format
 }: ChatCompletionCreateBody): Promise<ChatCompletionCreateResponse> {
-  const llm = createChatLLM({ model });
-  const chat = new Chat({ model, messages, responseFormat: response_format });
+  const llm = defaultAIProvider.createChatBackend({ model });
+  const chat = new Chat({ model: llm.modelId, messages, responseFormat: response_format });
   await ORM.em.persistAndFlush(chat);
   try {
     const schema = response_format?.json_schema.schema;

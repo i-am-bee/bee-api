@@ -29,9 +29,8 @@ import { ORM } from '@/database.js';
 import { APIError } from '@/errors/error.entity.js';
 import { getVectorStoreClient } from '@/vector-store-files/execution/client.js';
 import { watchForCancellation } from '@/utils/jobs.js';
-import { createEmbeddingAdapter } from '@/embedding/factory';
-import { VECTOR_STORE_EMBEDDING_MODEL } from '@/vector-stores/constants';
 import { getExtractedChunks } from '@/files/extraction/helpers';
+import { defaultAIProvider } from '@/runs/execution/provider';
 
 const getJobLogger = (vectorStoreId: string, fileId?: string) =>
   getLogger().child({ vectorStoreId, fileId }, { msgPrefix: '[vector-store-process] ' });
@@ -65,12 +64,10 @@ export async function processVectorStoreFile(vectorStoreFile: Loaded<VectorStore
   }
 
   async function* embedTransform(source: AsyncIterable<string[]>) {
-    const embeddingAdapter = await createEmbeddingAdapter(VECTOR_STORE_EMBEDDING_MODEL);
+    const embeddingAdapter = defaultAIProvider.createEmbeddingBackend();
     for await (const items of source) {
-      const embeddings = await embeddingAdapter.embedMany(items, {
-        signal: controller.signal
-      });
-      yield embeddings.map((embedding, idx) => ({
+      const output = await embeddingAdapter.embed(items, { signal: controller.signal });
+      yield output.embeddings.map((embedding, idx) => ({
         embedding: embedding,
         text: items[idx]
       }));
