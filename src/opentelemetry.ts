@@ -16,6 +16,8 @@
 
 import 'dotenv/config';
 
+import { setTimeout } from 'node:timers/promises';
+
 import { NodeSDK, resources, metrics } from '@opentelemetry/sdk-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
@@ -34,7 +36,7 @@ export const opentelemetrySDK = new NodeSDK({
 });
 opentelemetrySDK.start();
 
-process.on('beforeExit', async () => {
+const shutdown = async () => {
   await Promise.all(
     Object.entries(opentelemetrySDK)
       .filter(([_, value]) => value && typeof value.forceFlush === 'function')
@@ -45,4 +47,13 @@ process.on('beforeExit', async () => {
       })
   );
   await opentelemetrySDK.shutdown();
+};
+
+process.on('beforeExit', async () => {
+  try {
+    await Promise.race([shutdown(), setTimeout(5_000, null, { ref: false })]);
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to execute shutdown hook', err);
+  }
 });
