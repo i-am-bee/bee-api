@@ -134,7 +134,7 @@ export async function getTools(run: LoadedRun, context: AgentContext): Promise<F
     (tool): tool is SystemUsage => tool.type === ToolType.SYSTEM && tool.toolId === SystemTools.LLM
   );
   if (llmUsage) {
-    tools.push(new LLMTool({ llm: defaultAIProvider.createChatLLM() }));
+    tools.push(new LLMTool({ llm: defaultAIProvider.createChatBackend() }));
   }
 
   const calculatorUsage = run.tools.find(
@@ -186,7 +186,7 @@ export async function getTools(run: LoadedRun, context: AgentContext): Promise<F
         .flatMap((container) => container.file.$);
 
       if (codeInterpreterUsage) {
-        const codeLLM = defaultAIProvider.createCodeLLM();
+        const codeLLM = defaultAIProvider.createCodeBackend();
         tools.push(
           new PythonTool({
             codeInterpreter,

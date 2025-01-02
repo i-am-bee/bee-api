@@ -131,7 +131,7 @@ export async function createUser({
   user.defaultProject = ORM.em.getRepository(Project).getReference(project.id, { wrapped: true });
 
   const assistant = new Assistant({
-    model: defaultAIProvider.createChatLLM().modelId,
+    model: defaultAIProvider.createAssistantBackend().modelId,
     agent: Agent.BEE,
     tools: [
       new SystemUsage({ toolId: SystemTools.WEB_SEARCH }),

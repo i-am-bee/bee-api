@@ -114,7 +114,7 @@ export async function createAssistant({
     description: description ?? undefined,
     metadata,
     topP: top_p ?? undefined,
-    model: model ?? defaultAIProvider.createChatLLM().modelId,
+    model: model ?? defaultAIProvider.createAssistantBackend().modelId,
     agent,
     temperature: temperature ?? undefined,
     systemPromptOverwrite: system_prompt_overwrite ?? undefined

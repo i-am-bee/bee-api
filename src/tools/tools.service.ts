@@ -465,7 +465,7 @@ function getSystemTools() {
   });
   const fileSearch = new FileSearchTool({ vectorStores: [], maxNumResults: 0 });
   const readFile = new ReadFileTool({ files: [], fileSize: 0 });
-  const llmTool = new LLMTool({ llm: defaultAIProvider.createChatLLM() });
+  const llmTool = new LLMTool({ llm: defaultAIProvider.createChatBackend() });
   const calculatorTool = new CalculatorTool();
 
   const systemTools = new Map<string, SystemTool>();

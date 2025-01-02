@@ -55,7 +55,7 @@ export async function createChatCompletion({
   messages,
   response_format
 }: ChatCompletionCreateBody): Promise<ChatCompletionCreateResponse> {
-  const llm = defaultAIProvider.createChatLLM({ model });
+  const llm = defaultAIProvider.createChatBackend({ model });
   const chat = new Chat({ model: llm.modelId, messages, responseFormat: response_format });
   await ORM.em.persistAndFlush(chat);
   try {
