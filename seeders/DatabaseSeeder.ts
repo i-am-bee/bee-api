@@ -92,7 +92,7 @@ export class DatabaseSeeder extends Seeder {
       redactedValue: redactProjectKeyValue(PROJECT_API_KEY)
     });
     const beeAssistant = new Assistant({
-      model: defaultAIProvider.createChatLLM().modelId,
+      model: defaultAIProvider.createAssistantBackend().modelId,
       agent: Agent.BEE,
       tools: [
         {
@@ -121,7 +121,7 @@ export class DatabaseSeeder extends Seeder {
       }
     });
     const streamlitAssistant = new Assistant({
-      model: defaultAIProvider.createChatLLM().modelId,
+      model: defaultAIProvider.createAssistantBackend().modelId,
       agent: Agent.STREAMLIT,
       tools: [],
       name: 'Builder Assistant',

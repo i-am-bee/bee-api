@@ -64,7 +64,7 @@ export async function processVectorStoreFile(vectorStoreFile: Loaded<VectorStore
   }
 
   async function* embedTransform(source: AsyncIterable<string[]>) {
-    const embeddingAdapter = defaultAIProvider.createEmbeddingModel();
+    const embeddingAdapter = defaultAIProvider.createEmbeddingBackend();
     for await (const items of source) {
       const output = await embeddingAdapter.embed(items, { signal: controller.signal });
       yield output.embeddings.map((embedding, idx) => ({

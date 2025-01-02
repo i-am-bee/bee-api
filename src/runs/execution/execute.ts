@@ -122,7 +122,7 @@ export async function executeRun(run: LoadedRun) {
     const context = { run, publish } as AgentContext;
 
     const tools = await getTools(run, context);
-    const llm = defaultAIProvider.createChatLLM(run);
+    const llm = defaultAIProvider.createAssistantBackend(run);
     const memory = new TokenMemory({ llm });
     await memory.addMany(messages);
 

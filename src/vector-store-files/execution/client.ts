@@ -28,7 +28,7 @@ export type DocumentType = z.ZodType<Document>;
 
 export function getVectorStoreClient(): VectorStoreClient<DocumentType> {
   return new MilvusVectorStore({
-    modelName: defaultAIProvider.createEmbeddingModel().modelId,
+    modelName: defaultAIProvider.createEmbeddingBackend().modelId,
     documentSchema: DocumentSchema
   });
 }

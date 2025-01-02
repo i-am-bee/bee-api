@@ -94,9 +94,11 @@ export class FileSearchTool extends Tool<FileSearchToolOutput, FileSearchToolOpt
   ): Promise<FileSearchToolOutput> {
     const vectorStoreClient = getVectorStoreClient();
 
-    const embeddingModel = defaultAIProvider.createEmbeddingModel();
+    const embeddingModel = defaultAIProvider.createEmbeddingBackend();
 
-    const [embedding] = (await embeddingModel.embed([query], { signal: run.signal })).embeddings;
+    const {
+      embeddings: [embedding]
+    } = await embeddingModel.embed([query], { signal: run.signal });
 
     if (this.vectorStores.some((vectorStore) => vectorStore.expired)) {
       throw new Error('Some of the vector stores are expired');

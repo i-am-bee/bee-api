@@ -50,9 +50,10 @@ interface AIProvider<
   ChatLLMType extends ChatLLM<ChatLLMOutput>,
   LLMType extends LLM<BaseLLMOutput> = any
 > {
-  createChatLLM: (params?: ChatLLMParams) => ChatLLMType;
-  createCodeLLM: (params?: { model?: string }) => LLMType | void;
-  createEmbeddingModel?: (params?: { model?: string }) => EmbeddingModel;
+  createChatBackend: (params?: ChatLLMParams) => ChatLLMType;
+  createAssistantBackend: (params?: ChatLLMParams) => ChatLLMType;
+  createCodeBackend: (params?: { model?: string }) => LLMType | void;
+  createEmbeddingBackend?: (params?: { model?: string }) => EmbeddingModel;
 }
 
 export class BamAIProvider implements AIProvider<BAMChatLLM, BAMLLM> {
@@ -62,7 +63,10 @@ export class BamAIProvider implements AIProvider<BAMChatLLM, BAMLLM> {
     BamAIProvider.client ??= new BAMClient({ apiKey: BAM_API_KEY ?? undefined });
   }
 
-  createChatLLM({ model = 'meta-llama/llama-3-1-70b-instruct', ...params }: ChatLLMParams = {}) {
+  createChatBackend({
+    model = 'meta-llama/llama-3-1-70b-instruct',
+    ...params
+  }: ChatLLMParams = {}) {
     return BAMChatLLM.fromPreset(model as BAMChatLLMPresetModel, {
       client: BamAIProvider.client,
       parameters: (parameters) => ({
@@ -74,7 +78,11 @@ export class BamAIProvider implements AIProvider<BAMChatLLM, BAMLLM> {
     });
   }
 
-  createCodeLLM({ model = 'meta-llama/llama-3-1-70b-instruct' } = {}) {
+  createAssistantBackend(params?: ChatLLMParams) {
+    return this.createChatBackend(params);
+  }
+
+  createCodeBackend({ model = 'meta-llama/llama-3-1-70b-instruct' } = {}) {
     return new BAMLLM({
       client: BamAIProvider.client,
       modelId: model,
@@ -86,7 +94,7 @@ export class BamAIProvider implements AIProvider<BAMChatLLM, BAMLLM> {
     });
   }
 
-  createEmbeddingModel({ model = 'baai/bge-large-en-v1.5' } = {}) {
+  createEmbeddingBackend({ model = 'baai/bge-large-en-v1.5' } = {}) {
     return new BAMLLM({ client: BamAIProvider.client, modelId: model });
   }
 }
@@ -98,7 +106,7 @@ export class OllamaAIProvider implements AIProvider<OllamaChatLLM, OllamaLLM> {
     OllamaAIProvider.client ??= new Ollama({ host: OLLAMA_URL ?? undefined });
   }
 
-  createChatLLM({ model: modelId = 'llama3.1', ...params }: ChatLLMParams = {}) {
+  createChatBackend({ model: modelId = 'llama3.1', ...params }: ChatLLMParams = {}) {
     return new OllamaChatLLM({
       client: OllamaAIProvider.client,
       modelId,
@@ -109,9 +117,13 @@ export class OllamaAIProvider implements AIProvider<OllamaChatLLM, OllamaLLM> {
       }
     });
   }
-  createCodeLLM() {}
+  createAssistantBackend(params?: ChatLLMParams) {
+    return this.createChatBackend(params);
+  }
 
-  createEmbeddingModel({ model: modelId = 'nomic-embed-text' } = {}) {
+  createCodeBackend() {}
+
+  createEmbeddingBackend({ model: modelId = 'nomic-embed-text' } = {}) {
     return new OllamaLLM({ client: OllamaAIProvider.client, modelId });
   }
 }
@@ -122,7 +134,7 @@ export class OpenAIProvider implements AIProvider<OpenAIChatLLM> {
     OpenAIProvider.client ??= new OpenAI({ apiKey: OPENAI_API_KEY ?? undefined });
   }
 
-  createChatLLM({ model = 'gpt-4o', ...params }: ChatLLMParams = {}) {
+  createChatBackend({ model = 'gpt-4o', ...params }: ChatLLMParams = {}) {
     return new OpenAIChatLLM({
       client: OpenAIProvider.client,
       modelId: model as OpenAI.ChatModel,
@@ -134,9 +146,13 @@ export class OpenAIProvider implements AIProvider<OpenAIChatLLM> {
     });
   }
 
-  createCodeLLM() {}
+  createAssistantBackend(params?: ChatLLMParams) {
+    return this.createChatBackend(params);
+  }
 
-  createEmbeddingModel({ model = 'text-embedding-3-large' } = {}) {
+  createCodeBackend() {}
+
+  createEmbeddingBackend({ model = 'text-embedding-3-large' } = {}) {
     return {
       chatLLM: new OpenAIChatLLM({
         client: OpenAIProvider.client,
@@ -170,7 +186,10 @@ export class IBMvLLMAIProvider implements AIProvider<IBMVllmChatLLM, IBMvLLM> {
     });
   }
 
-  createChatLLM({ model = IBMVllmModel.LLAMA_3_1_70B_INSTRUCT, ...params }: ChatLLMParams = {}) {
+  createChatBackend({
+    model = IBMVllmModel.LLAMA_3_1_70B_INSTRUCT,
+    ...params
+  }: ChatLLMParams = {}) {
     return IBMVllmChatLLM.fromPreset(model as IBMVllmChatLLMPresetModel, {
       client: IBMvLLMAIProvider.client,
       parameters: (parameters) => ({
@@ -188,7 +207,11 @@ export class IBMvLLMAIProvider implements AIProvider<IBMVllmChatLLM, IBMvLLM> {
     });
   }
 
-  createCodeLLM({ model: modelId = 'meta-llama/llama-3-1-70b-instruct' } = {}) {
+  createAssistantBackend(params?: ChatLLMParams) {
+    return this.createChatBackend(params);
+  }
+
+  createCodeBackend({ model: modelId = 'meta-llama/llama-3-1-70b-instruct' } = {}) {
     return new IBMvLLM({
       client: IBMvLLMAIProvider.client,
       modelId,
@@ -199,7 +222,7 @@ export class IBMvLLMAIProvider implements AIProvider<IBMVllmChatLLM, IBMvLLM> {
     });
   }
 
-  createEmbeddingModel({ model: modelId = 'baai/bge-large-en-v1.5' } = {}) {
+  createEmbeddingBackend({ model: modelId = 'baai/bge-large-en-v1.5' } = {}) {
     return new IBMvLLM({ client: IBMvLLMAIProvider.client, modelId });
   }
 }
@@ -215,7 +238,10 @@ export class WatsonxAIProvider implements AIProvider<WatsonXChatLLM, WatsonXLLM>
     };
   }
 
-  createChatLLM({ model = 'meta-llama/llama-3-1-70b-instruct', ...params }: ChatLLMParams = {}) {
+  createChatBackend({
+    model = 'meta-llama/llama-3-1-70b-instruct',
+    ...params
+  }: ChatLLMParams = {}) {
     return WatsonXChatLLM.fromPreset(model as WatsonXChatLLMPresetModel, {
       ...this.credentials,
       parameters: (parameters) => ({
@@ -227,7 +253,11 @@ export class WatsonxAIProvider implements AIProvider<WatsonXChatLLM, WatsonXLLM>
     });
   }
 
-  createCodeLLM({ model: modelId = 'meta-llama/llama-3-1-70b-instruct' } = {}) {
+  createAssistantBackend(params?: ChatLLMParams) {
+    return this.createChatBackend(params);
+  }
+
+  createCodeBackend({ model: modelId = 'meta-llama/llama-3-1-70b-instruct' } = {}) {
     return new WatsonXLLM({
       ...this.credentials,
       modelId,
@@ -239,7 +269,7 @@ export class WatsonxAIProvider implements AIProvider<WatsonXChatLLM, WatsonXLLM>
     });
   }
 
-  createEmbeddingModel({ model: modelId = 'ibm/slate-30m-english-rtrvr-v2' } = {}) {
+  createEmbeddingBackend({ model: modelId = 'ibm/slate-30m-english-rtrvr-v2' } = {}) {
     return new WatsonXLLM({ ...this.credentials, modelId, region: WATSONX_REGION ?? undefined });
   }
 }

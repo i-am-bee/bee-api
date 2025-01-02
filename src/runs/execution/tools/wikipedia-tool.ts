@@ -36,7 +36,7 @@ export function wikipediaTool(
   maxResults = 5
 ): AnyTool {
   // LLM to perform text embedding
-  const embeddingLLM = defaultAIProvider.createEmbeddingModel();
+  const embeddingLLM = defaultAIProvider.createEmbeddingBackend();
 
   // Similarity tool to calculate the similarity between a query and a set of wikipedia passages
   const similarity = new SimilarityTool({
