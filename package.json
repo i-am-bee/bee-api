@@ -50,7 +50,7 @@
     "ajv": "^8.17.1",
     "axios": "^1.7.7",
     "bee-agent-framework": "0.0.54",
-    "bullmq": "^5.32.0",
+    "bullmq": "^5.34.6",
     "bullmq-otel": "^1.0.1",
     "cache-manager": "^5.7.6",
     "dayjs": "^1.11.11",

@@ -84,8 +84,8 @@ importers:
         specifier: 0.0.54
         version: 0.0.54(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0(encoding@0.1.13))(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.4(encoding@0.1.13))(@zilliz/milvus2-sdk-node@2.4.4)(encoding@0.1.13)(google-auth-library@9.15.0(encoding@0.1.13))(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(encoding@0.1.13)(zod@3.23.8))
       bullmq:
-        specifier: ^5.32.0
-        version: 5.32.0
+        specifier: ^5.34.6
+        version: 5.34.6
       bullmq-otel:
         specifier: ^1.0.1
         version: 1.0.1
@@ -2245,8 +2245,8 @@ packages:
   bullmq-otel@1.0.1:
     resolution: {integrity: sha512-9SSBA/iq8bFUJ9I5bDwv1UmtbJAmIGHt796g5lsYZWasqouTqkFA3+Z/n17mCc8VzfxxygCCCBsXdC1mICbxdw==}
 
-  bullmq@5.32.0:
-    resolution: {integrity: sha512-zNf/DrbCbH+H8fgMshu33OGwrkUZP3c/CyJeFHauglEy5U6Fd9r52ujItRiT1PIODHIG6pCIdWMbpJGCf+Wuxg==}
+  bullmq@5.34.6:
+    resolution: {integrity: sha512-pRCYyO9RlkQWxdmKlrNnUthyFwurYXRYLVXD1YIx+nCCdhAOiHatD8FDHbsT/w2I31c0NWoMcfZiIGuipiF7Lg==}
 
   bundle-name@4.1.0:
     resolution: {integrity: sha512-tjwM5exMg6BGRI+kNmTntNsvdZS1X8BFYS6tnJ2hdH0kVxM6/eVZ2xy+FqStSWvYmtfFMDLIxurorHwDKfDz5Q==}
@@ -8001,11 +8001,11 @@ snapshots:
   bullmq-otel@1.0.1:
     dependencies:
       '@opentelemetry/api': 1.9.0
-      bullmq: 5.32.0
+      bullmq: 5.34.6
     transitivePeerDependencies:
       - supports-color
 
-  bullmq@5.32.0:
+  bullmq@5.34.6:
     dependencies:
       cron-parser: 4.9.0
       ioredis: 5.4.1
