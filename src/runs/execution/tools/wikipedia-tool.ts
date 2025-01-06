@@ -79,7 +79,7 @@ export function wikipediaTool(
       query: input.question,
       documents: output.results.flatMap((document, idx) =>
         Array.from(
-          splitString(document.fields.markdown as string, {
+          splitString(document.fields.markdown ?? '', {
             size: passageSizeTokens * CHARS_PER_TOKEN_AVG,
             overlap: overlapTokens * CHARS_PER_TOKEN_AVG
           })
