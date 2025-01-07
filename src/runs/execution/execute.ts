@@ -46,6 +46,7 @@ import { LoadedRun } from '@/runs/execution/types.js';
 import { UserResource } from '@/tools/entities/tool-resources/user-resource.entity.js';
 import { SystemResource } from '@/tools/entities/tool-resources/system-resource.entity.js';
 import { Attachment } from '@/messages/attachment.entity';
+import { batchSpanProcessor, isOpenTelemetryEnabled } from '@/opentelemetry.js';
 
 const agentExecutionTime = new Summary({
   name: 'agent_execution_time_seconds',
@@ -144,6 +145,7 @@ export async function executeRun(run: LoadedRun) {
       );
 
       await agentRun;
+      if (isOpenTelemetryEnabled) await batchSpanProcessor.forceFlush();
 
       endAgentExecutionTimer();
       run.complete();
