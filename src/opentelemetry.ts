@@ -18,38 +18,46 @@ import 'dotenv/config';
 
 import { setTimeout } from 'node:timers/promises';
 
-import { NodeSDK, resources, metrics } from '@opentelemetry/sdk-node';
+import { NodeSDK, resources, metrics, tracing } from '@opentelemetry/sdk-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { ATTR_DEPLOYMENT_ENVIRONMENT_NAME } from '@opentelemetry/semantic-conventions/incubating';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
 
 const ENV = process.env.ENVIRONMENT;
+
+export const isOpenTelemetryEnabled = Boolean(process.env.NODE_ENV === 'production');
+export const batchSpanProcessor = new tracing.BatchSpanProcessor(new OTLPTraceExporter({}));
 
 export const opentelemetrySDK = new NodeSDK({
   resource: new resources.Resource({
     [ATTR_SERVICE_NAME]: `bee-api`,
     [ATTR_DEPLOYMENT_ENVIRONMENT_NAME]: ENV
   }),
+  spanProcessors: [batchSpanProcessor],
   metricReader: new metrics.PeriodicExportingMetricReader({ exporter: new OTLPMetricExporter() }),
   instrumentations: [...getNodeAutoInstrumentations()]
 });
-opentelemetrySDK.start();
 
-let isShuttingDown = false;
-const { promise, resolve } = Promise.withResolvers<void>();
+if (isOpenTelemetryEnabled) {
+  opentelemetrySDK.start();
 
-for (const event of ['beforeExit', 'SIGINT', 'SIGTERM']) {
-  process.once(event, () => {
-    if (!isShuttingDown) {
-      isShuttingDown = true;
-      Promise.race([opentelemetrySDK.shutdown(), setTimeout(5_000, null, { ref: false })])
-        .catch((err) => {
-          // eslint-disable-next-line no-console
-          console.error(`Failed to execute shutdown hook`, err);
-        })
-        .finally(() => resolve());
-    }
-    return promise;
-  });
+  let isShuttingDown = false;
+  const { promise, resolve } = Promise.withResolvers<void>();
+
+  for (const event of ['beforeExit', 'SIGINT', 'SIGTERM']) {
+    process.once(event, () => {
+      if (!isShuttingDown) {
+        isShuttingDown = true;
+        Promise.race([opentelemetrySDK.shutdown(), setTimeout(5_000, null, { ref: false })])
+          .catch((err) => {
+            // eslint-disable-next-line no-console
+            console.error(`Failed to execute shutdown hook`, err);
+          })
+          .finally(() => resolve());
+      }
+      return promise;
+    });
+  }
 }

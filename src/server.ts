@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import './opentelemetry.js';
 import '@/ui/auth-server.js';
 
 import { JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts';

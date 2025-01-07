@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "vite build && cp -R src/embedding/adapters/caikit/grpc/protos dist/embedding/adapters/caikit/grpc/protos",
-    "start": "node --enable-source-maps --experimental-loader=@opentelemetry/instrumentation/hook.mjs --import ./dist/opentelemetry.js ./dist/server.js",
+    "start": "node ./dist/server.js",
     "start:dev": "tsx watch src/server.ts | pino-pretty --singleLine",
     "start:dev:nowatch": "tsx src/server.ts | pino-pretty --singleLine",
     "start:dev:workers": "concurrently npm:start:dev:workers:*",
@@ -43,6 +43,7 @@
     "@mikro-orm/seeder": "6.2.9",
     "@opentelemetry/auto-instrumentations-node": "^0.54.0",
     "@opentelemetry/exporter-metrics-otlp-http": "^0.54.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "^0.57.0",
     "@opentelemetry/instrumentation": "^0.54.0",
     "@opentelemetry/sdk-node": "^0.54.0",
     "@opentelemetry/semantic-conventions": "^1.27.0",
