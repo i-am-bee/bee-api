@@ -16,6 +16,7 @@
 
 import { FetchResponse } from 'openapi-fetch';
 import { FastifyReply } from 'fastify';
+import { StatusCodes } from 'http-status-codes';
 
 import { Client } from './api/client.js';
 
@@ -61,20 +62,21 @@ function isAPIErrorCode(value: any): value is APIErrorCode {
 
 type MediaType = `${string}/${string}`;
 export async function processApiProxyResponse<T, O, M extends MediaType>(
-  response: Promise<FetchResponse<T, O, M>>,
+  fetchResponse: Promise<FetchResponse<T, O, M>>,
   reply: FastifyReply
 ): Promise<FetchResponse<T, O, M>['data']> {
-  const {
-    data,
-    error,
-    response: { headers }
-  } = await response;
+  const { data, error, response } = await fetchResponse;
 
   // apply only allowed headers from Observe API response
-  reply.headers(pickHeaders(headers, ['Retry-After']));
+  reply.headers(pickHeaders(response.headers, ['Retry-After']));
 
   if (error) {
-    getTraceLogger().error({ err: error }, 'Observe API: Invalid response');
+    if (response.status === StatusCodes.NOT_FOUND) {
+      getTraceLogger().debug('The trace does not exist in the Observe yet');
+    } else {
+      getTraceLogger().error({ err: error }, 'Observe API: Invalid response');
+    }
+
     const errorCode = error.code.toLocaleLowerCase();
 
     throw new APIError(
