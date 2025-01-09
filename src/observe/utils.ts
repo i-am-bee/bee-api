@@ -72,7 +72,7 @@ export async function processApiProxyResponse<T, O, M extends MediaType>(
 
   if (error) {
     if (response.status === StatusCodes.NOT_FOUND) {
-      getTraceLogger().debug('The trace does not exist in the Observe yet');
+      getTraceLogger().trace({ err: error }, 'The trace does not exist in the Observe yet');
     } else {
       getTraceLogger().error({ err: error }, 'Observe API: Invalid response');
     }
