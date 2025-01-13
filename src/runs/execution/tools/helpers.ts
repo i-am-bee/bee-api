@@ -34,6 +34,7 @@ import { DuckDuckGoSearchTool } from 'bee-agent-framework/tools/search/duckDuckG
 import { SearchToolOptions, SearchToolOutput } from 'bee-agent-framework/tools/search/base';
 import { PromptTemplate } from 'bee-agent-framework/template';
 import { CalculatorTool } from 'bee-agent-framework/tools/calculator';
+import { OpenAPITool, OpenAPIToolOutput } from 'bee-agent-framework/tools/openapi';
 import { LLMTool } from 'bee-agent-framework/tools/llm';
 
 import { AgentContext } from '../execute.js';
@@ -45,7 +46,6 @@ import { RedisCache } from '../cache.js';
 import { createPythonStorage } from './python-tool-storage.js';
 import { FunctionTool, FunctionToolOutput } from './function.js';
 import { FileSearchTool, FileSearchToolOutput } from './file-search-tool.js';
-import { ApiCallTool } from './api-call-tool.js';
 import { ReadFileTool } from './read-file-tool.js';
 
 import { CodeInterpreterCall } from '@/tools/entities/tool-calls/code-interpreter-call.entity.js';
@@ -57,7 +57,8 @@ import {
   BEE_CODE_INTERPRETER_CA_CERT,
   BEE_CODE_INTERPRETER_CERT,
   BEE_CODE_INTERPRETER_KEY,
-  BEE_CODE_INTERPRETER_URL
+  BEE_CODE_INTERPRETER_URL,
+  HTTP_PROXY_URL
 } from '@/config.js';
 import { FileContainer } from '@/files/entities/files-container.entity.js';
 import { FunctionUsage } from '@/tools/entities/tool-usages/function-usage.entity.js';
@@ -241,12 +242,12 @@ export async function getTools(run: LoadedRun, context: AgentContext): Promise<F
                 context
               });
             case ToolExecutor.API:
-              return new ApiCallTool({
+              return new OpenAPITool({
                 name: toolUsage.tool.$.name,
                 description: toolUsage.tool.$.description,
                 openApiSchema: (<ApiCallUserTool>toolUsage.tool.$).openApiSchema,
-                context,
-                apiKey: (<ApiCallUserTool>toolUsage.tool.$).apiKey
+                apiKey: (<ApiCallUserTool>toolUsage.tool.$).apiKey,
+                httpProxyUrl: HTTP_PROXY_URL ?? undefined
               });
           }
         })
@@ -369,7 +370,7 @@ export async function createToolCall(
     });
   } else if (tool instanceof FunctionTool) {
     return new FunctionCall({ name: tool.name, arguments: JSON.stringify(input) });
-  } else if (tool instanceof CustomTool || tool instanceof ApiCallTool) {
+  } else if (tool instanceof CustomTool || tool instanceof OpenAPITool) {
     const [toolEntity] = await ORM.em
       .getRepository(Tool)
       .find({ name: tool.name, project: run.project });
@@ -433,7 +434,8 @@ export async function finalizeToolCall(
     if (!(result instanceof FileSearchToolOutput)) throw new TypeError();
     toolCall.results = result.results;
   } else if (toolCall instanceof UserCall) {
-    if (!(result instanceof StringToolOutput)) throw new TypeError();
+    if (!(result instanceof StringToolOutput || result instanceof OpenAPIToolOutput))
+      throw new TypeError();
     toolCall.output = result.result;
   } else {
     throw new Error(`Unexpected tool call`);
