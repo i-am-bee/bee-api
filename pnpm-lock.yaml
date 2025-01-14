@@ -66,8 +66,8 @@ importers:
         specifier: ^1.27.0
         version: 1.27.0
       '@zilliz/milvus2-sdk-node':
-        specifier: ^2.4.4
-        version: 2.4.4
+        specifier: ^2.4.9
+        version: 2.5.3
       ajv:
         specifier: ^8.17.1
         version: 8.17.1
@@ -75,8 +75,8 @@ importers:
         specifier: ^1.7.7
         version: 1.7.7
       bee-agent-framework:
-        specifier: 0.0.55
-        version: 0.0.55(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0(encoding@0.1.13))(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.4(encoding@0.1.13))(@zilliz/milvus2-sdk-node@2.4.4)(encoding@0.1.13)(google-auth-library@9.15.0(encoding@0.1.13))(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(encoding@0.1.13)(zod@3.23.8))(yaml@2.6.0)
+        specifier: 0.0.57
+        version: 0.0.57(@googleapis/customsearch@3.2.0(encoding@0.1.13))(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@zilliz/milvus2-sdk-node@2.5.3)(encoding@0.1.13)(google-auth-library@9.15.0(encoding@0.1.13))(ollama@0.5.12)(openai-chat-tokens@0.2.8)(openai@4.67.3(encoding@0.1.13)(zod@3.23.8))(yaml@2.7.0)
       bullmq:
         specifier: ^5.34.6
         version: 5.34.6
@@ -126,8 +126,8 @@ importers:
         specifier: ^4.0.4
         version: 4.0.4
       ollama:
-        specifier: ^0.5.9
-        version: 0.5.9
+        specifier: ^0.5.11
+        version: 0.5.12
       openai:
         specifier: ^4.67.3
         version: 4.67.3(encoding@0.1.13)(zod@3.23.8)
@@ -159,8 +159,8 @@ importers:
         specifier: ^5.1.7
         version: 5.1.7
       yaml:
-        specifier: ^2.5.0
-        version: 2.6.0
+        specifier: ^2.6.1
+        version: 2.7.0
       yauzl:
         specifier: ^3.1.3
         version: 3.1.3
@@ -301,24 +301,9 @@ packages:
     resolution: {integrity: sha512-YTnYtra7W9e6/oAZEHj0bJehPRUlLH9/fbpT5LfB0NhQXyALCRkRs3zH9v07IYhkgpqX6Z78FnuccZr/l4Fs4Q==}
     engines: {node: '>=6.9.0'}
 
-  '@bufbuild/protobuf@1.10.0':
-    resolution: {integrity: sha512-QDdVFLoN93Zjg36NoQPZfsVH9tZew7wKDKyV5qRdj8ntT4wQCOradQjRaTdwMhWUYsgKsvCINKKm87FdEk96Ag==}
-
   '@colors/colors@1.6.0':
     resolution: {integrity: sha512-Ir+AOibqzrIsL6ajt3Rz3LskB7OiMVHqltZmspbW/TJuTVuyOMirVqAkjfY6JISiLHgyNqicAC8AyHHGzNd/dA==}
     engines: {node: '>=0.1.90'}
-
-  '@connectrpc/connect-node@1.6.1':
-    resolution: {integrity: sha512-DxcD1wsF/aX9GegjAtl7VbpiZNjVJozy87VbaFoN6AF0Ln1Q757r5dgV59Gz0wmlk5f17txUsrEr1f2inlnnAg==}
-    engines: {node: '>=16.0.0'}
-    peerDependencies:
-      '@bufbuild/protobuf': ^1.10.0
-      '@connectrpc/connect': 1.6.1
-
-  '@connectrpc/connect@1.6.1':
-    resolution: {integrity: sha512-KchMDNtU4CDTdkyf0qG7ugJ6qHTOR/aI7XebYn3OTCNagaDYWiZUVKgRgwH79yeMkpNgvEUaXSK7wKjaBK9b/Q==}
-    peerDependencies:
-      '@bufbuild/protobuf': ^1.10.0
 
   '@conventional-changelog/git-client@1.0.1':
     resolution: {integrity: sha512-PJEqBwAleffCMETaVm/fUgHldzBE35JFk3/9LL6NUA5EXa3qednu+UT6M7E5iBu3zIQZCULYIiZ90fBYHt6xUw==}
@@ -1909,8 +1894,8 @@ packages:
   '@vue/shared@3.4.37':
     resolution: {integrity: sha512-nIh8P2fc3DflG8+5Uw8PT/1i17ccFn0xxN/5oE9RfV5SVnd7G0XEFRwakrnNFE/jlS95fpGXDVG5zDETS26nmg==}
 
-  '@zilliz/milvus2-sdk-node@2.4.4':
-    resolution: {integrity: sha512-NskDv0dub4yZsJp3rWyXi/twV4JSWfi0ZBdUPHfsIY54dbu1CdYjZNYTrsxnqLQXpWfGSQ5RIBpIGJ7jUvXw5Q==}
+  '@zilliz/milvus2-sdk-node@2.5.3':
+    resolution: {integrity: sha512-8rLs/E0uukHdV1TEe5zMJiL+l6cmqgcYgmprlSbQLvF8ZBDl7rZsxayy94yNMTAxtrzwV5EUCvhd6aPZeO7FSw==}
 
   abbrev@1.1.1:
     resolution: {integrity: sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==}
@@ -2124,8 +2109,8 @@ packages:
     resolution: {integrity: sha512-4Bcg1P8xhUuqcii/S0Z9wiHIrQVPMermM1any+MX5GeGD7faD3/msQUDGLol9wOcz4/jbg/WJnGqoJF6LiBdtg==}
     engines: {node: '>=10.0.0'}
 
-  bee-agent-framework@0.0.55:
-    resolution: {integrity: sha512-4peuteFKgJ7HFj0m0N59EftIVpWm4FjkdLbJjuO1zJ4fL3nZZgCQZfv0Xn++McuuZwYC9DL5TbjzX29yNQngVw==}
+  bee-agent-framework@0.0.57:
+    resolution: {integrity: sha512-Ne4ZIb/h2R2kWTXAW+FEe+xQrZQQHhooFoahE2gzxFXgJZP5v4XuuMEKFc2Epa534Mh6TCvazntmFT23qgmTiQ==}
     peerDependencies:
       '@aws-sdk/client-bedrock-runtime': ^3.687.0
       '@elastic/elasticsearch': ^8.0.0
@@ -2133,9 +2118,9 @@ packages:
       '@googleapis/customsearch': ^3.2.0
       '@grpc/grpc-js': ^1.11.3
       '@grpc/proto-loader': ^0.7.13
-      '@ibm-generative-ai/node-sdk': ~3.2.4
       '@langchain/community': '>=0.2.28'
       '@langchain/core': '>=0.2.27'
+      '@modelcontextprotocol/sdk': ^1.0.4
       '@zilliz/milvus2-sdk-node': ^2.4.9
       google-auth-library: '*'
       groq-sdk: ^0.7.0
@@ -2157,11 +2142,11 @@ packages:
         optional: true
       '@grpc/proto-loader':
         optional: true
-      '@ibm-generative-ai/node-sdk':
-        optional: true
       '@langchain/community':
         optional: true
       '@langchain/core':
+        optional: true
+      '@modelcontextprotocol/sdk':
         optional: true
       '@zilliz/milvus2-sdk-node':
         optional: true
@@ -2179,9 +2164,6 @@ packages:
         optional: true
       yaml:
         optional: true
-
-  bee-proto@0.0.2:
-    resolution: {integrity: sha512-UgBcejkBslLdR39ozpDtX6gjD3OgB1pZS7GDO4v2CfthZhddwfzco/BdEd5IdeMX9d+srX7LgsBGOtn48djNWg==}
 
   before-after-hook@2.2.3:
     resolution: {integrity: sha512-NzUnlZexiaH/46WDhANlyR2bXRopNg4F/zuSA3OpZnllCUgRaOF2znDioDWrmbNVsuZk6l9pMquQB38cfBZwkQ==}
@@ -2708,8 +2690,8 @@ packages:
     resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
     engines: {node: '>=12'}
 
-  duck-duck-scrape@2.2.6:
-    resolution: {integrity: sha512-ov8IwoueOXnXsqGrN6ESys9x2uesyCVZYRex9is9uXyDuI3Je9pxjH/Y6atIUVjBhnwWQ5d1omoo2vbUmVDBLQ==}
+  duck-duck-scrape@2.2.7:
+    resolution: {integrity: sha512-BEcglwnfx5puJl90KQfX+Q2q5vCguqyMpZcSRPBWk8OY55qWwV93+E+7DbIkrGDW4qkqPfUvtOUdi0lXz6lEMQ==}
 
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
@@ -4255,8 +4237,8 @@ packages:
     resolution: {integrity: sha512-IF4PcGgzAr6XXSff26Sk/+P4KZFJVuHAJZj3wgO3vX2bMdNVp/QXTP3P7CEm9V1IdG8lDLY3HhiqpsE/nOwpPw==}
     engines: {node: ^10.13.0 || >=12.0.0}
 
-  ollama@0.5.9:
-    resolution: {integrity: sha512-F/KZuDRC+ZsVCuMvcOYuQ6zj42/idzCkkuknGyyGVmNStMZ/sU3jQpvhnl4SyC0+zBzLiKNZJnJeuPFuieWZvQ==}
+  ollama@0.5.12:
+    resolution: {integrity: sha512-flVH1fn1c9NF7VV3bW9kSu0E+bYc40b4DxL/gS2Debhao35osJFRDiPOj9sIWTMvcyj78Paw1OuhfIe7uhDWfQ==}
 
   on-exit-leak-free@2.1.2:
     resolution: {integrity: sha512-0eJJY6hXLGf1udHwfNftBqH+g73EU4B504nZeKpz1sYRKafAghwxEJunB2O7rDZkL4PGfsMVnTXZ2EjibbqcsA==}
@@ -5368,10 +5350,6 @@ packages:
   undici-types@6.19.8:
     resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
 
-  undici@5.28.4:
-    resolution: {integrity: sha512-72RFADWFqKmUb2hmmvNODKL3p9hcB6Gt2DOQMis1SEBaV6a4MH8soBvzg+95CYhCKPFedut2JY9bMfrDl9D23g==}
-    engines: {node: '>=14.0'}
-
   unicorn-magic@0.1.0:
     resolution: {integrity: sha512-lRfVq8fE8gz6QMBuDM6a+LO3IAzTi05H6gCVaUpir2E1Rwpo4ZUog45KpNXKC/Mn3Yb9UDuHumeFTo9iV/D9FQ==}
     engines: {node: '>=18'}
@@ -5669,8 +5647,8 @@ packages:
     engines: {node: '>= 14'}
     hasBin: true
 
-  yaml@2.6.0:
-    resolution: {integrity: sha512-a6ae//JvKDEra2kdi1qzCyrJW/WZCgFi8ydDV+eXExl95t+5R+ijnqHJbz9tmMh8FUjx3iv2fCQ4dclAQlO2UQ==}
+  yaml@2.7.0:
+    resolution: {integrity: sha512-+hSoy/QHluxmC9kCIJyL/uyFmLmc+e5CFR5Wa+bpIhIj85LVb9ZH2nVnqrHoSvKogwODv0ClqZkmiSSaIH5LTA==}
     engines: {node: '>= 14'}
     hasBin: true
 
@@ -5759,19 +5737,7 @@ snapshots:
       '@babel/helper-validator-identifier': 7.24.7
       to-fast-properties: 2.0.0
 
-  '@bufbuild/protobuf@1.10.0': {}
-
   '@colors/colors@1.6.0': {}
-
-  '@connectrpc/connect-node@1.6.1(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.6.1(@bufbuild/protobuf@1.10.0))':
-    dependencies:
-      '@bufbuild/protobuf': 1.10.0
-      '@connectrpc/connect': 1.6.1(@bufbuild/protobuf@1.10.0)
-      undici: 5.28.4
-
-  '@connectrpc/connect@1.6.1(@bufbuild/protobuf@1.10.0)':
-    dependencies:
-      '@bufbuild/protobuf': 1.10.0
 
   '@conventional-changelog/git-client@1.0.1(conventional-commits-filter@5.0.0)(conventional-commits-parser@6.0.0)':
     dependencies:
@@ -6015,7 +5981,7 @@ snapshots:
       fastify-plugin: 4.5.1
       openapi-types: 12.1.3
       rfdc: 1.4.1
-      yaml: 2.6.0
+      yaml: 2.7.0
 
   '@fastify/swagger@8.15.0':
     dependencies:
@@ -6023,7 +5989,7 @@ snapshots:
       json-schema-resolver: 2.0.0
       openapi-types: 12.1.3
       rfdc: 1.4.1
-      yaml: 2.6.0
+      yaml: 2.7.0
     transitivePeerDependencies:
       - supports-color
 
@@ -6081,7 +6047,7 @@ snapshots:
       http-status-codes: 2.3.0
       openapi-fetch: 0.8.2
       p-queue-compat: 1.0.225
-      yaml: 2.6.0
+      yaml: 2.7.0
     transitivePeerDependencies:
       - encoding
 
@@ -7633,7 +7599,7 @@ snapshots:
 
   '@vue/shared@3.4.37': {}
 
-  '@zilliz/milvus2-sdk-node@2.4.4':
+  '@zilliz/milvus2-sdk-node@2.5.3':
     dependencies:
       '@grpc/grpc-js': 1.12.2
       '@grpc/proto-loader': 0.7.13
@@ -7872,17 +7838,14 @@ snapshots:
 
   basic-ftp@5.0.5: {}
 
-  bee-agent-framework@0.0.55(@bufbuild/protobuf@1.10.0)(@googleapis/customsearch@3.2.0(encoding@0.1.13))(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@ibm-generative-ai/node-sdk@3.2.4(encoding@0.1.13))(@zilliz/milvus2-sdk-node@2.4.4)(encoding@0.1.13)(google-auth-library@9.15.0(encoding@0.1.13))(ollama@0.5.9)(openai-chat-tokens@0.2.8)(openai@4.67.3(encoding@0.1.13)(zod@3.23.8))(yaml@2.6.0):
+  bee-agent-framework@0.0.57(@googleapis/customsearch@3.2.0(encoding@0.1.13))(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@zilliz/milvus2-sdk-node@2.5.3)(encoding@0.1.13)(google-auth-library@9.15.0(encoding@0.1.13))(ollama@0.5.12)(openai-chat-tokens@0.2.8)(openai@4.67.3(encoding@0.1.13)(zod@3.23.8))(yaml@2.7.0):
     dependencies:
       '@ai-zen/node-fetch-event-source': 2.1.4(encoding@0.1.13)
-      '@connectrpc/connect': 1.6.1(@bufbuild/protobuf@1.10.0)
-      '@connectrpc/connect-node': 1.6.1(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.6.1(@bufbuild/protobuf@1.10.0))
       '@opentelemetry/api': 1.9.0
       '@streamparser/json': 0.0.21
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
-      bee-proto: 0.0.2
-      duck-duck-scrape: 2.2.6
+      duck-duck-scrape: 2.2.7
       fast-xml-parser: 4.5.1
       header-generator: 2.1.61
       joplin-turndown-plugin-gfm: 1.0.12
@@ -7908,22 +7871,15 @@ snapshots:
       '@googleapis/customsearch': 3.2.0(encoding@0.1.13)
       '@grpc/grpc-js': 1.12.2
       '@grpc/proto-loader': 0.7.13
-      '@ibm-generative-ai/node-sdk': 3.2.4(encoding@0.1.13)
-      '@zilliz/milvus2-sdk-node': 2.4.4
+      '@zilliz/milvus2-sdk-node': 2.5.3
       google-auth-library: 9.15.0(encoding@0.1.13)
-      ollama: 0.5.9
+      ollama: 0.5.12
       openai: 4.67.3(encoding@0.1.13)(zod@3.23.8)
       openai-chat-tokens: 0.2.8
-      yaml: 2.6.0
+      yaml: 2.7.0
     transitivePeerDependencies:
-      - '@bufbuild/protobuf'
       - debug
       - encoding
-
-  bee-proto@0.0.2:
-    dependencies:
-      '@bufbuild/protobuf': 1.10.0
-      '@connectrpc/connect': 1.6.1(@bufbuild/protobuf@1.10.0)
 
   before-after-hook@2.2.3: {}
 
@@ -8479,7 +8435,7 @@ snapshots:
 
   dotenv@16.4.5: {}
 
-  duck-duck-scrape@2.2.6:
+  duck-duck-scrape@2.2.7:
     dependencies:
       html-entities: 2.5.2
       needle: 3.3.1
@@ -10210,7 +10166,7 @@ snapshots:
 
   oidc-token-hash@5.0.3: {}
 
-  ollama@0.5.9:
+  ollama@0.5.12:
     dependencies:
       whatwg-fetch: 3.6.20
 
@@ -11417,10 +11373,6 @@ snapshots:
 
   undici-types@6.19.8: {}
 
-  undici@5.28.4:
-    dependencies:
-      '@fastify/busboy': 2.1.1
-
   unicorn-magic@0.1.0: {}
 
   unique-filename@1.1.1:
@@ -11743,7 +11695,7 @@ snapshots:
 
   yaml@2.5.1: {}
 
-  yaml@2.6.0: {}
+  yaml@2.7.0: {}
 
   yargs-parser@21.1.1: {}
 
