@@ -17,12 +17,22 @@
 import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts';
 
 import { listSpans, getTrace } from './observe.service.js';
-import { traceReadParamsSchema, traceReadQuerySchema } from './dtos/trace-read.js';
-import { spanReadQuerySchema } from './dtos/span-read.js';
+import {
+  TraceReadParams,
+  traceReadParamsSchema,
+  TraceReadQuery,
+  traceReadQuerySchema
+} from './dtos/trace-read.js';
+import {
+  SpanReadParams,
+  spanReadParamsSchema,
+  SpanReadQuery,
+  spanReadQuerySchema
+} from './dtos/span-read.js';
 
 export const observeModule: FastifyPluginAsyncJsonSchemaToTs = async (app) => {
-  app.get(
-    '/trace/:id',
+  app.get<{ Params: TraceReadParams; Querystring: TraceReadQuery }>(
+    '/traces/:id',
     {
       preHandler: app.auth(),
       schema: {
@@ -31,22 +41,23 @@ export const observeModule: FastifyPluginAsyncJsonSchemaToTs = async (app) => {
         hide: true
       }
     },
-    async (req) => {
-      return getTrace({ ...req.params, ...req.query });
+    async (req, reply) => {
+      return getTrace(req, reply);
     }
   );
 
-  app.get(
-    '/span',
+  app.get<{ Params: SpanReadParams; Querystring: SpanReadQuery }>(
+    '/traces/:trace_id/spans',
     {
       preHandler: app.auth(),
       schema: {
         querystring: spanReadQuerySchema,
+        params: spanReadParamsSchema,
         hide: true
       }
     },
-    async (req) => {
-      return listSpans(req.query);
+    async (req, reply) => {
+      return listSpans(req, reply);
     }
   );
 };

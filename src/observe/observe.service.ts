@@ -14,45 +14,49 @@
  * limitations under the License.
  */
 
+import { FastifyReply, FastifyRequest } from 'fastify';
+
 import { client } from './api/client.js';
-import { SpanReadQuery } from './dtos/span-read.js';
+import { SpanReadParams, SpanReadQuery } from './dtos/span-read.js';
 import { assertTracePermission, assertClient, processApiProxyResponse } from './utils.js';
 import { TraceReadParams, TraceReadQuery } from './dtos/trace-read.js';
 
-export async function getTrace({
-  id,
-  include_mlflow,
-  include_mlflow_tree,
-  include_tree
-}: TraceReadParams & TraceReadQuery) {
-  await assertTracePermission({ traceId: id });
+export async function getTrace(
+  req: FastifyRequest<{ Params: TraceReadParams; Querystring: TraceReadQuery }>,
+  reply: FastifyReply
+) {
+  await assertTracePermission({ traceId: req.params.id });
   assertClient(client);
 
   return processApiProxyResponse(
-    client.GET('/trace/{id}', {
+    client.GET('/v1/traces/{id}', {
       params: {
         path: {
-          id
+          id: req.params.id
         },
-        query: {
-          include_mlflow,
-          include_mlflow_tree,
-          include_tree
-        }
+        query: req.query
       }
-    })
+    }),
+    reply
   );
 }
 
-export async function listSpans(query: SpanReadQuery) {
-  await assertTracePermission({ traceId: query.trace_id });
+export async function listSpans(
+  req: FastifyRequest<{ Params: SpanReadParams; Querystring: SpanReadQuery }>,
+  reply: FastifyReply
+) {
+  await assertTracePermission({ traceId: req.params.trace_id });
   assertClient(client);
 
   return processApiProxyResponse(
-    client.GET('/span', {
+    client.GET('/v1/traces/{trace_id}/spans', {
       params: {
-        query: query
+        path: {
+          trace_id: req.params.trace_id
+        },
+        query: req.query
       }
-    })
+    }),
+    reply
   );
 }

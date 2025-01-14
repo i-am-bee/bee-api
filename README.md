@@ -3,9 +3,15 @@
     <h1 align="center">Bee API</h1>
 </p>
 
-OpenAI-compatible Assistants API backed by [Bee Agent Framework](https://github.com/i-am-bee/bee-agent-framework)
+<p align="center">
+  <h4 align="center">OpenAI-compatible Assistants API backed by <a href="https://github.com/i-am-bee/bee-agent-framework">Bee Agent Framework</a></h4>
+</p>
 
 ## Getting started
+
+> [!TIP]
+>
+> 🚀 The fastest way to setup Bee (UI + API) is through [Bee Stack](https://github.com/i-am-bee/bee-stack).
 
 1. Create `.env` (from `.env.example`) and fill in values.
 2. Run `pnpm install` to install dependencies.
@@ -25,6 +31,7 @@ The Assistants API consists mostly of CRUDL endpoints for managing API resources
 ### Infrastructure
 
 The infrastructure consists of:
+
 - REST API server
 - MongoDB
 - Redis
@@ -34,11 +41,12 @@ The REST API server stores resources in MongoDB database. Redis is used by BullM
 ### Server
 
 The codebase contains several types of modules:
--  `*.modules.ts` containing endpoint handlers
--  `*.services.ts` containing services for the handlers
--  `dtos/*.ts` containing JSON schema definitions for resources
--  `*.entity.ts` containing ORM definitions for database entities
--  `*.queue.ts` containing BullMQ queues and workers for asynchronous execution
+
+- `*.modules.ts` containing endpoint handlers
+- `*.services.ts` containing services for the handlers
+- `dtos/*.ts` containing JSON schema definitions for resources
+- `*.entity.ts` containing ORM definitions for database entities
+- `*.queue.ts` containing BullMQ queues and workers for asynchronous execution
 
 These modules are connected in the following manner
 
@@ -49,3 +57,43 @@ module ---> dto
 ```
 
 OpenAPI schema is auto-generated from the `dtos` and exposed on the `/docs` endpoint.
+
+## Starting the bee-api infrastructure
+
+The easiest way to run all the dependencies for the bee-api is to:
+
+- Clone the bee-stack repository https://github.com/i-am-bee/bee-stack
+- Navigate to the bee-stack directory.
+- Run the infrastructure:
+
+```
+./bee-stack.sh clean
+./bee-stack.sh start:infra
+```
+
+- Then navigate back to the bee-api repository.
+- Install packages:
+
+```
+pnpm install
+```
+
+- When running for the first time seed the database:
+
+```
+pnpm mikro-orm seeder:run
+```
+
+- copy .env.example to .env
+
+```
+cp .env.example .env
+```
+
+- Add values the env vars: CRYPTO_CIPHER_KEY, AI_BACKEND and API key for which ever provider you have chosen.
+
+- Run the bee-api:
+
+```
+pnpm start:dev
+```

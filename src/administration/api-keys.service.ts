@@ -24,22 +24,29 @@ import { ApiKeyReadParams, ApiKeyReadResponse } from './dtos/api-key-read';
 import { ApiKeyUpdateBody, ApiKeyUpdateParams, ApiKeyUpdateResponse } from './dtos/api-key-update';
 import { ApiKeysListParams, ApiKeysListQuery, ApiKeysListResponse } from './dtos/api-keys-list';
 import { ApiKeyDeleteParams, ApiKeyDeleteResponse } from './dtos/api-key-delete';
-import { getOrganizationUser, getProjectPrincipal } from './helpers';
+import { getOrganizationUser, getProjectPrincipal, redactProjectKeyValue } from './helpers';
 import { Project } from './entities/project.entity';
 import { OrganizationApiKeysListQuery } from './dtos/organization-api-keys-list';
 import { ProjectPrincipal } from './entities/project-principal.entity';
 import { PrincipalType } from './entities/principals/principal.entity';
 import { OrganizationUserRole, ProjectRole } from './entities/constants';
 import { toDto as toProjectDto } from './projects.service.js';
+import { toProjectUserDto } from './project-users.service';
 
 import { createDeleteResponse } from '@/utils/delete';
-import { API_KEY_PREFIX, generateApiKey, scryptApiKey } from '@/auth/utils';
+import { generateApiKey, scryptSecret } from '@/auth/utils';
 import { getUpdatedValue } from '@/utils/update';
 import { createPaginatedResponse, getListCursor } from '@/utils/pagination';
 import { ORM } from '@/database';
 import { APIError, APIErrorCode } from '@/errors/error.entity';
 
-export function toDto(apiKey: Loaded<ProjectApiKey, 'project'>, sensitiveId?: string): ApiKeyDto {
+type LoadedApiKey = Loaded<
+  ProjectApiKey,
+  'project' | 'createdBy.principal.account' | 'createdBy.principal.user.user'
+>;
+
+export function toDto(apiKey: LoadedApiKey, sensitiveId?: string): ApiKeyDto {
+  const projectPrincipal = apiKey.createdBy.$;
   return {
     object: 'organization.project.api_key',
     id: apiKey.id,
@@ -47,7 +54,15 @@ export function toDto(apiKey: Loaded<ProjectApiKey, 'project'>, sensitiveId?: st
     created_at: dayjs(apiKey.createdAt).unix(),
     secret: typeof sensitiveId === 'string' ? sensitiveId : apiKey.redactedValue,
     project: toProjectDto(apiKey.project.$),
-    last_used_at: apiKey.lastUsedAt ? dayjs(apiKey.lastUsedAt).unix() : null
+    last_used_at: apiKey.lastUsedAt ? dayjs(apiKey.lastUsedAt).unix() : null,
+    owner: {
+      type: projectPrincipal.principal.type,
+      ...(projectPrincipal.principal.type === PrincipalType.USER
+        ? {
+            [PrincipalType.USER]: toProjectUserDto(projectPrincipal)
+          }
+        : { [PrincipalType.SERVICE_ACCOUNT]: null }) // TODO return service account
+    }
   };
 }
 
@@ -64,7 +79,7 @@ export async function createApiKey({
     });
   }
   const keyValue = generateApiKey();
-  const key = scryptApiKey(keyValue);
+  const key = scryptSecret(keyValue);
   const apiKey = new ProjectApiKey({
     name,
     key,
@@ -75,16 +90,17 @@ export async function createApiKey({
 
   await ORM.em.persistAndFlush(apiKey);
 
-  return toDto(apiKey as Loaded<ProjectApiKey, 'project'>, keyValue);
+  const loadedApiKey = await getApiKey({ project_id: apiKey.project.id, api_key_id: apiKey.id });
+  return toDto(loadedApiKey, keyValue);
 }
 
-export const redactProjectKeyValue = (key: string) =>
-  key.replace(
-    key.substring(API_KEY_PREFIX.length + 2, key.length - 2),
-    '*'.repeat(key.length - 12)
-  );
-
-async function getApiKey({ project_id, api_key_id }: { project_id: string; api_key_id: string }) {
+async function getApiKey({
+  project_id,
+  api_key_id
+}: {
+  project_id: string;
+  api_key_id: string;
+}): Promise<LoadedApiKey> {
   const projectPrincipal = getProjectPrincipal();
   // validate project is inside the Org
   const project = await ORM.em.getRepository(Project).findOneOrFail({ id: project_id });
@@ -94,9 +110,12 @@ async function getApiKey({ project_id, api_key_id }: { project_id: string; api_k
       code: APIErrorCode.INVALID_INPUT
     });
   }
-  const apiKey = await ORM.em
-    .getRepository(ProjectApiKey)
-    .findOneOrFail({ id: api_key_id, project: project_id }, { populate: ['project'] });
+  const apiKey = await ORM.em.getRepository<LoadedApiKey>(ProjectApiKey).findOneOrFail(
+    { id: api_key_id, project: project_id },
+    {
+      populate: ['project', 'createdBy.principal.account', 'createdBy.principal.user.user' as any]
+    }
+  );
 
   return apiKey;
 }
@@ -132,11 +151,18 @@ export async function listApiKeys({
 }: ApiKeysListQuery & ApiKeysListParams): Promise<ApiKeysListResponse> {
   // validate project is in the org
   await ORM.em.getRepository(Project).findOneOrFail({ id: project_id });
-  const filter: FilterQuery<Loaded<ProjectApiKey, 'project'>> = { project: project_id };
+  const filter: FilterQuery<LoadedApiKey> = { project: project_id };
 
-  const cursor = await getListCursor<Loaded<ProjectApiKey, 'project'>>(
+  const cursor = await getListCursor<LoadedApiKey>(
     filter,
-    { limit, order, order_by, after, before, populate: ['project'] },
+    {
+      limit,
+      order,
+      order_by,
+      after,
+      before,
+      populate: ['project', 'createdBy.principal.account', 'createdBy.principal.user.user']
+    },
     ORM.em.getRepository(ProjectApiKey)
   );
   return createPaginatedResponse(cursor, toDto);
@@ -162,7 +188,7 @@ export async function listOrganizationApiKeys({
   before,
   search
 }: OrganizationApiKeysListQuery) {
-  const filter: FilterQuery<Loaded<ProjectApiKey, 'project'>> = {};
+  const filter: FilterQuery<LoadedApiKey> = {};
   const organizationUser = getOrganizationUser();
 
   if (organizationUser.role !== OrganizationUserRole.OWNER) {
@@ -194,7 +220,7 @@ export async function listOrganizationApiKeys({
     filter.name = regexp;
   }
 
-  const cursor = await getListCursor<Loaded<ProjectApiKey, 'project'>>(
+  const cursor = await getListCursor<LoadedApiKey>(
     filter,
     {
       limit,
@@ -203,7 +229,7 @@ export async function listOrganizationApiKeys({
       after,
       before,
       filters: { projectAdministrationAccess: false },
-      populate: ['project']
+      populate: ['project', 'createdBy.principal.account', 'createdBy.principal.user.user']
     },
     ORM.em.getRepository(ProjectApiKey)
   );

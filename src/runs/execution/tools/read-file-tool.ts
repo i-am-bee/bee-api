@@ -19,12 +19,18 @@ import {
   ToolInput,
   StringToolOutput,
   Tool,
-  ToolError
+  ToolError,
+  BaseToolRunOptions,
+  ToolEmitter
 } from 'bee-agent-framework/tools/base';
-import { ZodLiteral, z } from 'zod';
+import { z } from 'zod';
+import { hasAtLeast } from 'remeda';
+import { GetRunContext } from 'bee-agent-framework/context';
+import { Emitter } from 'bee-agent-framework/emitter/emitter';
 
-import { getExtractedFileObject } from '@/files/files.service.js';
 import { File } from '@/files/entities/file.entity.js';
+import { getExtractedText } from '@/files/extraction/helpers';
+import { getJobLogger } from '@/logger';
 
 export interface ReadFileToolOptions extends BaseToolOptions {
   fileSize: number;
@@ -35,46 +41,53 @@ export class ReadFileTool extends Tool<StringToolOutput, ReadFileToolOptions> {
   name = `ReadFile`;
   description = 'Retrieve file content.';
   inputSchema() {
+    const fileNames = this.options.files.map((file) => z.literal(file.filename));
+
     return z.object({
-      filename:
-        this.options.files.length === 1
-          ? z.literal(this.options.files[0].filename).describe(`Name of the file to read`)
-          : z
-              .union(
-                this.options.files.map((file) => z.literal(file.filename)) as [
-                  ZodLiteral<string>,
-                  ZodLiteral<string>,
-                  ...ZodLiteral<string>[]
-                ]
-              )
-              .describe('Name of the file to read.')
+      filename: hasAtLeast(fileNames, 2)
+        ? z.union(fileNames).describe('Name of the file to read.')
+        : hasAtLeast(fileNames, 1)
+          ? fileNames[0].describe(`Name of the file to read`)
+          : z.literal('non_existing_file').describe('No files available.')
     });
   }
 
-  protected async _run({ filename }: ToolInput<ReadFileTool>): Promise<StringToolOutput> {
+  readonly emitter: ToolEmitter<ToolInput<this>, StringToolOutput> = Emitter.root.child({
+    namespace: ['tool', 'file', 'read'],
+    creator: this
+  });
+
+  protected async _run(
+    { filename }: ToolInput<ReadFileTool>,
+    _: Partial<BaseToolRunOptions>,
+    run: GetRunContext<typeof this>
+  ): Promise<StringToolOutput> {
     const file = this.options.files.find((file) => file.filename === filename);
     if (!file) {
       throw new ToolError(`File ${filename} not found.`);
     }
+    let text: string;
     try {
-      const fileObject = await getExtractedFileObject(file);
-      if ((fileObject.ContentLength ?? 0) > this.options.fileSize) {
-        throw new ToolError(
-          `The file is too big (${fileObject.ContentLength} bytes). Maximum allowed size is ${this.options.fileSize} bytes`,
-          [],
-          {
-            isFatal: false,
-            isRetryable: true
-          }
-        );
-      }
+      text = await getExtractedText(file, run.signal);
+    } catch (err) {
+      getJobLogger('runs').warn({ err }, 'Failed to get extracted text.');
 
-      return new StringToolOutput('file content: \n' + fileObject.Body?.toString());
-    } catch {
-      throw new ToolError('This file is not a text file and can not be read.', [], {
+      throw new ToolError('Unable to read text from the file.', [], {
         isFatal: false,
         isRetryable: true
       });
     }
+    if (text.length > this.options.fileSize) {
+      throw new ToolError(
+        `The text is too big (${text.length} characters). Maximum allowed size is ${this.options.fileSize} characters`,
+        [],
+        {
+          isFatal: false,
+          isRetryable: true
+        }
+      );
+    }
+
+    return new StringToolOutput('file content: \n' + text);
   }
 }

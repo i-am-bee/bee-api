@@ -19,6 +19,8 @@ import { CustomTool, CustomToolCreateError } from 'bee-agent-framework/tools/cus
 import dayjs from 'dayjs';
 import mime from 'mime/lite';
 import { WikipediaTool } from 'bee-agent-framework/tools/search/wikipedia';
+import { LLMTool } from 'bee-agent-framework/tools/llm';
+import { CalculatorTool } from 'bee-agent-framework/tools/calculator';
 import { Tool as FrameworkTool } from 'bee-agent-framework/tools/base';
 import { ZodTypeAny } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
@@ -72,6 +74,7 @@ import { createCodeInterpreterConnectionOptions } from '@/runs/execution/tools/h
 import { ReadFileTool } from '@/runs/execution/tools/read-file-tool.js';
 import { snakeToCamel } from '@/utils/strings.js';
 import { createSearchTool } from '@/runs/execution/tools/search-tool';
+import { defaultAIProvider } from '@/runs/execution/provider';
 
 type SystemTool = Pick<FrameworkTool, 'description' | 'name' | 'inputSchema'> & {
   type: ToolType;
@@ -462,6 +465,8 @@ function getSystemTools() {
   });
   const fileSearch = new FileSearchTool({ vectorStores: [], maxNumResults: 0 });
   const readFile = new ReadFileTool({ files: [], fileSize: 0 });
+  const llmTool = new LLMTool({ llm: defaultAIProvider.createChatBackend() });
+  const calculatorTool = new CalculatorTool();
 
   const systemTools = new Map<string, SystemTool>();
 
@@ -470,7 +475,7 @@ function getSystemTools() {
     id: SystemTools.WEB_SEARCH,
     createdAt: new Date('2024-07-24'),
     ...searchTool,
-    inputSchema: searchTool.inputSchema,
+    inputSchema: searchTool.inputSchema.bind(searchTool),
     isExternal: true,
     metadata: {
       $ui_description_short: 'Retrieve real-time search results from across the internet'
@@ -483,7 +488,7 @@ function getSystemTools() {
     id: SystemTools.WIKIPEDIA,
     createdAt: new Date('2024-07-24'),
     ...wikipediaTool,
-    inputSchema: wikipediaTool.inputSchema,
+    inputSchema: wikipediaTool.inputSchema.bind(wikipediaTool),
     isExternal: true,
     metadata: {
       $ui_description_short:
@@ -497,7 +502,7 @@ function getSystemTools() {
     id: SystemTools.WEATHER,
     createdAt: new Date('2024-07-25'),
     ...weatherTool,
-    inputSchema: weatherTool.inputSchema,
+    inputSchema: weatherTool.inputSchema.bind(weatherTool),
     isExternal: true,
     metadata: {
       $ui_description_short:
@@ -511,7 +516,7 @@ function getSystemTools() {
     id: SystemTools.ARXIV,
     createdAt: new Date('2024-07-25'),
     ...arXivTool,
-    inputSchema: arXivTool.inputSchema,
+    inputSchema: arXivTool.inputSchema.bind(arXivTool),
     isExternal: true,
     metadata: {
       $ui_description_short:
@@ -525,7 +530,7 @@ function getSystemTools() {
     id: 'read_file',
     createdAt: new Date('2024-10-02'),
     ...readFile,
-    inputSchema: readFile.inputSchema,
+    inputSchema: readFile.inputSchema.bind(readFile),
     isExternal: false,
     metadata: {
       $ui_description_short: 'Read and interpret basic files'
@@ -547,7 +552,7 @@ function getSystemTools() {
     id: 'file_search',
     createdAt: new Date('2024-07-31'),
     ...fileSearch,
-    inputSchema: fileSearch.inputSchema,
+    inputSchema: fileSearch.inputSchema.bind(fileSearch),
     isExternal: false,
     metadata: {
       $ui_description_short: 'Access and interpret file content by using advanced search techniques'
@@ -560,7 +565,7 @@ function getSystemTools() {
     id: 'code_interpreter',
     createdAt: new Date('2024-07-01'),
     ...pythonTool,
-    inputSchema: pythonTool.inputSchema,
+    inputSchema: pythonTool.inputSchema.bind(pythonTool),
     isExternal: true,
     metadata: {
       $ui_description_short:
@@ -568,6 +573,26 @@ function getSystemTools() {
     },
     userDescription:
       'Execute Python code for various tasks, including data analysis, file processing, and visualizations. Supports the installation of any library such as NumPy, Pandas, SciPy, and Matplotlib. Users can create new files or convert existing files, which are then made available for download.'
+  });
+  systemTools.set(SystemTools.LLM, {
+    type: ToolType.SYSTEM,
+    id: SystemTools.LLM,
+    createdAt: new Date('2024-12-12'),
+    ...llmTool,
+    inputSchema: llmTool.inputSchema.bind(llmTool),
+    isExternal: false,
+    userDescription:
+      'Uses expert LLM to work with data in the existing conversation (classification, entity extraction, summarization, ...)'
+  });
+  systemTools.set(SystemTools.CALCULATOR, {
+    type: ToolType.SYSTEM,
+    id: SystemTools.CALCULATOR,
+    createdAt: new Date('2024-12-12'),
+    ...calculatorTool,
+    inputSchema: calculatorTool.inputSchema.bind(calculatorTool),
+    isExternal: false,
+    userDescription:
+      'A calculator tool that performs basic arithmetic operations like addition, subtraction, multiplication, and division. Only use the calculator tool if you need to perform a calculation.'
   });
 
   return systemTools;
@@ -591,6 +616,8 @@ export async function listTools({
           allSystemTools.get(SystemTools.WIKIPEDIA),
           allSystemTools.get(SystemTools.WEATHER),
           allSystemTools.get(SystemTools.ARXIV),
+          allSystemTools.get(SystemTools.LLM),
+          allSystemTools.get(SystemTools.CALCULATOR),
           allSystemTools.get('read_file')
         ]
       : [];

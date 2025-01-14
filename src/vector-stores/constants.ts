@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-import { getDefaultEmbeddingModel } from '@/embedding/factory';
-
-export const VECTOR_STORE_EMBEDDING_MODEL = getDefaultEmbeddingModel();
 export const VECTOR_STORE_DEFAULT_MAX_CHUNK_SIZE_TOKENS = 400;
 export const VECTOR_STORE_DEFAULT_CHUNK_OVERLAP_TOKENS = 200;
 export const VECTOR_STORE_DEFAULT_MAX_NUM_RESULTS = 5;

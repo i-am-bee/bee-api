@@ -20,7 +20,6 @@ import { FilterQuery, Loaded, ref, Ref } from '@mikro-orm/core';
 import ibm from 'ibm-cos-sdk';
 import { MultipartFile } from '@fastify/multipart';
 import dayjs from 'dayjs';
-import mime from 'mime/lite';
 
 import { File } from './entities/file.entity.js';
 import { File as FileDto } from './dtos/file.js';
@@ -29,9 +28,8 @@ import { FileReadParams, FileReadResponse } from './dtos/file-read.js';
 import { FileDeleteParams, FileDeleteResponse } from './dtos/file-delete.js';
 import { FilesListQuery, FilesListResponse } from './dtos/files-list.js';
 import { FileContentReadParams, FileContentReadResponse } from './dtos/file-content-read.js';
-import { queue } from './jobs/extraction.queue.js';
-import { Extraction } from './entities/extraction.entity.js';
-import { canBeExtracted } from './extraction/extract.js';
+import { scheduleExtraction, supportsExtraction } from './extraction/helpers.js';
+import { deriveMimeType } from './utils/mime.js';
 
 import { PassthroughHash } from '@/utils/streams.js';
 import { ORM } from '@/database.js';
@@ -46,7 +44,6 @@ import {
 import { APIError, APIErrorCode } from '@/errors/error.entity.js';
 import { listenToSocketClose } from '@/utils/networking.js';
 import { createDeleteResponse } from '@/utils/delete.js';
-import { QueueName } from '@/jobs/constants.js';
 import { Thread } from '@/threads/thread.entity.js';
 import { ensureRequestContextData } from '@/context.js';
 import { Project } from '@/administration/entities/project.entity.js';
@@ -122,6 +119,7 @@ export async function createFile({
     filename,
     bytes: 0,
     contentHash: '',
+    mimeType: deriveMimeType(mimetype, filename),
     dependsOn
   });
 
@@ -132,7 +130,7 @@ export async function createFile({
     Bucket: S3_BUCKET_FILE_STORAGE,
     Key: file.storageId,
     Body: content.compose(passthroughHash),
-    ContentType: mimetype
+    ContentType: file.mimeType
   });
   const unsub = listenToSocketClose(req.socket, () => s3request.abort());
   s3request.on('httpUploadProgress', (progress) => {
@@ -146,21 +144,18 @@ export async function createFile({
       .headObject({ Bucket: S3_BUCKET_FILE_STORAGE, Key: file.storageId })
       .promise();
     file.contentHash = passthroughHash.hash.digest('hex');
+    file.mimeType = head.ContentType;
     file.bytes = head.ContentLength ?? 0;
     await ORM.em.persistAndFlush(file);
     getFilesLogger(file.id).info('File created');
 
     (async () => {
-      try {
-        if (head.ContentType?.startsWith('text/') || head.ContentType === 'application/json') {
-          file.extraction = new Extraction({ storageId: file.storageId });
-        } else if (head.ContentType && canBeExtracted(head.ContentType)) {
-          const job = await queue.add(QueueName.FILES_EXTRACTION, { fileId: file.id });
-          file.extraction = new Extraction({ jobId: job.id });
+      if (supportsExtraction(file.mimeType)) {
+        try {
+          await scheduleExtraction(file);
+        } catch (err) {
+          getFilesLogger(file.id).warn({ err }, 'Failed to schedule extraction');
         }
-        await ORM.em.flush();
-      } catch (err) {
-        getFilesLogger(file.id).warn({ err }, 'Failed to schedule extraction');
       }
     })();
 
@@ -183,13 +178,6 @@ export async function readFile({ file_id }: FileReadParams): Promise<FileReadRes
 
 export async function deleteFile({ file_id }: FileDeleteParams): Promise<FileDeleteResponse> {
   const file = await ORM.em.getRepository(File).findOneOrFail({ id: file_id });
-
-  if (file.extraction?.jobId) {
-    const success = !!(await queue.remove(file.extraction.jobId));
-    if (success) {
-      file.extraction = new Extraction({ storageId: file.extraction.storageId });
-    }
-  }
 
   file.delete();
 
@@ -220,26 +208,6 @@ export async function listFiles({
   return createPaginatedResponse(cursor, toFileDto);
 }
 
-export async function getExtractedFileStats(file: Loaded<File>) {
-  if (!file.extraction?.storageId) throw new Error('Extraction not found');
-  return s3Client
-    .headObject({
-      Bucket: S3_BUCKET_FILE_STORAGE,
-      Key: file.extraction.storageId
-    })
-    .promise();
-}
-
-export async function getExtractedFileObject(file: Loaded<File>) {
-  if (!file.extraction?.storageId) throw new Error('Extraction not found');
-  return s3Client
-    .getObject({
-      Bucket: S3_BUCKET_FILE_STORAGE,
-      Key: file.extraction.storageId
-    })
-    .promise();
-}
-
 export async function readFileContent({
   file_id
 }: FileContentReadParams): Promise<FileContentReadResponse> {
@@ -262,7 +230,8 @@ export async function readFileContent({
   return ensureRequestContextData('res')
     .header(
       'content-type',
-      head.ContentType ?? mime.getType(file.filename) ?? 'application/octet-stream'
+      // derivation is used for backwards compatibility
+      deriveMimeType(file.mimeType ?? head.ContentType, file.filename)
     )
     .send(content);
 }

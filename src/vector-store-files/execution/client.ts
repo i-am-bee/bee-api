@@ -20,7 +20,7 @@ import { MilvusVectorStore } from './vector_db/adapters/milvus.js';
 import { VectorDbDocumentSchema } from './vector_db/types.js';
 import { VectorStoreClient } from './vector_db/adapters/interface.js';
 
-import { VECTOR_STORE_EMBEDDING_MODEL } from '@/vector-stores/constants.js';
+import { defaultAIProvider } from '@/runs/execution/provider';
 
 export const DocumentSchema = VectorDbDocumentSchema.extend({});
 export type Document = z.infer<typeof DocumentSchema>;
@@ -28,7 +28,7 @@ export type DocumentType = z.ZodType<Document>;
 
 export function getVectorStoreClient(): VectorStoreClient<DocumentType> {
   return new MilvusVectorStore({
-    modelName: VECTOR_STORE_EMBEDDING_MODEL,
+    modelName: defaultAIProvider.createEmbeddingBackend().modelId,
     documentSchema: DocumentSchema
   });
 }

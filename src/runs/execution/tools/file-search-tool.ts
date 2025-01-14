@@ -18,16 +18,19 @@ import {
   BaseToolOptions,
   BaseToolRunOptions,
   Tool,
+  ToolEmitter,
   ToolInput,
   ToolOutput
 } from 'bee-agent-framework/tools/base';
 import { z } from 'zod';
 import { isTruthy } from 'remeda';
 import { Loaded } from '@mikro-orm/core';
+import { GetRunContext } from 'bee-agent-framework/context';
+import { Emitter } from 'bee-agent-framework/emitter/emitter';
 
 import { getVectorStoreClient } from '@/vector-store-files/execution/client.js';
 import { VectorStore } from '@/vector-stores/entities/vector-store.entity.js';
-import { createEmbeddingAdapter } from '@/embedding/factory';
+import { defaultAIProvider } from '@/runs/execution/provider';
 
 export interface FileSearchToolOptions extends BaseToolOptions {
   vectorStores: Loaded<VectorStore>[];
@@ -79,16 +82,23 @@ export class FileSearchTool extends Tool<FileSearchToolOutput, FileSearchToolOpt
   }
   vectorStores: Loaded<VectorStore>[];
 
+  readonly emitter: ToolEmitter<ToolInput<this>, FileSearchToolOutput> = Emitter.root.child({
+    namespace: ['tool', 'file', 'search'],
+    creator: this
+  });
+
   async _run(
     { query }: ToolInput<FileSearchTool>,
-    options: BaseToolRunOptions
+    _options: Partial<BaseToolRunOptions>,
+    run: GetRunContext<typeof this>
   ): Promise<FileSearchToolOutput> {
     const vectorStoreClient = getVectorStoreClient();
 
-    const embeddingAdapter = await createEmbeddingAdapter();
+    const embeddingModel = defaultAIProvider.createEmbeddingBackend();
 
-    const embedding = await embeddingAdapter.embed(query, { signal: options.signal });
-    if (!embedding) throw new Error('Missing embedding data in embedding response');
+    const {
+      embeddings: [embedding]
+    } = await embeddingModel.embed([query], { signal: run.signal });
 
     if (this.vectorStores.some((vectorStore) => vectorStore.expired)) {
       throw new Error('Some of the vector stores are expired');

@@ -14,12 +14,23 @@
  * limitations under the License.
  */
 
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
+
 import { LastAssistants } from './dtos/last_assistant.dto.js';
+import { ModulesToPackagesQuery, ModulesToPackagesResponse } from './dtos/modules-to-packages.js';
 
 import { ORM } from '@/database.js';
 import { Assistant } from '@/assistants/assistant.entity.js';
 import { toDto } from '@/assistants/assistants.service.js';
 import { getProjectPrincipal } from '@/administration/helpers.js';
+import { PACKAGE_DB } from '@/config.js';
+
+const db = await open({
+  filename: PACKAGE_DB,
+  driver: sqlite3.cached.Database,
+  mode: sqlite3.OPEN_READONLY
+});
 
 export async function lastAssistants(): Promise<LastAssistants> {
   const projectPrincipal = getProjectPrincipal();
@@ -48,4 +59,16 @@ export async function lastAssistants(): Promise<LastAssistants> {
   ]);
 
   return assistants.map(toDto);
+}
+
+export async function modulesToPackages({
+  modules
+}: ModulesToPackagesQuery): Promise<ModulesToPackagesResponse> {
+  const results = await db.all<{ guess: string }[]>(
+    `SELECT DISTINCT guess FROM module_to_pypi_package WHERE module_name IN (${Array.from('?'.repeat(modules.length)).join(',')})`,
+    modules
+  );
+  return {
+    packages: results.map((result) => result.guess)
+  };
 }

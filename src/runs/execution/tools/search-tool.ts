@@ -30,10 +30,10 @@ export function createSearchTool(options?: SearchToolOptions, backend = SEARCH_T
       return new GoogleSearchTool({
         apiKey: BEE_GOOGLE_SEARCH_API_KEY,
         cseId: BEE_GOOGLE_SEARCH_CSE_ID,
-        maxResultsPerPage: 10,
+        maxResults: 10,
         ...options
       });
     case SearchToolBackend.DUCK_DUCK_GO:
-      return new DuckDuckGoSearchTool({ maxResultsPerPage: 10, ...options });
+      return new DuckDuckGoSearchTool({ maxResults: 10, ...options });
   }
 }

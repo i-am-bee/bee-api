@@ -18,11 +18,11 @@ import 'dotenv/config';
 import { difference } from 'remeda';
 
 import {
+  AIBackend,
   CodeInterpreterStorageBackend,
-  LLMBackend,
   SearchToolBackend
 } from './runs/execution/constants';
-import { EmbeddingBackend } from './embedding/constants';
+import { ExtractionBackend } from './files/extraction/constants';
 
 import { QueueName } from '@/jobs/constants.js';
 
@@ -80,8 +80,8 @@ export const AUTH_CLIENT_SECRET = getEnv('AUTH_CLIENT_SECRET');
 export const AUTH_AUDIENCE = getEnv('AUTH_AUDIENCE');
 
 // Backends
-export const LLM_BACKEND = getEnum('LLM_BACKEND', Object.values(LLMBackend));
-export const EMBEDDING_BACKEND = getEnum('EMBEDDING_BACKEND', Object.values(EmbeddingBackend));
+export const AI_BACKEND = getEnum('AI_BACKEND', Object.values(AIBackend));
+export const EXTRACTION_BACKEND = getEnum('EXTRACTION_BACKEND', Object.values(ExtractionBackend));
 
 export const OLLAMA_URL = getEnv('OLLAMA_URL', null);
 
@@ -102,6 +102,8 @@ export const CAIKIT_URL = getEnv('CAIKIT_URL', null);
 export const CAIKIT_CA_CERT = getEnv('CAIKIT_CA_CERT', null);
 export const CAIKIT_CERT = getEnv('CAIKIT_CERT', null);
 export const CAIKIT_KEY = getEnv('CAIKIT_KEY', null);
+
+export const WDU_URL = getEnv('WDU_URL', null);
 
 export const BEE_CODE_INTERPRETER_URL = getEnv('BEE_CODE_INTERPRETER_URL', null);
 export const BEE_CODE_INTERPRETER_CA_CERT = getEnv('BEE_CODE_INTERPRETER_CA_CERT', null);
@@ -160,8 +162,6 @@ if (MILVUS_USE_TLS && (!MILVUS_CA_CERT || !MILVUS_CERT || !MILVUS_KEY)) {
   throw new Error('MILVUS TLS is enabled but required certificates are not provided');
 }
 
-export const WDU_URL = getEnv('WDU_URL', null);
-
 // cannot import QueueName object due to cyclic import, using this weaker type-check
 const allowedQueues = Object.values(QueueName);
 export const RUN_BULLMQ_WORKERS = getStringArray('RUN_BULLMQ_WORKERS', allowedQueues, []);
@@ -169,7 +169,17 @@ export const RUN_BULLMQ_WORKERS = getStringArray('RUN_BULLMQ_WORKERS', allowedQu
 export const CRYPTO_CIPHER_KEY = Buffer.from(getEnv('CRYPTO_CIPHER_KEY'), 'base64');
 
 // TODO remove after org/project management is ready
-export const ORGANIZATION_ID_DEFAULT = getEnv('ORGANIZATION_ID_DEFAULT', null);
-export const ORGANIZATION_OWNER_ID_DEFAULT = getEnv('ORGANIZATION_OWNER_ID_DEFAULT');
-export const PROJECT_ID_DEFAULT = getEnv('PROJECT_ID_DEFAULT', null);
-export const PROJECT_ADMIN_ID_DEFAULT = getEnv('PROJECT_ADMIN_ID_DEFAULT');
+export const IBM_ORGANIZATION_OWNER_ID = getEnv('IBM_ORGANIZATION_OWNER_ID');
+
+const RUNS_QUOTA_DAILY_RAW = getEnv('RUNS_QUOTA_DAILY', null);
+export const RUNS_QUOTA_DAILY = RUNS_QUOTA_DAILY_RAW ? parseInt(RUNS_QUOTA_DAILY_RAW) : Infinity;
+
+const VECTOR_STORE_FILE_QUOTA_DAILY_RAW = getEnv('VECTOR_STORE_FILE_QUOTA_DAILY', null);
+export const VECTOR_STORE_FILE_QUOTA_DAILY = VECTOR_STORE_FILE_QUOTA_DAILY_RAW
+  ? parseInt(VECTOR_STORE_FILE_QUOTA_DAILY_RAW)
+  : Infinity;
+
+export const DEFAULT_RATE_LIMIT = parseInt(getEnv('DEFAULT_RATE_LIMIT', '25'));
+export const ARTIFACT_SECRET_RATE_LIMIT = parseInt(getEnv('ARTIFACT_SECRET_RATE_LIMIT', '25'));
+
+export const PACKAGE_DB = getEnv('PACKAGE_DB', './static/package-db.sqlite');

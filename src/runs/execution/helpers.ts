@@ -15,10 +15,7 @@
  */
 
 import { Loaded, ref, Ref } from '@mikro-orm/core';
-import { BeeSystemPrompt } from 'bee-agent-framework/agents/bee/prompts';
 import { unique } from 'remeda';
-
-import { Run } from '../entities/run.entity.js';
 
 import { ORM } from '@/database.js';
 import { File } from '@/files/entities/file.entity.js';
@@ -47,28 +44,13 @@ export function getRunVectorStores(
   return unique(vectorStores); // filter out duplicates
 }
 
-export function getPromptTemplate(run: Loaded<Run, 'assistant'>) {
-  const instructions = run.additionalInstructions
-    ? `${run.instructions} ${run.additionalInstructions}`
-    : run.instructions;
-  return BeeSystemPrompt.fork((input) => ({
-    ...input,
-    ...(run.assistant.$.systemPromptOverwrite
-      ? { template: run.assistant.$.systemPromptOverwrite }
-      : {}),
-    defaults: {
-      ...input.defaults,
-      ...(instructions ? { instructions } : {})
-    }
-  }));
-}
-
 export async function checkFileExistsOnToolResource(
   toolResource: AnyToolResource,
   file: Ref<File>
 ): Promise<boolean> {
   switch (toolResource.type) {
     case ToolType.USER:
+    case ToolType.SYSTEM:
     case ToolType.CODE_INTERPRETER:
       return !!toolResource.fileContainers.find((fc) => fc.file.id === file.id);
     case ToolType.FILE_SEARCH: {

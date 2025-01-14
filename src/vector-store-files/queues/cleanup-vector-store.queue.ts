@@ -25,7 +25,7 @@ async function jobHandler() {
   return RequestContext.create(ORM.em, async () => cleanupVectorStores());
 }
 
-export const { queue, worker } = createQueue({
+export const { queue } = createQueue({
   name: QueueName.VECTOR_STORES_CLEANUP,
   jobHandler,
   jobsOptions: { attempts: 1 }

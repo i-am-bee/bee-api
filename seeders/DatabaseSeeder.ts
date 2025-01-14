@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ref, type EntityManager } from '@mikro-orm/core';
+import { type EntityManager, ref } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
 
 import { OrganizationUserRole, ProjectRole } from '@/administration/entities/constants';
@@ -25,17 +25,13 @@ import { ProjectPrincipal } from '@/administration/entities/project-principal.en
 import { Project } from '@/administration/entities/project.entity';
 import { Assistant } from '@/assistants/assistant.entity';
 import { User } from '@/users/entities/user.entity';
-import { getDefaultModel } from '@/runs/execution/factory';
 import { SystemTools } from '@/tools/entities/tool-calls/system-call.entity';
 import { ProjectApiKey } from '@/administration/entities/project-api-key.entity';
-import { API_KEY_PREFIX, scryptApiKey } from '@/auth/utils';
-import {
-  ORGANIZATION_ID_DEFAULT,
-  ORGANIZATION_OWNER_ID_DEFAULT,
-  PROJECT_ADMIN_ID_DEFAULT,
-  PROJECT_ID_DEFAULT
-} from '@/config';
-import { redactProjectKeyValue } from '@/administration/api-keys.service';
+import { API_KEY_PREFIX, scryptSecret } from '@/auth/utils';
+import { IBM_ORGANIZATION_OWNER_ID } from '@/config';
+import { redactProjectKeyValue } from '@/administration/helpers';
+import { Agent } from '@/runs/execution/constants';
+import { defaultAIProvider } from '@/runs/execution/provider';
 
 const USER_EXTERNAL_ID = 'test';
 const PROJECT_API_KEY = `${API_KEY_PREFIX}testkey`;
@@ -52,17 +48,20 @@ export class DatabaseSeeder extends Seeder {
     const user = new User({
       externalId: USER_EXTERNAL_ID,
       name: 'Test user',
-      email: 'test@email.com'
+      email: 'test@email.com',
+      defaultOrganization: em
+        .getRepository(Organization)
+        .getReference('placeholder', { wrapped: true }),
+      defaultProject: em.getRepository(Project).getReference('placeholder', { wrapped: true })
     });
     const organization = new Organization({ createdBy: ref(user), name: 'Default Organization' });
-    organization.id = ORGANIZATION_ID_DEFAULT ?? 'org_670cc04869ddffe24f4fd70d';
     const organizationUser = new OrganizationUser({
       user: ref(user),
       role: OrganizationUserRole.OWNER,
       organization: ref(organization),
       createdBy: em.getRepository(OrganizationUser).getReference('placeholder', { wrapped: true })
     });
-    organizationUser.id = ORGANIZATION_OWNER_ID_DEFAULT;
+    organizationUser.id = IBM_ORGANIZATION_OWNER_ID;
     organizationUser.createdBy = em
       .getRepository(OrganizationUser)
       .getReference(organizationUser.id, { wrapped: true });
@@ -71,26 +70,30 @@ export class DatabaseSeeder extends Seeder {
       createdBy: ref(organizationUser),
       organization: ref(organization)
     });
-    project.id = PROJECT_ID_DEFAULT ?? 'proj_670cc04869ddffe24f4fd70f';
     const projectUser = new ProjectPrincipal({
       principal: new UserPrincipal({ user: ref(organizationUser) }),
       role: ProjectRole.ADMIN,
       createdBy: em.getRepository(ProjectPrincipal).getReference('placeholder', { wrapped: true }),
       project: ref(project)
     });
-    projectUser.id = PROJECT_ADMIN_ID_DEFAULT;
+    user.defaultOrganization = em
+      .getRepository(Organization)
+      .getReference(organization.id, { wrapped: true });
+    user.defaultProject = em.getRepository(Project).getReference(project.id, { wrapped: true });
+
     projectUser.createdBy = em
       .getRepository(ProjectPrincipal)
       .getReference(projectUser.id, { wrapped: true });
     const projectApiKey = new ProjectApiKey({
-      key: scryptApiKey(PROJECT_API_KEY),
+      key: scryptSecret(PROJECT_API_KEY),
       name: 'test key',
       createdBy: ref(projectUser),
       project: ref(project),
       redactedValue: redactProjectKeyValue(PROJECT_API_KEY)
     });
-    const assistant = new Assistant({
-      model: getDefaultModel(),
+    const beeAssistant = new Assistant({
+      model: defaultAIProvider.createAssistantBackend().modelId,
+      agent: Agent.BEE,
       tools: [
         {
           type: 'system',
@@ -117,7 +120,20 @@ export class DatabaseSeeder extends Seeder {
         $ui_icon: 'Bee'
       }
     });
-    em.persist([assistant, projectApiKey]);
+    const streamlitAssistant = new Assistant({
+      model: defaultAIProvider.createAssistantBackend().modelId,
+      agent: Agent.STREAMLIT,
+      tools: [],
+      name: 'Builder Assistant',
+      project: ref(project),
+      createdBy: ref(projectUser),
+      description: 'An example streamlit agent, tailored for building Streamlit applications.',
+      metadata: {
+        $ui_color: 'white',
+        $ui_icon: 'Bee'
+      }
+    });
+    em.persist([beeAssistant, streamlitAssistant, projectApiKey]);
     await em.flush();
     process.env.IN_SEEDER = undefined;
   }

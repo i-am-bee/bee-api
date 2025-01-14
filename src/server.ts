@@ -50,6 +50,8 @@ import { projectUsersModule } from './administration/project-users.module.js';
 import { organizationUsersModule } from './administration/organization-users.module.js';
 import { apiKeysModule } from './administration/api-keys.module.js';
 import { toolSecretsModule } from './tools/tool-secrets.module.js';
+import { artifactsModule } from './artifacts/artifacts.module.js';
+import { chatModule } from './chat/chat.module.js';
 
 const app = fastify({
   logger: fastifyLogger,
@@ -95,18 +97,20 @@ try {
   app.register(projectsModule, { prefix: '/v1' });
   app.register(projectUsersModule, { prefix: '/v1' });
   app.register(organizationUsersModule, { prefix: '/v1' });
+  app.register(artifactsModule, { prefix: '/v1' });
+  app.register(chatModule, { prefix: '/v1' });
 
   app.register(uiModule, { prefix: '/v1' });
 
   // bee observe proxy
   if (BEE_OBSERVE_API_URL) {
-    app.register(observeModule, { prefix: '/observe' });
+    app.register(observeModule, { prefix: '/observe/v1' });
   }
 
   await createCronJobs();
 
   // Bullmq workers
-  runWorkers(RUN_BULLMQ_WORKERS);
+  await runWorkers(RUN_BULLMQ_WORKERS);
 
   await app.listen({ port: PORT, host: '0.0.0.0' });
 } catch (err) {

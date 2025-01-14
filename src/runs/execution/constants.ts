@@ -17,20 +17,26 @@
 export const RUN_EXPIRATION_MILLISECONDS = 10 * 60 * 1000;
 export const STATUS_POLL_INTERVAL = 5 * 1000;
 
-export const LLMBackend = {
+export const Agent = {
+  BEE: 'bee',
+  STREAMLIT: 'streamlit'
+} as const;
+export type Agent = (typeof Agent)[keyof typeof Agent];
+
+export const AIBackend = {
   OLLAMA: 'ollama',
   IBM_VLLM: 'ibm-vllm',
   OPENAI: 'openai',
   BAM: 'bam',
   WATSONX: 'watsonx'
 } as const;
-export type LLMBackend = (typeof LLMBackend)[keyof typeof LLMBackend];
 
 export const CodeInterpreterStorageBackend = {
   S3: 's3',
   FILESYSTEM: 'filesystem'
 } as const;
-export type CodeInterpreterStorageBackend = (typeof LLMBackend)[keyof typeof LLMBackend];
+export type CodeInterpreterStorageBackend =
+  (typeof CodeInterpreterStorageBackend)[keyof typeof CodeInterpreterStorageBackend];
 
 export const SearchToolBackend = {
   GOOGLE: 'google',

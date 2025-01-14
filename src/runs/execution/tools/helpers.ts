@@ -15,9 +15,8 @@
  */
 
 import {
-  AnyTool,
+  AnyTool as FrameworkTool,
   StringToolOutput,
-  Tool as FrameworkTool,
   ToolOutput
 } from 'bee-agent-framework/tools/base';
 import { PythonTool } from 'bee-agent-framework/tools/python/python';
@@ -34,12 +33,13 @@ import { LLMChatTemplates } from 'bee-agent-framework/adapters/shared/llmChatTem
 import { DuckDuckGoSearchTool } from 'bee-agent-framework/tools/search/duckDuckGoSearch';
 import { SearchToolOptions, SearchToolOutput } from 'bee-agent-framework/tools/search/base';
 import { PromptTemplate } from 'bee-agent-framework/template';
+import { CalculatorTool } from 'bee-agent-framework/tools/calculator';
+import { LLMTool } from 'bee-agent-framework/tools/llm';
 
 import { AgentContext } from '../execute.js';
 import { getRunVectorStores } from '../helpers.js';
 import { CodeInterpreterTool as CodeInterpreterUserTool } from '../../../tools/entities/tool/code-interpreter-tool.entity.js';
 import { ApiTool as ApiCallUserTool } from '../../../tools/entities/tool/api-tool.entity.js';
-import { createCodeLLM } from '../factory.js';
 import { RedisCache } from '../cache.js';
 
 import { createPythonStorage } from './python-tool-storage.js';
@@ -69,20 +69,18 @@ import { UserUsage } from '@/tools/entities/tool-usages/user-usage.entity.js';
 import { FileSearchUsage } from '@/tools/entities/tool-usages/file-search-usage.entity.js';
 import { FileSearchCall } from '@/tools/entities/tool-calls/file-search-call.entity.js';
 import { FunctionTool as FunctionUserTool } from '@/tools/entities/tool/function-tool.entity.js';
-import { WikipediaSimilaritySearchTool } from '@/runs/execution/tools/wikipedia-similarity-search-tool.js';
+import { wikipediaTool } from '@/runs/execution/tools/wikipedia-tool';
 import { LoadedRun } from '@/runs/execution/types.js';
 import { CodeInterpreterResource } from '@/tools/entities/tool-resources/code-interpreter-resource.entity.js';
 import { File } from '@/files/entities/file.entity.js';
 import { Attachment } from '@/messages/attachment.entity.js';
 import { SystemResource } from '@/tools/entities/tool-resources/system-resource.entity.js';
 import { createSearchTool } from '@/runs/execution/tools/search-tool';
-import { createCacheClient } from '@/redis.js';
+import { sharedRedisCacheClient } from '@/redis.js';
+import { defaultAIProvider } from '@/runs/execution/provider';
 
 const searchCache: SearchToolOptions['cache'] = new RedisCache({
-  client: createCacheClient({
-    connectTimeout: 1000,
-    maxRetriesPerRequest: 1
-  }),
+  client: sharedRedisCacheClient,
   keyPrefix: 'search:',
   ttlSeconds: 60 * 60
 });
@@ -130,7 +128,20 @@ export async function getTools(run: LoadedRun, context: AgentContext): Promise<F
     (tool): tool is SystemUsage =>
       tool.type === ToolType.SYSTEM && tool.toolId === SystemTools.WIKIPEDIA
   );
-  if (wikipediaUsage) tools.push(new WikipediaSimilaritySearchTool());
+  if (wikipediaUsage) tools.push(wikipediaTool());
+
+  const llmUsage = run.tools.find(
+    (tool): tool is SystemUsage => tool.type === ToolType.SYSTEM && tool.toolId === SystemTools.LLM
+  );
+  if (llmUsage) {
+    tools.push(new LLMTool({ llm: defaultAIProvider.createChatBackend() }));
+  }
+
+  const calculatorUsage = run.tools.find(
+    (tool): tool is SystemUsage =>
+      tool.type === ToolType.SYSTEM && tool.toolId === SystemTools.CALCULATOR
+  );
+  if (calculatorUsage) tools.push(new CalculatorTool());
 
   const weatherUsage = run.tools.find(
     (tool): tool is SystemUsage =>
@@ -175,7 +186,7 @@ export async function getTools(run: LoadedRun, context: AgentContext): Promise<F
         .flatMap((container) => container.file.$);
 
       if (codeInterpreterUsage) {
-        const codeLLM = createCodeLLM();
+        const codeLLM = defaultAIProvider.createCodeBackend();
         tools.push(
           new PythonTool({
             codeInterpreter,
@@ -308,43 +319,53 @@ export async function createToolCall(
     tool,
     input
   }: {
-    tool: AnyTool;
+    tool: FrameworkTool;
     input: unknown;
   },
   { run }: AgentContext
 ) {
   if (tool instanceof FileSearchTool) {
     return new FileSearchCall({
-      input: tool.inputSchema().parse(input).query
+      input: await tool.parse(input).then((result) => result.query)
     });
-  } else if (tool instanceof WikipediaSimilaritySearchTool) {
+  } else if (tool.name === wikipediaTool().name) {
     return new SystemCall({
       toolId: SystemTools.WIKIPEDIA,
-      input: tool.inputSchema().parse(input)
+      input: await tool.parse(input)
     });
   } else if (tool instanceof GoogleSearchTool || tool instanceof DuckDuckGoSearchTool) {
     return new SystemCall({
       toolId: SystemTools.WEB_SEARCH,
-      input: tool.inputSchema().parse(input)
+      input: await tool.parse(input)
     });
   } else if (tool instanceof OpenMeteoTool) {
     return new SystemCall({
       toolId: SystemTools.WEATHER,
-      input: tool.inputSchema().parse(input)
+      input: await tool.parse(input)
     });
   } else if (tool instanceof ArXivTool) {
     return new SystemCall({
       toolId: SystemTools.ARXIV,
-      input: tool.inputSchema().parse(input)
+      input: await tool.parse(input)
     });
   } else if (tool instanceof PythonTool) {
     return new CodeInterpreterCall({
-      input: (await tool.inputSchema()).parse(input).code
+      input: await tool.parse(input).then((result) => result.code)
     });
   } else if (tool instanceof ReadFileTool) {
     return new SystemCall({
       toolId: SystemTools.READ_FILE,
-      input: tool.inputSchema().parse(input)
+      input: await tool.parse(input)
+    });
+  } else if (tool instanceof LLMTool) {
+    return new SystemCall({
+      toolId: SystemTools.LLM,
+      input: await tool.parse(input)
+    });
+  } else if (tool instanceof CalculatorTool) {
+    return new SystemCall({
+      toolId: SystemTools.CALCULATOR,
+      input: await tool.parse(input)
     });
   } else if (tool instanceof FunctionTool) {
     return new FunctionCall({ name: tool.name, arguments: JSON.stringify(input) });
@@ -391,6 +412,8 @@ export async function finalizeToolCall(
         toolCall.output = result;
         break;
       }
+      case SystemTools.CALCULATOR:
+      case SystemTools.LLM:
       case SystemTools.READ_FILE: {
         if (!(result instanceof StringToolOutput)) throw new TypeError();
         toolCall.output = result.result;
@@ -405,7 +428,7 @@ export async function finalizeToolCall(
     );
   } else if (toolCall instanceof FunctionCall) {
     if (!(result instanceof FunctionToolOutput)) throw new TypeError();
-    toolCall.output = result.output;
+    toolCall.output = result.result;
   } else if (toolCall instanceof FileSearchCall) {
     if (!(result instanceof FileSearchToolOutput)) throw new TypeError();
     toolCall.results = result.results;

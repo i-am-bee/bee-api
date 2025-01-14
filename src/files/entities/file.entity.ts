@@ -18,7 +18,10 @@ import { randomUUID } from 'node:crypto';
 
 import { Embedded, Entity, Enum, Property } from '@mikro-orm/core';
 
-import { Extraction } from './extraction.entity.js';
+import { DoclingExtraction } from './extractions/docling-extraction.entity.js';
+import { UnstructuredOpensourceExtraction } from './extractions/unstructured-opensource-extraction.entity.js';
+import { WDUExtraction } from './extractions/wdu-extraction.entity.js';
+import { UnstructuredAPIExtraction } from './extractions/unstructured-api-extraction.entity.js';
 
 import { ProjectScopedEntity, ProjectScopedEntityInput } from '@/common/project-scoped.entity.js';
 
@@ -47,12 +50,27 @@ export class File extends ProjectScopedEntity {
   contentHash!: string; // SHA256 hash of the file content
 
   @Property()
+  mimeType?: string;
+
+  @Property()
   storageId: string;
 
   @Embedded({ object: true })
-  extraction?: Extraction;
+  extraction?:
+    | DoclingExtraction
+    | UnstructuredAPIExtraction
+    | UnstructuredOpensourceExtraction
+    | WDUExtraction;
 
-  constructor({ purpose, bytes, filename, contentHash, storageId, ...rest }: FilePurposeInput) {
+  constructor({
+    purpose,
+    bytes,
+    filename,
+    contentHash,
+    storageId,
+    mimeType,
+    ...rest
+  }: FilePurposeInput) {
     super(rest);
 
     this.purpose = purpose;
@@ -60,9 +78,10 @@ export class File extends ProjectScopedEntity {
     this.filename = filename;
     this.contentHash = contentHash;
     this.storageId = storageId ?? randomUUID();
+    this.mimeType = mimeType;
   }
 }
 
 export type FilePurposeInput = ProjectScopedEntityInput &
-  Pick<File, 'purpose' | 'bytes' | 'filename' | 'contentHash'> &
+  Pick<File, 'purpose' | 'bytes' | 'filename' | 'contentHash' | 'mimeType'> &
   Partial<Pick<File, 'storageId'>>;

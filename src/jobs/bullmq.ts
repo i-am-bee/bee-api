@@ -13,17 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import path from 'node:path';
 
+import { Utils } from '@mikro-orm/core';
+import { globby } from 'globby';
 import { DefaultJobOptions, Job, Queue, Worker, WorkerOptions } from 'bullmq';
+import { BullMQOtel } from 'bullmq-otel';
 import { isTruthy } from 'remeda';
 
-import { createClient } from '../redis.js';
+import { defaultRedisConnectionOptions } from '../redis.js';
 import { getLogger } from '../logger.js';
 import { gateway } from '../metrics.js';
 
 import { QueueName } from './constants.js';
 
 import { jobLocalStorage } from '@/context.js';
+
+const telemetry = new BullMQOtel('bullmq');
 
 const getQueueLogger = (queueName: string, job?: Job) =>
   getLogger().child({
@@ -39,10 +45,11 @@ const getQueueLogger = (queueName: string, job?: Job) =>
 
 const logger = getLogger();
 
-const connection = createClient({
+const connectionOpts = {
+  ...defaultRedisConnectionOptions,
   // https://docs.bullmq.io/guide/going-to-production#maxretriesperrequest
   maxRetriesPerRequest: null
-});
+};
 
 const defaultJobOptions = {
   removeOnComplete: true,
@@ -77,14 +84,16 @@ function addCallbacks(worker: Worker, queue: Queue) {
   });
 }
 
-const Queues = new Map<QueueName, { queue: Queue; worker: Worker }>();
+const Workers = new Map<QueueName, Worker>();
 
 interface CreateQueueInput<T, U> {
   name: QueueName;
   jobsOptions?: DefaultJobOptions;
   workerOptions?: Partial<Omit<WorkerOptions, 'autorun'>>;
-  jobHandler: (job: Job<T>) => Promise<U>;
+  jobHandler?: (job: Job<T>) => Promise<U>;
 }
+
+const Queues = new Map<QueueName, Queue>();
 
 export function createQueue<T, U>({
   name,
@@ -93,7 +102,8 @@ export function createQueue<T, U>({
   jobHandler
 }: CreateQueueInput<T, U>) {
   const queue = new Queue<T, U>(name, {
-    connection: connection.options,
+    connection: connectionOpts,
+    telemetry,
     defaultJobOptions: jobsOptions ? { ...defaultJobOptions, ...jobsOptions } : defaultJobOptions
   });
 
@@ -101,41 +111,64 @@ export function createQueue<T, U>({
     getQueueLogger(name).error({ err }, `Queue has failed`);
   });
 
-  const worker = new Worker(
-    name,
-    (job) => jobLocalStorage.run({ job }, () => jobHandler(job)),
+  if (jobHandler) {
+    const worker = new Worker(
+      name,
+      (job) => jobLocalStorage.run({ job }, () => jobHandler(job)),
 
-    {
-      // We need to set autorun to false otherwise the worker might pick up stuff while ORM is not ready
-      autorun: false,
-      ...workerOptions,
-      connection: connection.options
-    }
-  );
+      {
+        // We need to set autorun to false otherwise the worker might pick up stuff while ORM is not ready
+        autorun: false,
+        telemetry,
+        ...workerOptions,
+        connection: connectionOpts
+      }
+    );
+    addCallbacks(worker, queue);
+    Workers.set(name, worker);
+  }
+  Queues.set(name, queue);
 
-  addCallbacks(worker, queue);
-
-  Queues.set(name, { queue, worker });
-
-  return { queue, worker };
+  return { queue };
 }
 
-export function runWorkers(queueNames: QueueName[]) {
-  queueNames.forEach((queueName) => {
-    if (!Queues.has(queueName)) throw Error(`Worker for ${queueName} has not been registered!`);
-  });
-  const workers = queueNames
-    .map((name) => Queues.get(name))
-    .filter(isTruthy)
-    .map(({ worker }) => worker);
+export async function runWorkers(queueNames: QueueName[]) {
+  await discoverQueues();
+
+  const workers = queueNames.map((name) => Workers.get(name)).filter(isTruthy);
 
   workers.forEach((worker) => worker.run());
 
   logger.info({ queueNames }, `Workers started successfully`);
 }
 
+export async function closeAllQueues() {
+  await Promise.all(
+    [...Queues.values()].map(async (queue) => {
+      if (!(await queue.isPaused())) {
+        await queue.close();
+      }
+    })
+  );
+  logger.info('Queues shutdown successfully');
+}
+
 export async function closeAllWorkers() {
-  await Promise.all([...Queues.values()].map(({ worker }) => worker.close()));
-  connection.quit();
+  await Promise.all(
+    [...Workers.values()].map(async (worker) => {
+      if (!worker.isPaused()) {
+        await worker.close();
+      }
+    })
+  );
   logger.info('Workers shutdown successfully');
+}
+
+export async function discoverQueues() {
+  const isTsNode = Utils.detectTsNode();
+  const queueGlobs = isTsNode ? './**/*.queue.ts' : './**/*.queue.js';
+  const cwd = isTsNode ? `${process.cwd()}/src` : `${process.cwd()}/dist`;
+  const queues = await globby(queueGlobs, { cwd });
+  logger.info({ queues }, `Discovered queues.`);
+  await Promise.all(queues.map((file) => import(path.join(cwd, file))));
 }

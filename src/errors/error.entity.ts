@@ -19,11 +19,6 @@ import { FrameworkError } from 'bee-agent-framework';
 import { AgentError } from 'bee-agent-framework/agents/base';
 import { ToolError } from 'bee-agent-framework/tools/base';
 
-import {
-  convertGrpcError,
-  isGrpcServiceError
-} from '@/embedding/adapters/caikit/grpc/utils/errors';
-
 export const APIErrorCode = {
   AUTH_ERROR: 'auth_error',
   INTERNAL_SERVER_ERROR: 'internal_server_error',
@@ -79,11 +74,6 @@ export class APIError {
         { message: err.message, code: APIErrorCode.FRAMEWORK_ERROR },
         { cause: err }
       );
-    }
-
-    // This should be last check before generic error since isGrpcServiceError is just a heuristic
-    if (isGrpcServiceError(err)) {
-      return convertGrpcError(err);
     }
 
     return new APIError(

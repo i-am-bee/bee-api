@@ -19,6 +19,7 @@ import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 import { assistantSchema } from './assistant.js';
 
 import { createPaginationQuerySchema, withPagination } from '@/schema.js';
+import { Agent } from '@/runs/execution/constants.js';
 
 export const assistantsListQuerySchema = {
   type: 'object',
@@ -28,6 +29,10 @@ export const assistantsListQuerySchema = {
     public: {
       type: 'boolean',
       default: false
+    },
+    agent: {
+      type: 'string',
+      enum: Object.values(Agent)
     },
     search: {
       type: 'string',
