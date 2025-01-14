@@ -30,7 +30,8 @@ export const toolCreateBodySchema = {
         name: { type: 'string' },
         source_code: { type: 'string' },
         metadata: metadataSchema,
-        user_description: { type: 'string' }
+        user_description: { type: 'string' },
+        secrets: { type: 'array', items: { type: 'string' } }
       }
     },
     {
