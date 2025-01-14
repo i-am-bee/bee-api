@@ -92,8 +92,6 @@ export const IBM_VLLM_PRIVATE_KEY = getEnv('IBM_VLLM_PRIVATE_KEY', null);
 
 export const OPENAI_API_KEY = getEnv('OPENAI_API_KEY', null);
 
-export const BAM_API_KEY = getEnv('BAM_API_KEY', null);
-
 export const WATSONX_API_KEY = getEnv('WATSONX_API_KEY', null);
 export const WATSONX_PROJECT_ID = getEnv('WATSONX_PROJECT_ID', null);
 export const WATSONX_REGION = getEnv('WATSONX_REGION', null);

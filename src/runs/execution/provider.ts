@@ -1,10 +1,6 @@
 import { ChatLLM, ChatLLMOutput } from 'bee-agent-framework/llms/chat';
 import { LLM, LLMInput } from 'bee-agent-framework/llms/llm';
 import { BaseLLMOutput, EmbeddingOptions, EmbeddingOutput } from 'bee-agent-framework/llms/base';
-import { BAMChatLLM } from 'bee-agent-framework/adapters/bam/chat';
-import { BAMLLM } from 'bee-agent-framework/adapters/bam/llm';
-import { Client as BAMClient } from '@ibm-generative-ai/node-sdk';
-import { BAMChatLLMPresetModel } from 'bee-agent-framework/adapters/bam/chatPreset';
 import { OllamaChatLLM } from 'bee-agent-framework/adapters/ollama/chat';
 import { OllamaLLM } from 'bee-agent-framework/adapters/ollama/llm';
 import { Ollama } from 'ollama';
@@ -24,7 +20,6 @@ import { WatsonXLLM } from 'bee-agent-framework/adapters/watsonx/llm';
 
 import {
   AI_BACKEND,
-  BAM_API_KEY,
   IBM_VLLM_CERT_CHAIN,
   IBM_VLLM_PRIVATE_KEY,
   IBM_VLLM_ROOT_CERT,
@@ -54,49 +49,6 @@ interface AIProvider<
   createAssistantBackend: (params?: ChatLLMParams) => ChatLLMType;
   createCodeBackend: (params?: { model?: string }) => LLMType | void;
   createEmbeddingBackend?: (params?: { model?: string }) => EmbeddingModel;
-}
-
-export class BamAIProvider implements AIProvider<BAMChatLLM, BAMLLM> {
-  static client: BAMClient;
-
-  constructor() {
-    BamAIProvider.client ??= new BAMClient({ apiKey: BAM_API_KEY ?? undefined });
-  }
-
-  createChatBackend({
-    model = 'meta-llama/llama-3-1-70b-instruct',
-    ...params
-  }: ChatLLMParams = {}) {
-    return BAMChatLLM.fromPreset(model as BAMChatLLMPresetModel, {
-      client: BamAIProvider.client,
-      parameters: (parameters) => ({
-        ...parameters,
-        top_p: params.topP ?? parameters.top_p,
-        temperature: params.temperature ?? parameters.temperature,
-        max_new_tokens: MAX_NEW_TOKENS
-      })
-    });
-  }
-
-  createAssistantBackend(params?: ChatLLMParams) {
-    return this.createChatBackend(params);
-  }
-
-  createCodeBackend({ model = 'meta-llama/llama-3-1-70b-instruct' } = {}) {
-    return new BAMLLM({
-      client: BamAIProvider.client,
-      modelId: model,
-      parameters: {
-        decoding_method: 'greedy',
-        include_stop_sequence: false,
-        max_new_tokens: MAX_NEW_TOKENS
-      }
-    });
-  }
-
-  createEmbeddingBackend({ model = 'baai/bge-large-en-v1.5' } = {}) {
-    return new BAMLLM({ client: BamAIProvider.client, modelId: model });
-  }
 }
 
 export class OllamaAIProvider implements AIProvider<OllamaChatLLM, OllamaLLM> {
@@ -278,7 +230,6 @@ export const aiProviderByBackend = {
   [AIBackend.OLLAMA]: OllamaAIProvider,
   [AIBackend.IBM_VLLM]: IBMvLLMAIProvider,
   [AIBackend.OPENAI]: OpenAIProvider,
-  [AIBackend.BAM]: BamAIProvider,
   [AIBackend.WATSONX]: WatsonxAIProvider
 };
 
