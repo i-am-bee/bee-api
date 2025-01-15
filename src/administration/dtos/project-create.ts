@@ -16,8 +16,6 @@
 
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 
-import { ProjectVisiblity } from '../entities/project.entity.js';
-
 import { projectSchema } from './project.js';
 
 export const projectCreateBodySchema = {
@@ -25,12 +23,7 @@ export const projectCreateBodySchema = {
   additionalProperties: false,
   required: ['name'],
   properties: {
-    name: { type: 'string' },
-    visibility: {
-      type: 'string',
-      enum: Object.values(ProjectVisiblity),
-      default: ProjectVisiblity.PUBLIC
-    }
+    name: { type: 'string' }
   }
 } as const satisfies JSONSchema;
 export type ProjectCreateBody = FromSchema<typeof projectCreateBodySchema>;
