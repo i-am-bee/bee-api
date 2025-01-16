@@ -17,6 +17,7 @@
 import {
   AnyTool as FrameworkTool,
   StringToolOutput,
+  ToolError,
   ToolOutput
 } from 'bee-agent-framework/tools/base';
 import { PythonTool } from 'bee-agent-framework/tools/python/python';
@@ -38,7 +39,10 @@ import { LLMTool } from 'bee-agent-framework/tools/llm';
 
 import { AgentContext } from '../execute.js';
 import { getRunVectorStores } from '../helpers.js';
-import { CodeInterpreterTool as CodeInterpreterUserTool } from '../../../tools/entities/tool/code-interpreter-tool.entity.js';
+import {
+  CodeInterpreterTool,
+  CodeInterpreterTool as CodeInterpreterUserTool
+} from '../../../tools/entities/tool/code-interpreter-tool.entity.js';
 import { ApiTool as ApiCallUserTool } from '../../../tools/entities/tool/api-tool.entity.js';
 import { RedisCache } from '../cache.js';
 
@@ -76,8 +80,13 @@ import { File } from '@/files/entities/file.entity.js';
 import { Attachment } from '@/messages/attachment.entity.js';
 import { SystemResource } from '@/tools/entities/tool-resources/system-resource.entity.js';
 import { createSearchTool } from '@/runs/execution/tools/search-tool';
-import { sharedRedisCacheClient } from '@/redis.js';
+import { sharedRedisCacheClient, withRedisClient } from '@/redis.js';
 import { defaultAIProvider } from '@/runs/execution/provider';
+import { ToolSecret } from '@/tools/entities/tool-secret.entity.js';
+import { createApproveChannel, createToolInputChannel, toRunDto } from '@/runs/runs.service.js';
+import { RequiredToolInput } from '@/runs/entities/requiredToolInput.entity.js';
+import { ToolApprovalType } from '@/runs/entities/toolApproval.entity.js';
+import { RequiredToolApprove } from '@/runs/entities/requiredToolApprove.entity.js';
 
 const searchCache: SearchToolOptions['cache'] = new RedisCache({
   client: sharedRedisCacheClient,
@@ -437,5 +446,138 @@ export async function finalizeToolCall(
     toolCall.output = result.result;
   } else {
     throw new Error(`Unexpected tool call`);
+  }
+}
+
+export async function requireToolApproval(ctx: AgentContext) {
+  const { toolCall } = ctx;
+  if (toolCall) {
+    if (
+      ctx.run.toolApprovals?.find(
+        (approval) =>
+          approval.toolId ===
+          (toolCall.type === ToolType.USER
+            ? toolCall.tool.id
+            : toolCall.type === ToolType.SYSTEM
+              ? toolCall.toolId
+              : toolCall.type)
+      )?.requireApproval === ToolApprovalType.ALWAYS
+    ) {
+      await withRedisClient(
+        (client) =>
+          new Promise((resolve, reject) => {
+            client.subscribe(createApproveChannel(ctx.run, toolCall), async (err) => {
+              try {
+                if (err) {
+                  reject(err);
+                } else {
+                  ctx.run.requireAction(
+                    new RequiredToolApprove({
+                      toolCalls: [...(ctx.run.requiredAction?.toolCalls ?? []), toolCall]
+                    })
+                  );
+                  await ORM.em.flush();
+                  await ctx.publish({
+                    event: 'thread.run.requires_action',
+                    data: toRunDto(ctx.run)
+                  });
+                  await ctx.publish({
+                    event: 'done',
+                    data: '[DONE]'
+                  });
+                }
+              } catch (err) {
+                reject(err);
+              }
+            });
+            client.on('message', async (_, approval) => {
+              try {
+                ctx.run.submitAction();
+                await ORM.em.flush();
+                if (approval !== 'true') {
+                  reject(
+                    new ToolError('User has not approved this tool to run.', [], {
+                      isFatal: false,
+                      isRetryable: false
+                    })
+                  );
+                }
+                resolve(true);
+              } catch (err) {
+                reject(err);
+              }
+            });
+          })
+      );
+    }
+  }
+}
+
+export async function requireToolInput(ctx: AgentContext) {
+  const { toolCall } = ctx;
+  if (toolCall) {
+    if (toolCall.type === 'user') {
+      const tool = await ORM.em.getRepository(Tool).findOneOrFail(toolCall.tool.id);
+
+      if (tool instanceof CodeInterpreterTool) {
+        const toolSecrets = await ORM.em.getRepository(ToolSecret).find({ tool: toolCall.tool.id });
+        const fulfilledSecrets: { [key: string]: string } = (tool.secrets ?? []).reduce(
+          (acc, secretName) => ({
+            ...acc,
+            [secretName]: toolSecrets.find((ts) => ts.name === secretName)?.value
+          }),
+          {}
+        );
+        const missingSecrets = Object.entries(fulfilledSecrets)
+          .filter(([_, value]) => !value)
+          .map(([key]) => key);
+        if (missingSecrets.length > 0)
+          await withRedisClient(
+            (client) =>
+              new Promise((resolve, reject) => {
+                client.subscribe(createToolInputChannel(ctx.run, toolCall), async (err) => {
+                  try {
+                    if (err) {
+                      reject(err);
+                    } else {
+                      ctx.run.requireAction(
+                        new RequiredToolInput({
+                          toolCalls: [...(ctx.run.requiredAction?.toolCalls ?? []), toolCall],
+                          inputFields: missingSecrets
+                        })
+                      );
+                      await ORM.em.flush();
+                      await ctx.publish({
+                        event: 'thread.run.requires_action',
+                        data: toRunDto(ctx.run)
+                      });
+                      await ctx.publish({
+                        event: 'done',
+                        data: '[DONE]'
+                      });
+                    }
+                  } catch (err) {
+                    reject(err);
+                  }
+                });
+                client.on('message', async (_, inputs) => {
+                  try {
+                    ctx.run.submitAction();
+                    await ORM.em.flush();
+                    const newSecrest = JSON.parse(inputs);
+
+                    newSecrest.forEach((secret: { name: string; value: string }) => {
+                      fulfilledSecrets[secret.name] = secret.value;
+                    });
+                    // TODO pass secrets to the tool
+                    resolve(true);
+                  } catch (err) {
+                    reject(err);
+                  }
+                });
+              })
+          );
+      }
+    }
   }
 }

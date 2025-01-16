@@ -18,12 +18,14 @@ import { Embeddable, Enum, Property } from '@mikro-orm/core';
 
 import { RequiredToolApprove } from './requiredToolApprove.entity';
 import { RequiredToolOutput } from './requiredToolOutput.entity';
+import { RequiredToolInput } from './requiredToolInput.entity';
 
 import { generatePrefixedObjectId } from '@/utils/id';
 
 export enum RequiredActionType {
   OUTPUT = 'output',
-  APPROVE = 'approve'
+  APPROVE = 'approve',
+  INPUT = 'input'
 }
 
 @Embeddable({ abstract: true, discriminatorColumn: 'type' })
@@ -35,4 +37,4 @@ export abstract class RequiredAction {
   type!: RequiredActionType;
 }
 
-export type AnyRequiredAction = RequiredToolApprove | RequiredToolOutput;
+export type AnyRequiredAction = RequiredToolApprove | RequiredToolInput | RequiredToolOutput;

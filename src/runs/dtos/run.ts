@@ -86,6 +86,23 @@ export const runSchema = {
           }
         },
         {
+          required: ['type', 'submit_tool_inputs'],
+          properties: {
+            type: { const: 'submit_tool_inputs' },
+            submit_tool_inputs: {
+              type: 'object',
+              required: ['tool_calls', 'input_fields'],
+              properties: {
+                tool_calls: {
+                  type: 'array',
+                  items: toolCallSchema
+                },
+                input_fields: { type: 'array', items: { type: 'string' } }
+              }
+            }
+          }
+        },
+        {
           required: ['type', 'submit_tool_approvals'],
           properties: {
             type: { const: 'submit_tool_approvals' },
