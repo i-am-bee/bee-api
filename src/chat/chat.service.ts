@@ -99,7 +99,7 @@ export async function createChatCompletion({
               }))
             } as ChatCompletionChunk
           });
-          chat.output = chat.output?.merge(output) ?? output;
+          chat.output = chat.output?.mergeImmutable(output) ?? output;
         }
       } catch (err) {
         sse.send(res, { data: chat.error ?? 'Internal server error' }); // TODO
