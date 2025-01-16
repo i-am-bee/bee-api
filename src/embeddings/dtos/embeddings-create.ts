@@ -20,7 +20,7 @@ import { embeddingsSchema } from './embeddings';
 
 export const embeddingsCreateBodySchema = {
   type: 'object',
-  required: ['model', 'input'],
+  required: ['input'],
   properties: {
     model: { type: 'string' },
     input: { oneOf: [{ type: 'string' }, { type: 'array', items: { type: 'string' } }] }
