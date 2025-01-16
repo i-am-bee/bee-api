@@ -74,7 +74,8 @@ export async function createChatCompletion({
               json: schema // We can't just set schema to undefined due to bug in the vLLM
             }
           }
-        : {})
+        : {}),
+      stream: !!stream
     }
   ] as const;
 
@@ -86,21 +87,22 @@ export async function createChatCompletion({
       const unsub = listenToSocketClose(req.socket, () => controller.abort());
       sse.init(res);
       try {
-        for await (const output of llm.stream(...args)) {
-          sse.send(res, {
-            data: {
-              id: chat.id,
-              object: 'chat.completion.chunk',
-              model,
-              created: dayjs(chat.createdAt).unix(),
-              choices: output.messages.map((message, index) => ({
-                index,
-                delta: { role: message.role, content: message.text }
-              }))
-            } as ChatCompletionChunk
+        chat.output = await llm.generate(...args).observe((emitter) => {
+          emitter.on('newToken', ({ value }) => {
+            sse.send(res, {
+              data: {
+                id: chat.id,
+                object: 'chat.completion.chunk',
+                model,
+                created: dayjs(chat.createdAt).unix(),
+                choices: value.messages.map((message, index) => ({
+                  index,
+                  delta: { role: message.role, content: message.text }
+                }))
+              } as ChatCompletionChunk
+            });
           });
-          chat.output = chat.output?.mergeImmutable(output) ?? output;
-        }
+        });
       } catch (err) {
         sse.send(res, { data: chat.error ?? 'Internal server error' }); // TODO
         throw err;
