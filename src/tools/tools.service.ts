@@ -75,6 +75,8 @@ import { ReadFileTool } from '@/runs/execution/tools/read-file-tool.js';
 import { snakeToCamel } from '@/utils/strings.js';
 import { createSearchTool } from '@/runs/execution/tools/search-tool';
 import { defaultAIProvider } from '@/runs/execution/provider';
+import { redactKey } from '@/administration/helpers.js';
+import decrypt from '@/utils/crypto/decrypt.js';
 
 type SystemTool = Pick<FrameworkTool, 'description' | 'name' | 'inputSchema'> & {
   type: ToolType;
@@ -246,6 +248,8 @@ export function toDto(tool: AnyTool | SystemTool): ToolDto {
             ? JSON.stringify(tool.parameters)
             : null,
       open_api_schema: tool.executor === ToolExecutor.API ? tool.openApiSchema : null,
+      api_key:
+        tool.executor === ToolExecutor.API && tool.apiKey ? redactKey(decrypt(tool.apiKey)) : null,
       description: tool.description
     };
   } else {
@@ -715,9 +719,31 @@ async function createOpenApiTool(
   body: Extract<ToolCreateBody, { open_api_schema: string }>
 ): Promise<ToolCreateResponse> {
   const schema = parse(body.open_api_schema);
+
+  if (!schema.info.title && !body.name) {
+    throw new APIError({
+      message: 'Body name or OpenAPI info.name is requred.',
+      code: APIErrorCode.INVALID_INPUT
+    });
+  }
+
+  if (!schema.info.description) {
+    throw new APIError({
+      message: 'OpenAPI info.description is requred.',
+      code: APIErrorCode.INVALID_INPUT
+    });
+  }
+
+  if (!schema.servers || schema.servers.length === 0 || !schema.servers[0].url) {
+    throw new APIError({
+      message: 'OpenAPI servers is requred.',
+      code: APIErrorCode.INVALID_INPUT
+    });
+  }
+
   const tool = new ApiTool({
     openApiSchema: body.open_api_schema,
-    name: schema.info.title,
+    name: body.name ?? schema.info.title,
     description: schema.info.description,
     apiKey: body.api_key ? encrypt(body.api_key) : undefined,
     metadata: body.metadata,
@@ -813,6 +839,16 @@ export async function updateTool({
       });
     }
     tool.openApiSchema = getUpdatedValue(body.open_api_schema, tool.openApiSchema);
+  }
+
+  if ('api_key' in body) {
+    if (!('apiKey' in tool)) {
+      throw new APIError({
+        message: 'Can not change tool executor',
+        code: APIErrorCode.INVALID_INPUT
+      });
+    }
+    tool.apiKey = getUpdatedValue(body.api_key, tool.apiKey);
   }
 
   if ('parameters' in body) {
