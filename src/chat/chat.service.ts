@@ -93,13 +93,17 @@ export async function createChatCompletion({
               data: {
                 id: chat.id,
                 object: 'chat.completion.chunk',
-                model,
+                model: llm.modelId,
                 created: dayjs(chat.createdAt).unix(),
-                choices: value.messages.map((message, index) => ({
-                  index,
-                  delta: { role: message.role, content: message.text }
-                }))
-              } as ChatCompletionChunk
+                choices: value.messages.map((message, index) => {
+                  if (message.role !== ChatMessageRole.ASSISTANT)
+                    throw new LLMError(`Unexpected message role ${message.role}`);
+                  return {
+                    index,
+                    delta: { role: message.role, content: message.text }
+                  };
+                })
+              } as const satisfies ChatCompletionChunk
             });
           });
         });
