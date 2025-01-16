@@ -31,7 +31,10 @@ export async function embeddings({
   input
 }: EmbeddingsCreateBody): Promise<EmbeddingsCreateResponse> {
   const llm = defaultAIProvider.createEmbeddingBackend({ model });
-  const embeddings = new Embeddings({ model, inputs: typeof input === 'string' ? [input] : input });
+  const embeddings = new Embeddings({
+    model: llm.modelId,
+    inputs: typeof input === 'string' ? [input] : input
+  });
   await ORM.em.persistAndFlush(embeddings);
   try {
     const output = await llm.embed(embeddings.inputs);
