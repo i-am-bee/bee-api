@@ -25,15 +25,19 @@ import {
 } from './dtos/chat-completion-create';
 import { ChatMessageRole } from './constants';
 import { Chat } from './entities/chat.entity';
+import { ChatCompletionChunk } from './dtos/chat-completion-chunk';
 
-import { getLogger } from '@/logger';
+import { getServiceLogger } from '@/logger';
 import { APIError, APIErrorCode } from '@/errors/error.entity';
 import { ORM } from '@/database';
 import { defaultAIProvider } from '@/runs/execution/provider';
+import { ensureRequestContextData } from '@/context';
+import { listenToSocketClose } from '@/utils/networking';
+import * as sse from '@/streaming/sse';
 
-const getChatLogger = () => getLogger();
+const getChatLogger = () => getServiceLogger('chat');
 
-export function toDto(chat: Loaded<Chat>): ChatCompletionCreateResponse {
+export function toChatDto(chat: Loaded<Chat>): ChatCompletionCreateResponse {
   return {
     id: chat.id,
     object: 'chat.completion',
@@ -52,37 +56,80 @@ export function toDto(chat: Loaded<Chat>): ChatCompletionCreateResponse {
 
 export async function createChatCompletion({
   model,
+  stream,
   messages,
   response_format
-}: ChatCompletionCreateBody): Promise<ChatCompletionCreateResponse> {
+}: ChatCompletionCreateBody): Promise<ChatCompletionCreateResponse | void> {
   const llm = defaultAIProvider.createChatBackend({ model });
   const chat = new Chat({ model: llm.modelId, messages, responseFormat: response_format });
   await ORM.em.persistAndFlush(chat);
-  try {
-    const schema = response_format?.json_schema.schema;
-    const output = await llm.generate(
-      messages.map(({ role, content }) => BaseMessage.of({ role, text: content })),
-      {
-        ...(schema
-          ? {
-              guided: {
-                json: schema // We can't just set schema to undefined due to bug in the vLLM
-              }
-            }
-          : {})
-      }
-    );
-    chat.output = output;
-    await ORM.em.flush();
 
-    return toDto(chat);
+  const schema = response_format?.json_schema.schema;
+  const args = [
+    messages.map(({ role, content }) => BaseMessage.of({ role, text: content })),
+    {
+      ...(schema
+        ? {
+            guided: {
+              json: schema // We can't just set schema to undefined due to bug in the vLLM
+            }
+          }
+        : {})
+    }
+  ] as const;
+
+  try {
+    if (stream) {
+      const req = ensureRequestContextData('req');
+      const res = ensureRequestContextData('res');
+      const controller = new AbortController();
+      const unsub = listenToSocketClose(req.socket, () => controller.abort());
+      sse.init(res);
+      try {
+        for await (const output of llm.stream(...args)) {
+          sse.send(
+            res,
+            JSON.stringify({
+              id: chat.id,
+              object: 'chat.completion.chunk',
+              model,
+              created: dayjs(chat.createdAt).unix(),
+              choices: output.messages.map((message, index) => ({
+                index,
+                delta: { role: message.role, content: message.text }
+              }))
+            } as ChatCompletionChunk)
+          );
+          chat.output = chat.output?.merge(output) ?? output;
+        }
+      } catch (err) {
+        getChatLogger().error({ err }, 'LLM generation failed');
+        chat.error = err.toString();
+        sse.send(res, JSON.stringify(chat.error ?? 'Internal server error')); // TODO
+      } finally {
+        sse.end(res);
+        unsub();
+        await ORM.em.flush();
+      }
+    } else {
+      try {
+        chat.output = await llm.generate(...args);
+        return toChatDto(chat);
+      } catch (err) {
+        getChatLogger().error({ err }, 'LLM generation failed');
+        chat.error = err.toString();
+        if (err instanceof LLMError) {
+          throw new APIError({ code: APIErrorCode.SERVICE_ERROR, message: err.message });
+        }
+        throw err;
+      } finally {
+        await ORM.em.flush();
+      }
+    }
   } catch (err) {
     getChatLogger().error({ err }, 'LLM generation failed');
     chat.error = err.toString();
+  } finally {
     await ORM.em.flush();
-    if (err instanceof LLMError) {
-      throw new APIError({ code: APIErrorCode.SERVICE_ERROR, message: err.message });
-    }
-    throw err;
   }
 }

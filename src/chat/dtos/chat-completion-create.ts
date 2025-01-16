@@ -25,6 +25,7 @@ export const chatCompletionCreateBodySchema = {
   required: ['messages'],
   properties: {
     model: { type: 'string' },
+    stream: { type: 'boolean', nullable: true, default: false },
     messages: {
       type: 'array',
       minItems: 1,

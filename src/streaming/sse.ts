@@ -17,8 +17,6 @@
 import { FastifyReply } from 'fastify';
 import { entries } from 'remeda';
 
-import { Event } from './dtos/event.js';
-
 export const init = (res: FastifyReply) => {
   res.hijack();
   if (!res.raw.headersSent) {
@@ -33,14 +31,10 @@ export const init = (res: FastifyReply) => {
   }
 };
 
-export const send = (res: FastifyReply, event: Event) => {
-  res.raw.write(createMessage(event));
+export const send = (res: FastifyReply, data: string) => {
+  res.raw.write(data);
 };
 
 export const end = (res: FastifyReply) => {
   res.raw.end();
 };
-
-function createMessage(event: Event): string {
-  return `event: ${event.event}\ndata: ${JSON.stringify(event.data)}\n\n`;
-}
