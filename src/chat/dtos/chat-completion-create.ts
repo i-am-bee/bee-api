@@ -19,6 +19,7 @@ import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 import { ChatMessageRole } from '../constants';
 
 import { chatCompletionSchema } from './chat-completion';
+import { chatCompletionChunkSchema } from './chat-completion-chunk';
 
 export const chatCompletionCreateBodySchema = {
   type: 'object',
@@ -69,3 +70,8 @@ export type ChatCompletionCreateBody = FromSchema<typeof chatCompletionCreateBod
 
 export const chatCompletionCreateResponseSchema = chatCompletionSchema;
 export type ChatCompletionCreateResponse = FromSchema<typeof chatCompletionCreateResponseSchema>;
+
+export const chatCompletionCreateResponseStreamSchema = chatCompletionChunkSchema;
+export type ChatCompletionCreateResponseStream = FromSchema<
+  typeof chatCompletionCreateResponseStreamSchema
+>;

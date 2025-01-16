@@ -76,7 +76,7 @@ export async function subscribeAndForward(
         });
         client.on('message', (_, message) => {
           const event = JSON.parse(message) as Event;
-          sse.send(res, createMessage(event));
+          sse.send(res, { event: event.event, data: event.data });
           if (event.event === 'done' || event.event === 'error') {
             resolve();
           }
@@ -86,13 +86,9 @@ export async function subscribeAndForward(
         });
       });
     } catch (err) {
-      sse.send(res, createMessage({ event: 'error', data: err }));
+      sse.send(res, { event: 'error', data: err });
     } finally {
       sse.end(res);
     }
   });
-}
-
-function createMessage(event: Event): string {
-  return `event: ${event.event}\ndata: ${JSON.stringify(event.data)}\n\n`;
 }

@@ -31,8 +31,9 @@ export const init = (res: FastifyReply) => {
   }
 };
 
-export const send = (res: FastifyReply, data: string) => {
-  res.raw.write(data);
+export const send = (res: FastifyReply, { event, data }: { event?: string; data: any }) => {
+  if (event) res.raw.write(`event: ${event}\n`);
+  res.raw.write(`data: ${JSON.stringify(data)}\n\n`);
 };
 
 export const end = (res: FastifyReply) => {

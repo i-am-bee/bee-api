@@ -20,7 +20,8 @@ import { StatusCodes } from 'http-status-codes';
 import {
   ChatCompletionCreateBody,
   chatCompletionCreateBodySchema,
-  chatCompletionCreateResponseSchema
+  chatCompletionCreateResponseSchema,
+  chatCompletionCreateResponseStreamSchema
 } from './dtos/chat-completion-create.js';
 import { createChatCompletion } from './chat.service.js';
 
@@ -39,7 +40,12 @@ export const chatModule: FastifyPluginAsyncJsonSchemaToTs = async (app) => {
       schema: {
         body: chatCompletionCreateBodySchema,
         response: {
-          [StatusCodes.OK]: chatCompletionCreateResponseSchema
+          [StatusCodes.OK]: {
+            content: {
+              'application/json': { schema: chatCompletionCreateResponseSchema },
+              'text/event-stream': { schema: chatCompletionCreateResponseStreamSchema }
+            }
+          }
         },
         tags: [Tag.OPENAI_API]
       }

@@ -87,9 +87,8 @@ export async function createChatCompletion({
       sse.init(res);
       try {
         for await (const output of llm.stream(...args)) {
-          sse.send(
-            res,
-            JSON.stringify({
+          sse.send(res, {
+            data: {
               id: chat.id,
               object: 'chat.completion.chunk',
               model,
@@ -98,37 +97,29 @@ export async function createChatCompletion({
                 index,
                 delta: { role: message.role, content: message.text }
               }))
-            } as ChatCompletionChunk)
-          );
+            } as ChatCompletionChunk
+          });
           chat.output = chat.output?.merge(output) ?? output;
         }
       } catch (err) {
-        getChatLogger().error({ err }, 'LLM generation failed');
-        chat.error = err.toString();
-        sse.send(res, JSON.stringify(chat.error ?? 'Internal server error')); // TODO
+        sse.send(res, { data: chat.error ?? 'Internal server error' }); // TODO
+        throw err;
       } finally {
         sse.end(res);
         unsub();
-        await ORM.em.flush();
       }
     } else {
-      try {
-        chat.output = await llm.generate(...args);
-        return toChatDto(chat);
-      } catch (err) {
-        getChatLogger().error({ err }, 'LLM generation failed');
-        chat.error = err.toString();
-        if (err instanceof LLMError) {
-          throw new APIError({ code: APIErrorCode.SERVICE_ERROR, message: err.message });
-        }
-        throw err;
-      } finally {
-        await ORM.em.flush();
-      }
+      chat.output = await llm.generate(...args);
+      return toChatDto(chat);
     }
   } catch (err) {
     getChatLogger().error({ err }, 'LLM generation failed');
     chat.error = err.toString();
+    if (err instanceof LLMError) {
+      throw new APIError({ code: APIErrorCode.SERVICE_ERROR, message: err.message });
+    } else {
+      throw err;
+    }
   } finally {
     await ORM.em.flush();
   }
