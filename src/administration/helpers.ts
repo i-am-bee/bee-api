@@ -47,4 +47,6 @@ export const redactProjectKeyValue = (key: string) =>
   );
 
 export const redactKey = (key: string) =>
-  key.replace(key.substring(2, key.length - 2), '*'.repeat(10));
+  key.length >= 10
+    ? key.replace(key.substring(2, key.length - 2), '*'.repeat(10))
+    : key[0] + '*'.repeat(13);
