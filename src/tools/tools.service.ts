@@ -691,7 +691,7 @@ async function createCodeInterpreterTool(
       sourceCode: body.source_code,
       jsonSchema: customTool.inputSchema(),
       description: customTool.description,
-      metadata: body.metadata,
+      metadata: body.metadata ?? undefined,
       userDescription: body.user_description
     });
 
@@ -746,7 +746,7 @@ async function createOpenApiTool(
     name: body.name ?? schema.info.title,
     description: schema.info.description,
     apiKey: body.api_key ? encrypt(body.api_key) : undefined,
-    metadata: body.metadata,
+    metadata: body.metadata ?? undefined,
     userDescription: body.user_description
   });
 
@@ -762,7 +762,7 @@ async function createFunctionTool(
     name: body.name,
     description: body.description ?? '',
     parameters: body.parameters,
-    metadata: body.metadata,
+    metadata: body.metadata ?? undefined,
     userDescription: body.user_description
   });
 

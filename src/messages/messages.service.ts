@@ -156,7 +156,7 @@ export async function createMessageEntity({
     thread: ref(thread),
     role,
     content,
-    metadata,
+    metadata: metadata ?? undefined,
     attachments: _attachments,
     order
   });

@@ -211,7 +211,7 @@ export async function createRun({
     tools: toolsParam?.map(createToolUsage) ?? assistant.tools,
     instructions: instructions ?? assistant.instructions,
     additionalInstructions: additionalInstructions ?? undefined,
-    metadata,
+    metadata: metadata ?? undefined,
     model: model ?? assistant.model,
     topP: top_p ?? assistant.topP,
     temperature: temperature ?? assistant.temperature,

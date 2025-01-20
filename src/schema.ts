@@ -25,7 +25,8 @@ export const metadataSchema = {
   patternProperties: {
     '.*': { type: 'string', maxLength: 512 }
   },
-  additionalProperties: true
+  additionalProperties: true,
+  nullable: true
 } as const satisfies JSONSchema;
 
 export const createPaginationQuerySchema = <T extends readonly string[]>(
