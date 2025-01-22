@@ -54,7 +54,8 @@ export const toolUpdateBodySchema = {
           type: 'string'
         },
         api_key: {
-          type: 'string'
+          type: 'string',
+          nullable: true
         },
         metadata: metadataSchema,
         user_description: { type: 'string' }

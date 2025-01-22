@@ -848,7 +848,7 @@ export async function updateTool({
         code: APIErrorCode.INVALID_INPUT
       });
     }
-    tool.apiKey = getUpdatedValue(body.api_key, tool.apiKey);
+    tool.apiKey = getUpdatedValue(body.api_key && encrypt(body.api_key), tool.apiKey);
   }
 
   if ('parameters' in body) {
