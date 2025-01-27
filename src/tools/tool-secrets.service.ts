@@ -16,10 +16,9 @@
 
 import { Loaded, ref } from '@mikro-orm/core';
 
-import { AnyTool, Tool } from './entities/tool/tool.entity.js';
+import { Tool } from './entities/tool/tool.entity.js';
 import { ToolSecret } from './entities/tool-secret.entity.js';
 import { ToolSecret as ToolSecretDto } from './dtos/tool-secret.js';
-import { toDto as toToolDto } from './tools.service.js';
 import { ToolSecretsListQuery, ToolSecretsListResponse } from './dtos/tool-secrets-list.js';
 import { ToolSecretCreateBody, ToolSecretCreateResponse } from './dtos/tool-secret-create.js';
 import {
@@ -34,14 +33,17 @@ import { createDeleteResponse } from '@/utils/delete.js';
 import { ORM } from '@/database.js';
 import { createPaginatedResponse, getListCursor } from '@/utils/pagination.js';
 import { getUpdatedValue } from '@/utils/update.js';
+import { redactKey } from '@/administration/helpers.js';
+import encrypt from '@/utils/crypto/encrypt.js';
+import decrypt from '@/utils/crypto/decrypt.js';
 
-export function toDto(toolSecret: Loaded<ToolSecret, 'tool'>): ToolSecretDto {
+export function toToolSecretDto(toolSecret: Loaded<ToolSecret>): ToolSecretDto {
   return {
     id: toolSecret.id,
     object: 'tool-secret',
-    value: toolSecret.value,
+    value: redactKey(decrypt(toolSecret.value)),
     name: toolSecret.name,
-    tool: toToolDto(toolSecret.tool.$ as AnyTool)
+    tool_id: toolSecret.tool.id
   };
 }
 
@@ -52,12 +54,12 @@ export async function listToolSecrets({
   order,
   order_by
 }: ToolSecretsListQuery): Promise<ToolSecretsListResponse> {
-  const cursor = await getListCursor<Loaded<ToolSecret, 'tool'>>(
+  const cursor = await getListCursor<Loaded<ToolSecret>>(
     {},
-    { limit, order, order_by, after, before, populate: ['tool'] },
+    { limit, order, order_by, after, before },
     ORM.em.getRepository(ToolSecret)
   );
-  return createPaginatedResponse(cursor, toDto);
+  return createPaginatedResponse(cursor, toToolSecretDto);
 }
 
 export async function createToolSecret({
@@ -69,25 +71,23 @@ export async function createToolSecret({
 
   const toolSecret = new ToolSecret({
     name,
-    value,
+    value: encrypt(value),
     tool: ref(tool)
   });
 
   await ORM.em.persistAndFlush(toolSecret);
 
-  return toDto(toolSecret as Loaded<ToolSecret, 'tool'>);
+  return toToolSecretDto(toolSecret);
 }
 
 export async function updateToolSecret({
   tool_id,
   ...body
 }: ToolSecretUpdateBody & ToolSecretUpdateParams): Promise<ToolSecretUpdateResponse> {
-  const toolSecret = await ORM.em
-    .getRepository(ToolSecret)
-    .findOneOrFail({ id: tool_id }, { populate: ['tool'] });
+  const toolSecret = await ORM.em.getRepository(ToolSecret).findOneOrFail({ id: tool_id });
 
   toolSecret.name = getUpdatedValue(body.name, toolSecret.name);
-  toolSecret.value = getUpdatedValue(body.value, toolSecret.value);
+  toolSecret.value = getUpdatedValue(body.value ?? encrypt(body.value), toolSecret.value);
   if (tool_id) {
     const tool = await ORM.em.getRepository(Tool).findOneOrFail({ id: tool_id });
     toolSecret.tool = ref(tool);
@@ -95,16 +95,14 @@ export async function updateToolSecret({
 
   await ORM.em.flush();
 
-  return toDto(toolSecret);
+  return toToolSecretDto(toolSecret);
 }
 
 export async function readToolSecret({
   tool_secret_id
 }: ToolSecretReadParams): Promise<ToolSecretReadResponse> {
-  const toolSecret = await ORM.em
-    .getRepository(ToolSecret)
-    .findOneOrFail({ id: tool_secret_id }, { populate: ['tool'] });
-  return toDto(toolSecret);
+  const toolSecret = await ORM.em.getRepository(ToolSecret).findOneOrFail({ id: tool_secret_id });
+  return toToolSecretDto(toolSecret);
 }
 
 export async function deleteToolSecret({

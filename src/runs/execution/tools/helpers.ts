@@ -15,11 +15,14 @@
  */
 
 import {
+  AnyTool,
+  BaseToolRunOptions,
   AnyTool as FrameworkTool,
   StringToolOutput,
   ToolError,
   ToolOutput
 } from 'bee-agent-framework/tools/base';
+import { setProp } from 'bee-agent-framework/internals/helpers/object';
 import { PythonTool } from 'bee-agent-framework/tools/python/python';
 import { PythonToolOutput } from 'bee-agent-framework/tools/python/output';
 import { Loaded, ref } from '@mikro-orm/core';
@@ -87,6 +90,7 @@ import { createApproveChannel, createToolInputChannel, toRunDto } from '@/runs/r
 import { RequiredToolInput } from '@/runs/entities/requiredToolInput.entity.js';
 import { ToolApprovalType } from '@/runs/entities/toolApproval.entity.js';
 import { RequiredToolApprove } from '@/runs/entities/requiredToolApprove.entity.js';
+import decrypt from '@/utils/crypto/decrypt.js';
 
 const searchCache: SearchToolOptions['cache'] = new RedisCache({
   client: sharedRedisCacheClient,
@@ -512,7 +516,10 @@ export async function requireToolApproval(ctx: AgentContext) {
   }
 }
 
-export async function requireToolInput(ctx: AgentContext) {
+export async function requireToolInput(
+  ctx: AgentContext,
+  { tool: frameworkTool, options }: { tool: AnyTool; options: BaseToolRunOptions }
+) {
   const { toolCall } = ctx;
   if (toolCall) {
     if (toolCall.type === 'user') {
@@ -521,10 +528,13 @@ export async function requireToolInput(ctx: AgentContext) {
       if (tool instanceof CodeInterpreterTool) {
         const toolSecrets = await ORM.em.getRepository(ToolSecret).find({ tool: toolCall.tool.id });
         const fulfilledSecrets: { [key: string]: string } = (tool.secrets ?? []).reduce(
-          (acc, secretName) => ({
-            ...acc,
-            [secretName]: toolSecrets.find((ts) => ts.name === secretName)?.value
-          }),
+          (acc, secretName) => {
+            const secret = toolSecrets.find((ts) => ts.name === secretName);
+            return {
+              ...acc,
+              [secretName]: secret ? decrypt(secret.value) : undefined
+            };
+          },
           {}
         );
         const missingSecrets = Object.entries(fulfilledSecrets)
@@ -568,7 +578,19 @@ export async function requireToolInput(ctx: AgentContext) {
                     newSecrest.forEach((secret: { name: string; value: string }) => {
                       fulfilledSecrets[secret.name] = secret.value;
                     });
-                    // TODO pass secrets to the tool
+
+                    if (frameworkTool instanceof CustomTool) {
+                      Object.entries(fulfilledSecrets).forEach(([key, value]) =>
+                        setProp(options, ['env', key], value)
+                      );
+                    } else {
+                      reject(
+                        new ToolError('Invalid tool type', [], {
+                          isFatal: true,
+                          isRetryable: false
+                        })
+                      );
+                    }
                     resolve(true);
                   } catch (err) {
                     reject(err);

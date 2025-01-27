@@ -40,10 +40,10 @@ importers:
         version: 6.2.9
       '@mikro-orm/migrations-mongodb':
         specifier: 6.2.9
-        version: 6.2.9(@mikro-orm/core@6.2.9)(@types/node@20.16.14)(gcp-metadata@6.1.0(encoding@0.1.13))(socks@2.8.3)
+        version: 6.2.9(@mikro-orm/core@6.2.9)(@types/node@20.16.14)(socks@2.8.3)
       '@mikro-orm/mongodb':
         specifier: 6.2.9
-        version: 6.2.9(@mikro-orm/core@6.2.9)(gcp-metadata@6.1.0(encoding@0.1.13))(socks@2.8.3)
+        version: 6.2.9(@mikro-orm/core@6.2.9)(socks@2.8.3)
       '@mikro-orm/reflection':
         specifier: 6.2.9
         version: 6.2.9(@mikro-orm/core@6.2.9)
@@ -75,8 +75,8 @@ importers:
         specifier: ^1.7.7
         version: 1.7.7
       bee-agent-framework:
-        specifier: 0.0.57
-        version: 0.0.57(@googleapis/customsearch@3.2.0(encoding@0.1.13))(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@zilliz/milvus2-sdk-node@2.5.3)(encoding@0.1.13)(google-auth-library@9.15.0(encoding@0.1.13))(ollama@0.5.12)(openai-chat-tokens@0.2.8)(openai@4.67.3(encoding@0.1.13)(zod@3.23.8))(yaml@2.7.0)
+        specifier: 0.0.58
+        version: 0.0.58(@googleapis/customsearch@3.2.0(encoding@0.1.13))(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@zilliz/milvus2-sdk-node@2.5.3)(encoding@0.1.13)(google-auth-library@9.15.0(encoding@0.1.13))(ollama@0.5.12)(openai-chat-tokens@0.2.8)(openai@4.67.3(encoding@0.1.13)(zod@3.23.8))(yaml@2.7.0)
       bullmq:
         specifier: ^5.34.6
         version: 5.34.6
@@ -2109,8 +2109,8 @@ packages:
     resolution: {integrity: sha512-4Bcg1P8xhUuqcii/S0Z9wiHIrQVPMermM1any+MX5GeGD7faD3/msQUDGLol9wOcz4/jbg/WJnGqoJF6LiBdtg==}
     engines: {node: '>=10.0.0'}
 
-  bee-agent-framework@0.0.57:
-    resolution: {integrity: sha512-Ne4ZIb/h2R2kWTXAW+FEe+xQrZQQHhooFoahE2gzxFXgJZP5v4XuuMEKFc2Epa534Mh6TCvazntmFT23qgmTiQ==}
+  bee-agent-framework@0.0.58:
+    resolution: {integrity: sha512-fOds1DmOFF09cePot6Tc1bcXnLOZhOCCQFolUseUvthclv+pNsLtrv7eZTI/rWAuQVq/X8P+QEo+3Cf0zFWKFg==}
     peerDependencies:
       '@aws-sdk/client-bedrock-runtime': ^3.687.0
       '@elastic/elasticsearch': ^8.0.0
@@ -6162,12 +6162,12 @@ snapshots:
       - supports-color
       - tedious
 
-  '@mikro-orm/migrations-mongodb@6.2.9(@mikro-orm/core@6.2.9)(@types/node@20.16.14)(gcp-metadata@6.1.0(encoding@0.1.13))(socks@2.8.3)':
+  '@mikro-orm/migrations-mongodb@6.2.9(@mikro-orm/core@6.2.9)(@types/node@20.16.14)(socks@2.8.3)':
     dependencies:
       '@mikro-orm/core': 6.2.9
-      '@mikro-orm/mongodb': 6.2.9(@mikro-orm/core@6.2.9)(gcp-metadata@6.1.0(encoding@0.1.13))(socks@2.8.3)
+      '@mikro-orm/mongodb': 6.2.9(@mikro-orm/core@6.2.9)(socks@2.8.3)
       fs-extra: 11.2.0
-      mongodb: 6.7.0(gcp-metadata@6.1.0(encoding@0.1.13))(socks@2.8.3)
+      mongodb: 6.7.0(socks@2.8.3)
       umzug: 3.8.0(@types/node@20.16.14)
     transitivePeerDependencies:
       - '@aws-sdk/credential-providers'
@@ -6179,11 +6179,11 @@ snapshots:
       - snappy
       - socks
 
-  '@mikro-orm/mongodb@6.2.9(@mikro-orm/core@6.2.9)(gcp-metadata@6.1.0(encoding@0.1.13))(socks@2.8.3)':
+  '@mikro-orm/mongodb@6.2.9(@mikro-orm/core@6.2.9)(socks@2.8.3)':
     dependencies:
       '@mikro-orm/core': 6.2.9
       bson: 6.8.0
-      mongodb: 6.7.0(gcp-metadata@6.1.0(encoding@0.1.13))(socks@2.8.3)
+      mongodb: 6.7.0(socks@2.8.3)
     transitivePeerDependencies:
       - '@aws-sdk/credential-providers'
       - '@mongodb-js/zstd'
@@ -7838,7 +7838,7 @@ snapshots:
 
   basic-ftp@5.0.5: {}
 
-  bee-agent-framework@0.0.57(@googleapis/customsearch@3.2.0(encoding@0.1.13))(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@zilliz/milvus2-sdk-node@2.5.3)(encoding@0.1.13)(google-auth-library@9.15.0(encoding@0.1.13))(ollama@0.5.12)(openai-chat-tokens@0.2.8)(openai@4.67.3(encoding@0.1.13)(zod@3.23.8))(yaml@2.7.0):
+  bee-agent-framework@0.0.58(@googleapis/customsearch@3.2.0(encoding@0.1.13))(@grpc/grpc-js@1.12.2)(@grpc/proto-loader@0.7.13)(@zilliz/milvus2-sdk-node@2.5.3)(encoding@0.1.13)(google-auth-library@9.15.0(encoding@0.1.13))(ollama@0.5.12)(openai-chat-tokens@0.2.8)(openai@4.67.3(encoding@0.1.13)(zod@3.23.8))(yaml@2.7.0):
     dependencies:
       '@ai-zen/node-fetch-event-source': 2.1.4(encoding@0.1.13)
       '@opentelemetry/api': 1.9.0
@@ -8652,7 +8652,7 @@ snapshots:
       debug: 4.3.6
       enhanced-resolve: 5.17.1
       eslint: 8.57.0
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.5.4))(eslint-plugin-import@2.29.1)(eslint@8.57.0))(eslint@8.57.0)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
       fast-glob: 3.3.2
       get-tsconfig: 4.7.6
@@ -8664,7 +8664,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.8.1(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.5.4))(eslint-plugin-import@2.29.1)(eslint@8.57.0))(eslint@8.57.0):
+  eslint-module-utils@2.8.1(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -8685,7 +8685,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.5.4))(eslint-plugin-import@2.29.1)(eslint@8.57.0))(eslint@8.57.0)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
       hasown: 2.0.2
       is-core-module: 2.15.0
       is-glob: 4.0.3
@@ -10006,13 +10006,12 @@ snapshots:
       '@types/whatwg-url': 11.0.5
       whatwg-url: 13.0.0
 
-  mongodb@6.7.0(gcp-metadata@6.1.0(encoding@0.1.13))(socks@2.8.3):
+  mongodb@6.7.0(socks@2.8.3):
     dependencies:
       '@mongodb-js/saslprep': 1.1.8
       bson: 6.8.0
       mongodb-connection-string-url: 3.0.1
     optionalDependencies:
-      gcp-metadata: 6.1.0(encoding@0.1.13)
       socks: 2.8.3
 
   ms@2.1.2: {}

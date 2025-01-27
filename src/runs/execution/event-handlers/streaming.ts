@@ -104,7 +104,7 @@ export function createBeeStreamingHandler(ctx: AgentContext) {
 
       await requireToolApproval(ctx);
 
-      await requireToolInput(ctx);
+      await requireToolInput(ctx, data);
 
       await ctx.publish({
         event: 'thread.run.step.in_progress',

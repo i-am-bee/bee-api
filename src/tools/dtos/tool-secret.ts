@@ -16,11 +16,9 @@
 
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 
-import { toolSchema } from './tool';
-
 export const toolSecretSchema = {
   type: 'object',
-  required: ['id', 'object', 'name', 'value', 'tool'],
+  required: ['id', 'object', 'name', 'value', 'tool_id'],
   properties: {
     id: {
       type: 'string'
@@ -32,7 +30,9 @@ export const toolSecretSchema = {
     value: {
       type: 'string'
     },
-    tool: toolSchema
+    tool_id: {
+      type: 'string'
+    }
   }
 } as const satisfies JSONSchema;
 export type ToolSecret = FromSchema<typeof toolSecretSchema>;

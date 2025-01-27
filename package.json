@@ -46,7 +46,7 @@
     "@zilliz/milvus2-sdk-node": "^2.4.9",
     "ajv": "^8.17.1",
     "axios": "^1.7.7",
-    "bee-agent-framework": "0.0.57",
+    "bee-agent-framework": "0.0.58",
     "bullmq": "^5.34.6",
     "bullmq-otel": "^1.0.1",
     "cache-manager": "^5.7.6",
