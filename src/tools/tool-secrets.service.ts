@@ -87,7 +87,7 @@ export async function updateToolSecret({
   const toolSecret = await ORM.em.getRepository(ToolSecret).findOneOrFail({ id: tool_id });
 
   toolSecret.name = getUpdatedValue(body.name, toolSecret.name);
-  toolSecret.value = getUpdatedValue(body.value ?? encrypt(body.value), toolSecret.value);
+  toolSecret.value = getUpdatedValue(body.value && encrypt(body.value), toolSecret.value);
   if (tool_id) {
     const tool = await ORM.em.getRepository(Tool).findOneOrFail({ id: tool_id });
     toolSecret.tool = ref(tool);
