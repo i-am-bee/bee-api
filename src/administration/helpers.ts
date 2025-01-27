@@ -45,3 +45,8 @@ export const redactProjectKeyValue = (key: string) =>
     key.substring(API_KEY_PREFIX.length + 2, key.length - 2),
     '*'.repeat(key.length - 12)
   );
+
+export const redactKey = (key: string) =>
+  key.length >= 10
+    ? key.replace(key.substring(2, key.length - 2), '*'.repeat(10))
+    : key[0] + '*'.repeat(13);

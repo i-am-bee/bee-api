@@ -27,7 +27,6 @@ export const AIBackend = {
   OLLAMA: 'ollama',
   IBM_VLLM: 'ibm-vllm',
   OPENAI: 'openai',
-  BAM: 'bam',
   WATSONX: 'watsonx'
 } as const;
 

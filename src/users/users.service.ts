@@ -68,7 +68,7 @@ export async function createUser({
     externalId,
     email,
     name,
-    metadata,
+    metadata: metadata ?? undefined,
     defaultOrganization: ORM.em
       .getRepository(Organization)
       .getReference('placeholder', { wrapped: true }),

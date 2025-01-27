@@ -199,7 +199,6 @@ export async function getTools(run: LoadedRun, context: AgentContext): Promise<F
         tools.push(
           new PythonTool({
             codeInterpreter,
-            executorId,
             storage: createPythonStorage(files, run),
             preprocess: codeLLM
               ? {

@@ -76,7 +76,7 @@ export async function subscribeAndForward(
         });
         client.on('message', (_, message) => {
           const event = JSON.parse(message) as Event;
-          sse.send(res, event);
+          sse.send(res, { event: event.event, data: event.data });
           if (event.event === 'done' || event.event === 'error') {
             resolve();
           }

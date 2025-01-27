@@ -113,7 +113,7 @@ export class ApiCallTool extends Tool<StringToolOutput, ApiCallToolOptions> {
     this.apiKey = apiKey;
     this.description = description ?? 'Use input schema to infer description';
     this.openApiSchema = parse(openApiSchema);
-    if (!this.openApiSchema?.paths) {
+    if (!this.openApiSchema?.servers) {
       throw new APIError({
         message: `Server is not specified`,
         code: APIErrorCode.INVALID_INPUT

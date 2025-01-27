@@ -52,6 +52,7 @@ import { apiKeysModule } from './administration/api-keys.module.js';
 import { toolSecretsModule } from './tools/tool-secrets.module.js';
 import { artifactsModule } from './artifacts/artifacts.module.js';
 import { chatModule } from './chat/chat.module.js';
+import { embeddingsModule } from './embeddings/embeddings.module.js';
 
 const app = fastify({
   logger: fastifyLogger,
@@ -99,6 +100,7 @@ try {
   app.register(organizationUsersModule, { prefix: '/v1' });
   app.register(artifactsModule, { prefix: '/v1' });
   app.register(chatModule, { prefix: '/v1' });
+  app.register(embeddingsModule, { prefix: '/v1' });
 
   app.register(uiModule, { prefix: '/v1' });
 
