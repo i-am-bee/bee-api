@@ -42,7 +42,6 @@ export const toolUpdateBodySchema = {
     },
     {
       additionalProperties: false,
-      required: ['open_api_schema'],
       properties: {
         name: {
           type: 'string'
