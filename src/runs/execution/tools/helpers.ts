@@ -526,7 +526,9 @@ export async function requireToolInput(
       const tool = await ORM.em.getRepository(Tool).findOneOrFail(toolCall.tool.id);
 
       if (tool instanceof CodeInterpreterTool) {
-        const toolSecrets = await ORM.em.getRepository(ToolSecret).find({ tool: toolCall.tool.id });
+        const toolSecrets = await ORM.em
+          .getRepository(ToolSecret)
+          .find({ tool: toolCall.tool.id, createdBy: ctx.run.createdBy, project: ctx.run.project });
         const fulfilledSecrets: { [key: string]: string } = (tool.secrets ?? []).reduce(
           (acc, secretName) => {
             const secret = toolSecrets.find((ts) => ts.name === secretName);
