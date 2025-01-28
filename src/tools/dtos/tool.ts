@@ -63,6 +63,10 @@ export const toolSchema = {
       type: 'string',
       nullable: true
     },
+    api_key: {
+      type: 'string',
+      nullable: true
+    },
     created_at: {
       type: 'number'
     },

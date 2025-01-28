@@ -112,7 +112,7 @@ export async function createAssistant({
     instructions: instructions ?? undefined,
     name: name ?? undefined,
     description: description ?? undefined,
-    metadata,
+    metadata: metadata ?? undefined,
     topP: top_p ?? undefined,
     model: model ?? defaultAIProvider.createAssistantBackend().modelId,
     agent,

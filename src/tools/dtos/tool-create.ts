@@ -37,6 +37,7 @@ export const toolCreateBodySchema = {
       additionalProperties: false,
       required: ['open_api_schema'],
       properties: {
+        name: { type: 'string' },
         open_api_schema: { type: 'string' },
         api_key: { type: 'string', writeOnly: true },
         metadata: metadataSchema,

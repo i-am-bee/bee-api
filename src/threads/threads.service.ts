@@ -57,7 +57,7 @@ export async function createThread({
 }: ThreadCreateBody): Promise<ThreadCreateResponse> {
   const thread = new Thread({
     toolResources: await createToolResources(tool_resources),
-    metadata
+    metadata: metadata ?? undefined
   });
   ORM.em.persist(thread);
   const threadMessages = await Promise.all(

@@ -93,7 +93,7 @@ export async function createArtifact(body: ArtifactCreateBody): Promise<Artifact
         thread: message && ref(message.thread),
         message: message && ref(message),
         sourceCode: body.source_code,
-        metadata: body.metadata,
+        metadata: body.metadata ?? undefined,
         accessToken: body.shared === true ? getToken() : undefined,
         name: body.name,
         description: body.description

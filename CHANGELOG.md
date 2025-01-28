@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.0.22](https://github.com/i-am-bee/bee-api/compare/v0.0.21...v0.0.22) (2025-01-15)
+
+### Features
+
+* **instrumentation:** add shutdown hook ([#142](https://github.com/i-am-bee/bee-api/issues/142)) ([6b9c710](https://github.com/i-am-bee/bee-api/commit/6b9c71007c14e2d19e69e6a609536f3abe05d618))
+
+### Bug Fixes
+
+* **bullmq:** update bullmq to fix error reporting ([#147](https://github.com/i-am-bee/bee-api/issues/147)) ([c1e3c6d](https://github.com/i-am-bee/bee-api/commit/c1e3c6dc86cab913c3a246c4cfafbe2456030355))
+* **Observe:** remove observe not found error logs ([#149](https://github.com/i-am-bee/bee-api/issues/149)) ([f50e20d](https://github.com/i-am-bee/bee-api/commit/f50e20d480c199dc9894ba0841dd4a3fb0d23967))
+* **tools:** check file existence for system tools ([#145](https://github.com/i-am-bee/bee-api/issues/145)) ([9e6a2e0](https://github.com/i-am-bee/bee-api/commit/9e6a2e07a11eb90bb84412bf9d01b283a14efa58))
+* **workers:** add installation command, update pyproject ([#146](https://github.com/i-am-bee/bee-api/issues/146)) ([2780d00](https://github.com/i-am-bee/bee-api/commit/2780d00fb8e0b17441e0f519c29bfe1b78505a73))
+
 ## [0.0.21](https://github.com/i-am-bee/bee-api/compare/v0.0.20...v0.0.21) (2024-12-19)
 
 ### Features
