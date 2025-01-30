@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.0.23](https://github.com/i-am-bee/bee-api/compare/v0.0.22...v0.0.23) (2025-01-29)
+
+### Features
+
+* chat streaming and embeddings support ([#156](https://github.com/i-am-bee/bee-api/issues/156)) ([2a8f729](https://github.com/i-am-bee/bee-api/commit/2a8f7297dd6ce959cbb77e1fc731d62b4257d060))
+* **tools:** update OpenAPI tools ([#157](https://github.com/i-am-bee/bee-api/issues/157)) ([1feb69e](https://github.com/i-am-bee/bee-api/commit/1feb69e42ab544b5008a1ff517cfc47a0f5c2e6a))
+
+### Bug Fixes
+
+* **metadata:** add nulability to schema for openai compatibility ([#158](https://github.com/i-am-bee/bee-api/issues/158)) ([e7b8eab](https://github.com/i-am-bee/bee-api/commit/e7b8eab2e1d7438bf30d8729724deea110995187))
+* **tool:** fix update api tool api key ([#161](https://github.com/i-am-bee/bee-api/issues/161)) ([9d93ba1](https://github.com/i-am-bee/bee-api/commit/9d93ba1bf5fcb1b3e6a4fc78ea63ca0bb86f45cc))
+* **tools:** encrypt updated api keys ([#160](https://github.com/i-am-bee/bee-api/issues/160)) ([1d561d6](https://github.com/i-am-bee/bee-api/commit/1d561d69477f03ba378b936ea29fcdda74e252f6))
+
 ## [0.0.22](https://github.com/i-am-bee/bee-api/compare/v0.0.21...v0.0.22) (2025-01-15)
 
 ### Features

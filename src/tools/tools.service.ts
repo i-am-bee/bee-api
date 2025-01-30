@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Loaded, ref } from '@mikro-orm/core';
+import { Loaded, ref, UniqueConstraintViolationException } from '@mikro-orm/core';
 import { CustomTool, CustomToolCreateError } from 'bee-agent-framework/tools/custom';
 import dayjs from 'dayjs';
 import mime from 'mime/lite';
@@ -715,31 +715,35 @@ async function createCodeInterpreterTool(
   }
 }
 
-async function createOpenApiTool(
-  body: Extract<ToolCreateBody, { open_api_schema: string }>
-): Promise<ToolCreateResponse> {
-  const schema = parse(body.open_api_schema);
-
-  if (!schema.info.title && !body.name) {
+function validateOpenApiSchema(schema: any, name?: string) {
+  if (!schema.info.title && !name) {
     throw new APIError({
-      message: 'Body name or OpenAPI info.name is requred.',
+      message: 'Body name or OpenAPI info.name is required.',
       code: APIErrorCode.INVALID_INPUT
     });
   }
 
   if (!schema.info.description) {
     throw new APIError({
-      message: 'OpenAPI info.description is requred.',
+      message: 'OpenAPI info.description is required.',
       code: APIErrorCode.INVALID_INPUT
     });
   }
 
   if (!schema.servers || schema.servers.length === 0 || !schema.servers[0].url) {
     throw new APIError({
-      message: 'OpenAPI servers is requred.',
+      message: 'OpenAPI servers is required.',
       code: APIErrorCode.INVALID_INPUT
     });
   }
+}
+
+async function createOpenApiTool(
+  body: Extract<ToolCreateBody, { open_api_schema: string }>
+): Promise<ToolCreateResponse> {
+  const schema = parse(body.open_api_schema);
+
+  validateOpenApiSchema(schema, body.name);
 
   const tool = new ApiTool({
     openApiSchema: body.open_api_schema,
@@ -750,7 +754,17 @@ async function createOpenApiTool(
     userDescription: body.user_description
   });
 
-  await ORM.em.persistAndFlush(tool);
+  try {
+    await ORM.em.persistAndFlush(tool);
+  } catch (e) {
+    if (e instanceof UniqueConstraintViolationException)
+      throw new APIError({
+        message: 'Tool name must be unique. Change the title in the openapi schema.',
+        code: APIErrorCode.INVALID_INPUT
+      });
+
+    throw e;
+  }
 
   return toDto(tool);
 }
@@ -831,18 +845,19 @@ export async function updateTool({
     }
   }
 
-  if ('open_api_schema' in body) {
+  if ('open_api_schema' in body && body.open_api_schema) {
     if (!('openApiSchema' in tool)) {
       throw new APIError({
         message: 'Can not change tool executor',
         code: APIErrorCode.INVALID_INPUT
       });
     }
+    validateOpenApiSchema(parse(body.open_api_schema), tool.name);
     tool.openApiSchema = getUpdatedValue(body.open_api_schema, tool.openApiSchema);
   }
 
   if ('api_key' in body) {
-    if (!('apiKey' in tool)) {
+    if (!('openApiSchema' in tool)) {
       throw new APIError({
         message: 'Can not change tool executor',
         code: APIErrorCode.INVALID_INPUT
