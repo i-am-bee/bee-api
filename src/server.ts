@@ -49,6 +49,7 @@ import { projectsModule } from './administration/projects.module.js';
 import { projectUsersModule } from './administration/project-users.module.js';
 import { organizationUsersModule } from './administration/organization-users.module.js';
 import { apiKeysModule } from './administration/api-keys.module.js';
+import { toolSecretsModule } from './tools/tool-secrets.module.js';
 import { artifactsModule } from './artifacts/artifacts.module.js';
 import { chatModule } from './chat/chat.module.js';
 import { embeddingsModule } from './embeddings/embeddings.module.js';
@@ -88,6 +89,7 @@ try {
   app.register(messagesModule, { prefix: '/v1' });
   app.register(runsModule, { prefix: '/v1' });
   app.register(toolsModule, { prefix: '/v1' });
+  app.register(toolSecretsModule, { prefix: '/v1' });
   app.register(runStepsModule, { prefix: '/v1' });
   app.register(filesModule, { prefix: '/v1' });
   app.register(vectorStoresModule, { prefix: '/v1' });

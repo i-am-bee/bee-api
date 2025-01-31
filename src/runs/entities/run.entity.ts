@@ -22,6 +22,7 @@ import { RUN_EXPIRATION_MILLISECONDS } from '../execution/constants.js';
 import { RequiredToolApprove } from './requiredToolApprove.entity.js';
 import { RequiredToolOutput } from './requiredToolOutput.entity.js';
 import { ToolApproval } from './toolApproval.entity.js';
+import { RequiredToolInput } from './requiredToolInput.entity.js';
 
 import { Assistant } from '@/assistants/assistant.entity.js';
 import { Thread } from '@/threads/thread.entity.js';
@@ -75,7 +76,7 @@ export class Run extends PrincipalScopedEntity {
 
   // Union must be defined in alphabetical order, otherwise Mikro-ORM won't discovered the auto-created virtual polymorphic entity
   @Embedded({ object: true })
-  requiredAction?: RequiredToolApprove | RequiredToolOutput;
+  requiredAction?: RequiredToolApprove | RequiredToolInput | RequiredToolOutput;
 
   @Embedded({ object: true })
   toolApprovals?: ToolApproval[];

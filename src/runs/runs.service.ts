@@ -16,6 +16,7 @@
 
 import { FilterQuery, Loaded, QueryOrder, ref } from '@mikro-orm/core';
 import { Redis } from 'ioredis';
+import { intersection } from 'remeda';
 
 import { RunCreateBody, RunCreateParams, RunCreateResponse } from './dtos/run-create.js';
 import { Run, RunStatus } from './entities/run.entity.js';
@@ -42,6 +43,12 @@ import { RequiredToolOutput } from './entities/requiredToolOutput.entity.js';
 import { RequiredToolApprove } from './entities/requiredToolApprove.entity.js';
 import { ToolApproval, ToolApprovalType } from './entities/toolApproval.entity.js';
 import { RequiredActionType } from './entities/requiredAction.entity.js';
+import { RequiredToolInput } from './entities/requiredToolInput.entity.js';
+import {
+  RunSubmitToolInputsBody,
+  RunSubmitToolInputsParams,
+  RunSubmitToolInputsResponse
+} from './dtos/run-submit-tool-inputs.js';
 
 import { ORM } from '@/database.js';
 import { Thread } from '@/threads/thread.entity.js';
@@ -70,6 +77,7 @@ import { getProjectPrincipal } from '@/administration/helpers.js';
 import { RUNS_QUOTA_DAILY } from '@/config.js';
 import { dayjs, getLatestDailyFixedTime } from '@/utils/datetime.js';
 import { updateRateLimitHeadersWithDailyQuota } from '@/utils/rate-limit.js';
+import { UserCall } from '@/tools/entities/tool-calls/user-call.entity.js';
 
 export async function assertRunsQuota(newRuns = 1) {
   const count = await ORM.em.getRepository(Run).count({
@@ -108,7 +116,15 @@ export function toRunDto(run: Loaded<Run>): RunDto {
               type: 'submit_tool_approvals',
               submit_tool_approvals: { tool_calls: run.requiredAction.toolCalls.map(toToolCallDto) }
             }
-          : null,
+          : run.requiredAction instanceof RequiredToolInput
+            ? {
+                type: 'submit_tool_inputs',
+                submit_tool_inputs: {
+                  tool_calls: run.requiredAction.toolCalls.map(toToolCallDto),
+                  input_fields: run.requiredAction.inputFields
+                }
+              }
+            : null,
     tools: run.tools.map(toToolUsageDto) ?? [],
     instructions: run.instructions ?? null,
     additional_instructions: run.additionalInstructions ?? null,
@@ -485,6 +501,67 @@ export async function submitToolApproval({
     await Promise.all(
       suppliedToolCalls.map(({ toolCall, approve }) => {
         client.publish(createApproveChannel(run, toolCall), approve.toString());
+      })
+    );
+  };
+
+  return continueRun({ stream, run, submit });
+}
+
+export function createToolInputChannel(run: Run, toolCall: ToolCall) {
+  return `run:${run.id}:call:${toolCall.id}:input`;
+}
+
+export async function submitToolInputs({
+  thread_id,
+  run_id,
+  tool_inputs,
+  stream
+}: RunSubmitToolInputsParams &
+  RunSubmitToolInputsBody): Promise<RunSubmitToolInputsResponse | void> {
+  const run = await ORM.em.getRepository(Run).findOneOrFail({ id: run_id, thread: thread_id });
+
+  if (
+    run.status !== RunStatus.REQUIRES_ACTION ||
+    !run.requiredAction ||
+    run.requiredAction?.type !== RequiredActionType.INPUT
+  )
+    throw new APIError({
+      message: 'No input is required for the run',
+      code: APIErrorCode.INVALID_INPUT
+    });
+
+  const suppliedToolCalls = tool_inputs.map(({ tool_call_id, inputs }) => {
+    const toolCall = run.requiredAction?.toolCalls.find(({ id }) => id === tool_call_id);
+    if (!toolCall || !(toolCall instanceof UserCall))
+      throw new APIError({
+        message: `Unexpected tool call ${tool_call_id}`,
+        code: APIErrorCode.INVALID_INPUT
+      });
+
+    if (
+      intersection(
+        inputs.map((i) => i.name),
+        (run.requiredAction as RequiredToolInput).inputFields
+      ).length !== inputs.length
+    ) {
+      throw new APIError({
+        message: `Missing required tool input. Provide all input fields: ${(run.requiredAction as RequiredToolInput).inputFields}`,
+        code: APIErrorCode.INVALID_INPUT
+      });
+    }
+    return { toolCall, inputs };
+  });
+  if (suppliedToolCalls.length < run.requiredAction.toolCalls.length)
+    throw new APIError({
+      message: 'Missing tool calls',
+      code: APIErrorCode.INVALID_INPUT
+    });
+
+  const submit = async (client: Redis) => {
+    await Promise.all(
+      suppliedToolCalls.map(({ toolCall, inputs }) => {
+        client.publish(createToolInputChannel(run, toolCall), JSON.stringify(inputs));
       })
     );
   };

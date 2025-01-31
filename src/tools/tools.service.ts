@@ -691,6 +691,7 @@ async function createCodeInterpreterTool(
       sourceCode: body.source_code,
       jsonSchema: customTool.inputSchema(),
       description: customTool.description,
+      secrets: body.secrets,
       metadata: body.metadata ?? undefined,
       userDescription: body.user_description
     });
@@ -833,6 +834,7 @@ export async function updateTool({
         );
         tool.jsonSchema = newCustomTool.inputSchema();
         tool.description = newCustomTool.description;
+        tool.secrets = getUpdatedValue(body.secrets, tool.secrets);
       } catch (err) {
         if (err instanceof CustomToolCreateError) {
           throw new APIError({

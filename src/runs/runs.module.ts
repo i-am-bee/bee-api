@@ -33,6 +33,7 @@ import {
   readRun,
   readRunTrace,
   submitToolApproval,
+  submitToolInputs,
   submitToolOutput,
   updateRun
 } from './runs.service.js';
@@ -79,6 +80,14 @@ import {
   runSubmitToolApprovalsResponseSchema,
   runSubmitToolApprovalsStreamSchema
 } from './dtos/run-submit-tool-approvals.js';
+import {
+  runSubmitToolInputsBodySchema,
+  RunSubmitToolInputsParams,
+  runSubmitToolInputsParamsSchema,
+  RunSubmitToolInputsBody,
+  runSubmitToolInputsResponseSchema,
+  runSubmitToolInputsStreamSchema
+} from './dtos/run-submit-tool-inputs.js';
 
 import { Tag } from '@/swagger.js';
 
@@ -251,7 +260,7 @@ export const runsModule: FastifyPluginAsyncJsonSchemaToTs = async (app) => {
             }
           }
         },
-        tags: [Tag.OPENAI_ASSISTANTS_API]
+        tags: [Tag.BEE_API]
       },
       preHandler: app.auth(),
       config: {
@@ -261,5 +270,31 @@ export const runsModule: FastifyPluginAsyncJsonSchemaToTs = async (app) => {
       }
     },
     async (req) => submitToolApproval({ ...req.params, ...req.body })
+  );
+
+  app.post<{ Params: RunSubmitToolInputsParams; Body: RunSubmitToolInputsBody }>(
+    '/threads/:thread_id/runs/:run_id/submit_tool_inputs',
+    {
+      schema: {
+        params: runSubmitToolInputsParamsSchema,
+        body: runSubmitToolInputsBodySchema,
+        response: {
+          [StatusCodes.OK]: {
+            content: {
+              'application/json': { schema: runSubmitToolInputsResponseSchema },
+              'text/event-stream': { schema: runSubmitToolInputsStreamSchema }
+            }
+          }
+        },
+        tags: [Tag.BEE_API]
+      },
+      preHandler: app.auth(),
+      config: {
+        rateLimit: {
+          max: 26 // global rate limit +1 for the UI
+        }
+      }
+    },
+    async (req) => submitToolInputs({ ...req.params, ...req.body })
   );
 };

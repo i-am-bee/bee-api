@@ -20,7 +20,6 @@ import { ref } from '@mikro-orm/core';
 import { Role } from 'bee-agent-framework/llms/primitives/message';
 import { BeeCallbacks } from 'bee-agent-framework/agents/bee/types';
 import { Summary } from 'prom-client';
-import { ToolError } from 'bee-agent-framework/tools/base';
 import {
   StreamlitEvents as StreamlitEventsFramework,
   StreamlitRunOutput
@@ -30,7 +29,12 @@ import { Agent } from '../constants';
 
 import { AgentContext } from '@/runs/execution/execute.js';
 import { getLogger } from '@/logger.js';
-import { createToolCall, finalizeToolCall } from '@/runs/execution/tools/helpers.js';
+import {
+  createToolCall,
+  finalizeToolCall,
+  requireToolApproval,
+  requireToolInput
+} from '@/runs/execution/tools/helpers.js';
 import { RunStep, RunStepStatus } from '@/run-steps/entities/run-step.entity.js';
 import { RunStepToolCalls } from '@/run-steps/entities/details/run-step-tool-calls.entity.js';
 import { ORM } from '@/database.js';
@@ -43,11 +47,6 @@ import { RunStatus } from '@/runs/entities/run.entity.js';
 import { APIError } from '@/errors/error.entity.js';
 import { jobRegistry } from '@/metrics.js';
 import { EmitterEvent } from '@/run-steps/entities/emitter-event.entity';
-import { createApproveChannel, toRunDto } from '@/runs/runs.service';
-import { RequiredToolApprove } from '@/runs/entities/requiredToolApprove.entity';
-import { ToolApprovalType } from '@/runs/entities/toolApproval.entity';
-import { ToolType } from '@/tools/entities/tool/tool.entity';
-import { withRedisClient } from '@/redis.js';
 import { Trace } from '@/observe/entities/trace.entity';
 
 const agentToolExecutionTime = new Summary({
@@ -103,67 +102,9 @@ export function createBeeStreamingHandler(ctx: AgentContext) {
         data: toRunStepDto(ctx.runStep)
       });
 
-      const toolCall = ctx.toolCall;
-      if (toolCall) {
-        if (
-          ctx.run.toolApprovals?.find(
-            (approval) =>
-              approval.toolId ===
-              (toolCall.type === ToolType.USER
-                ? toolCall.tool.id
-                : toolCall.type === ToolType.SYSTEM
-                  ? toolCall.toolId
-                  : toolCall.type)
-          )?.requireApproval === ToolApprovalType.ALWAYS
-        ) {
-          await withRedisClient(
-            (client) =>
-              new Promise((resolve, reject) => {
-                client.subscribe(createApproveChannel(ctx.run, toolCall), async (err) => {
-                  try {
-                    if (err) {
-                      reject(err);
-                    } else {
-                      ctx.run.requireAction(
-                        new RequiredToolApprove({
-                          toolCalls: [...(ctx.run.requiredAction?.toolCalls ?? []), toolCall]
-                        })
-                      );
-                      await ORM.em.flush();
-                      await ctx.publish({
-                        event: 'thread.run.requires_action',
-                        data: toRunDto(ctx.run)
-                      });
-                      await ctx.publish({
-                        event: 'done',
-                        data: '[DONE]'
-                      });
-                    }
-                  } catch (err) {
-                    reject(err);
-                  }
-                });
-                client.on('message', async (_, approval) => {
-                  try {
-                    ctx.run.submitAction();
-                    await ORM.em.flush();
-                    if (approval !== 'true') {
-                      reject(
-                        new ToolError('User has not approved this tool to run.', [], {
-                          isFatal: false,
-                          isRetryable: false
-                        })
-                      );
-                    }
-                    resolve(true);
-                  } catch (err) {
-                    reject(err);
-                  }
-                });
-              })
-          );
-        }
-      }
+      await requireToolApproval(ctx);
+
+      await requireToolInput(ctx, data);
 
       await ctx.publish({
         event: 'thread.run.step.in_progress',
