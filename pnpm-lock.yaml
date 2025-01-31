@@ -101,9 +101,6 @@ importers:
       globby:
         specifier: ^14.0.2
         version: 14.0.2
-      http-proxy-agent:
-        specifier: ^7.0.2
-        version: 7.0.2
       http-status-codes:
         specifier: ^2.3.0
         version: 2.3.0
