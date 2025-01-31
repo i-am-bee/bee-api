@@ -36,6 +36,7 @@ import { PromptTemplate } from 'bee-agent-framework/template';
 import { CalculatorTool } from 'bee-agent-framework/tools/calculator';
 import { OpenAPITool, OpenAPIToolOutput } from 'bee-agent-framework/tools/openapi';
 import { LLMTool } from 'bee-agent-framework/tools/llm';
+import { ProxyAgent } from 'undici';
 
 import { AgentContext } from '../execute.js';
 import { getRunVectorStores } from '../helpers.js';
@@ -79,6 +80,7 @@ import { SystemResource } from '@/tools/entities/tool-resources/system-resource.
 import { createSearchTool } from '@/runs/execution/tools/search-tool';
 import { sharedRedisCacheClient } from '@/redis.js';
 import { defaultAIProvider } from '@/runs/execution/provider';
+import decrypt from '@/utils/crypto/decrypt.js';
 
 const searchCache: SearchToolOptions['cache'] = new RedisCache({
   client: sharedRedisCacheClient,
@@ -240,14 +242,26 @@ export async function getTools(run: LoadedRun, context: AgentContext): Promise<F
                 parameters: (<FunctionUserTool>toolUsage.tool.$).parameters,
                 context
               });
-            case ToolExecutor.API:
+            case ToolExecutor.API: {
+              const tool = <ApiCallUserTool>toolUsage.tool.$;
               return new OpenAPITool({
-                name: toolUsage.tool.$.name,
-                description: toolUsage.tool.$.description,
-                openApiSchema: (<ApiCallUserTool>toolUsage.tool.$).openApiSchema,
-                apiKey: (<ApiCallUserTool>toolUsage.tool.$).apiKey,
-                httpProxyUrl: HTTP_PROXY_URL ?? undefined
+                name: tool.name,
+                description: tool.description,
+                openApiSchema: tool.openApiSchema,
+                fetchOptions: {
+                  headers: {
+                    Accept: 'application/json',
+                    ...(tool.apiKey
+                      ? {
+                          Authorization: `Bearer ${decrypt(tool.apiKey)}`
+                        }
+                      : {})
+                  },
+                  signal: AbortSignal.timeout(30_000),
+                  ...(HTTP_PROXY_URL ? { dispatcher: new ProxyAgent({ uri: HTTP_PROXY_URL }) } : {})
+                }
               });
+            }
           }
         })
       );
