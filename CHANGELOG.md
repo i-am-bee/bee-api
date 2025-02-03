@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.0.24](https://github.com/i-am-bee/bee-api/compare/v0.0.23...v0.0.24) (2025-02-03)
+
+### Features
+
+* **projectSecrets:** add CRUDL for project secrets ([#40](https://github.com/i-am-bee/bee-api/issues/40)) ([ecd16bd](https://github.com/i-am-bee/bee-api/commit/ecd16bd1abeb01a9a79130d7a9ad5aed6ed8c245))
+
+### Bug Fixes
+
+* **upm:** use package-db from repo ([#162](https://github.com/i-am-bee/bee-api/issues/162)) ([6962b9f](https://github.com/i-am-bee/bee-api/commit/6962b9f7afe73d654a326776ec7a09bc59b74623))
+
 ## [0.0.23](https://github.com/i-am-bee/bee-api/compare/v0.0.22...v0.0.23) (2025-01-29)
 
 ### Features
