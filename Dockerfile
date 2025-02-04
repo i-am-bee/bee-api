@@ -16,7 +16,7 @@ ENV HUSKY=0
 
 # Install dependencies based on the preferred package manager
 COPY package.json pnpm-lock.yaml* .npmrc ./
-RUN corepack enable pnpm && pnpm i --frozen-lockfile
+RUN npm install -g corepack@latest && corepack enable pnpm && pnpm i --frozen-lockfile
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -26,7 +26,7 @@ ENV CI=1
 COPY --from=deps ${APP_DIR}/node_modules ./node_modules
 COPY . .
 
-RUN corepack enable pnpm && pnpm run build;
+RUN npm install -g corepack@latest && corepack enable pnpm && pnpm run build;
 
 # Production image, copy all the files and run next
 FROM base AS runner
