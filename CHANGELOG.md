@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.25](https://github.com/i-am-bee/bee-api/compare/v0.0.24...v0.0.25) (2025-02-04)
+
+### Features
+
+* **tools:** switch openAPI tool to framework version ([#153](https://github.com/i-am-bee/bee-api/issues/153)) ([30a93a7](https://github.com/i-am-bee/bee-api/commit/30a93a7af354b95a52d8a7ce3035f40feb17e643))
+
 ## [0.0.24](https://github.com/i-am-bee/bee-api/compare/v0.0.23...v0.0.24) (2025-02-03)
 
 ### Features
