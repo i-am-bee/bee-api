@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.0.26](https://github.com/i-am-bee/bee-api/compare/v0.0.25...v0.0.26) (2025-02-04)
+
 ## [0.0.25](https://github.com/i-am-bee/bee-api/compare/v0.0.24...v0.0.25) (2025-02-04)
 
 ### Features
