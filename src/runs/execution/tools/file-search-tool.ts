@@ -77,7 +77,12 @@ export class FileSearchTool extends Tool<FileSearchToolOutput, FileSearchToolOpt
   description: string;
   inputSchema() {
     return z.object({
-      query: z.string({ description: 'Question to answer using file search.' }).min(1).max(128)
+      query: z
+        .string({
+          description: 'The search query or text for which similar data should be retrieved.'
+        })
+        .min(1)
+        .max(128)
     });
   }
   vectorStores: Loaded<VectorStore>[];
@@ -129,8 +134,6 @@ export class FileSearchTool extends Tool<FileSearchToolOutput, FileSearchToolOpt
     this.name = `FileSearch`;
     this.maxNumResults = config.maxNumResults;
     this.vectorStores = config.vectorStores;
-    this.description =
-      `Worker that searches results from content of files. ` +
-      `Use to find out single fact about the content. Input must be a short specific query.`;
+    this.description = 'Search in a vector store containing data from attached files.';
   }
 }
