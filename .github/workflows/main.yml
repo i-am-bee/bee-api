@@ -48,7 +48,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Enable Corepack
-        run: corepack enable
+        run: |
+          npm install -g corepack@latest
+          corepack enable
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
