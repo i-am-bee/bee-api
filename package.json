@@ -24,7 +24,7 @@
     "release": "release-it"
   },
   "dependencies": {
-    "@fastify/multipart": "^8.3.0",
+    "@fastify/multipart": "^8.3.1",
     "@fastify/rate-limit": "^9.1.0",
     "@fastify/request-context": "^5.1.0",
     "@fastify/swagger": "^8.14.0",
@@ -108,7 +108,7 @@
     "vite-plugin-dts": "^3.9.1",
     "vite-plugin-externalize-deps": "^0.8.0",
     "vite-tsconfig-paths": "^4.3.2",
-    "vitest": "^1.6.0"
+    "vitest": "^1.6.1"
   },
   "lint-staged": {
     "*.{js,ts}": [
