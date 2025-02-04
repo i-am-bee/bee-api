@@ -111,7 +111,7 @@ export async function createUser({
     requestContext.set('organizationUser', orgUser);
   }
 
-  const project = new Project({ name: `${name}'s project`, visibility: 'private' });
+  const project = new Project({ name: `${name}'s project` });
   const projectPrincipal = new ProjectPrincipal({
     project: ref(project),
     createdBy: ORM.em
