@@ -19,12 +19,12 @@ import { requestContext } from '@fastify/request-context';
 import dayjs from 'dayjs';
 
 import { ProjectCreateBody, ProjectCreateResponse } from './dtos/project-create';
-import { Project, ProjectStatus, ProjectVisiblity } from './entities/project.entity';
+import { Project, ProjectStatus } from './entities/project.entity';
 import { Project as ProjectDto } from './dtos/project';
 import { ProjectsListQuery, ProjectsListResponse } from './dtos/projects-list';
 import { ProjectPrincipal } from './entities/project-principal.entity';
 import { UserPrincipal } from './entities/principals/user-principal.entity';
-import { OrganizationUserRole, ProjectRole } from './entities/constants';
+import { ProjectRole } from './entities/constants';
 import { getOrganizationUser } from './helpers';
 import { ProjectReadParams, ProjectReadResponse } from './dtos/project-read';
 import {
@@ -46,27 +46,16 @@ export function toDto(project: Loaded<Project>): ProjectDto {
     object: 'organization.project',
     id: project.id,
     name: project.name,
-    visibility: project.visibility,
     status: project.status,
     created_at: dayjs(project.createdAt).unix(),
     archived_at: project.archivedAt ? dayjs(project.archivedAt).unix() : null
   };
 }
 
-export async function createProject({
-  name,
-  visibility
-}: ProjectCreateBody): Promise<ProjectCreateResponse> {
+export async function createProject({ name }: ProjectCreateBody): Promise<ProjectCreateResponse> {
   const orgUser = getOrganizationUser();
 
-  if (orgUser.role === OrganizationUserRole.MEMBER && visibility === ProjectVisiblity.PUBLIC) {
-    throw new APIError({
-      message: 'Members can only create private projects',
-      code: APIErrorCode.INVALID_INPUT
-    });
-  }
-
-  const project = new Project({ name, visibility });
+  const project = new Project({ name });
   const projectPrincipal = new ProjectPrincipal({
     project: ref(project),
     createdBy: ORM.em
@@ -92,8 +81,7 @@ export async function readProject({ project_id }: ProjectReadParams): Promise<Pr
 
 export async function updateProject({
   project_id,
-  name,
-  visibility
+  name
 }: ProjectUpdateParams & ProjectUpdateBody): Promise<ProjectUpdateResponse> {
   const project = await ORM.em.getRepository(Project).findOneOrFail({ id: project_id });
 
@@ -104,7 +92,6 @@ export async function updateProject({
     });
 
   project.name = getUpdatedValue(name, project.name);
-  project.visibility = getUpdatedValue(visibility, project.visibility);
   await ORM.em.flush();
 
   return toDto(project);
@@ -127,14 +114,7 @@ export async function listProjects({
     ); // TODO missing pagination
 
   const filter: FilterQuery<Project> = {
-    $and: [
-      {
-        $or: [
-          { id: { $in: principals.map(({ project }) => project.id) } },
-          { visibility: ProjectVisiblity.PUBLIC }
-        ]
-      }
-    ]
+    id: { $in: principals.map(({ project }) => project.id) }
   };
 
   if (!include_archived) {
