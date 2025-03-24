@@ -16,16 +16,15 @@
 
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 
-import { ProjectStatus, ProjectVisiblity } from '../entities/project.entity';
+import { ProjectStatus } from '../entities/project.entity';
 
 export const projectSchema = {
   type: 'object',
-  required: ['object', 'id', 'name', 'visibility', 'status', 'created_at', 'archived_at'],
+  required: ['object', 'id', 'name', 'status', 'created_at', 'archived_at'],
   properties: {
     object: { const: 'organization.project' },
     id: { type: 'string' },
     name: { type: 'string' },
-    visibility: { type: 'string', enum: Object.values(ProjectVisiblity) },
     status: { type: 'string', enum: Object.values(ProjectStatus) },
     created_at: { type: 'number' },
     archived_at: { type: 'number', nullable: true }

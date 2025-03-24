@@ -32,12 +32,6 @@ export const ProjectStatus = {
 } as const;
 export type ProjectStatus = (typeof ProjectStatus)[keyof typeof ProjectStatus];
 
-export const ProjectVisiblity = {
-  PUBLIC: 'public',
-  PRIVATE: 'private'
-} as const;
-export type ProjectVisiblity = (typeof ProjectVisiblity)[keyof typeof ProjectVisiblity];
-
 @Entity()
 export class Project extends OrganizationAdministrationScopedEntity {
   getIdPrefix(): string {
@@ -53,20 +47,11 @@ export class Project extends OrganizationAdministrationScopedEntity {
   @Property()
   archivedAt?: Date;
 
-  @Enum(() => ProjectVisiblity)
-  visibility: ProjectVisiblity;
-
-  constructor({
-    name,
-    status = ProjectStatus.ACTIVE,
-    visibility = ProjectVisiblity.PUBLIC,
-    ...rest
-  }: ProjectInput) {
+  constructor({ name, status = ProjectStatus.ACTIVE, ...rest }: ProjectInput) {
     super(rest);
 
     this.name = name;
     this.status = status;
-    this.visibility = visibility;
   }
 
   override delete(): void {
@@ -94,4 +79,4 @@ export class Project extends OrganizationAdministrationScopedEntity {
 
 export type ProjectInput = OrganizationAdministrationScopedEntityInput &
   Pick<Project, 'name'> &
-  Pick<Partial<Project>, 'status' | 'visibility'>;
+  Pick<Partial<Project>, 'status'>;

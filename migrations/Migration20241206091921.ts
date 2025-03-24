@@ -19,7 +19,7 @@ import { Ref, ref } from '@mikro-orm/core';
 
 import { User } from '@/users/entities/user.entity';
 import { OrganizationUser } from '@/administration/entities/organization-user.entity';
-import { Project, ProjectVisiblity } from '@/administration/entities/project.entity';
+import { Project } from '@/administration/entities/project.entity';
 import { Organization } from '@/administration/entities/organization.entity';
 import { UserPrincipal } from '@/administration/entities/principals/user-principal.entity';
 import { ProjectPrincipal } from '@/administration/entities/project-principal.entity';
@@ -49,8 +49,7 @@ export class Migration20241206091921 extends Migration {
       const project = new Project({
         name: `${user.name}'s project`,
         organization: ref(Organization, user.defaultOrganization),
-        createdBy: ref(OrganizationUser, organizationUser._id),
-        visibility: ProjectVisiblity.PRIVATE
+        createdBy: ref(OrganizationUser, organizationUser._id)
       });
       await this.getCollection<BaseDocument>(Project).insertOne(
         {
@@ -60,7 +59,6 @@ export class Migration20241206091921 extends Migration {
           organization: project.organization.id,
           createdBy: project.createdBy.id,
           name: project.name,
-          visibility: project.visibility,
           status: project.status
         },
         { session: this.ctx }
